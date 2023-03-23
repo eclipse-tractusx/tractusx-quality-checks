@@ -19,18 +19,42 @@
 
 package txqualitychecks
 
-type QualityGuideline interface {
-	Name() string
-	Description() string
-	ExternalDescription() string
-	Test() *QualityResult
+import (
+	"errors"
+	"fmt"
+)
+
+type GuidelineTestRunner struct {
+	guidelines []QualityGuideline
+	printer    Printer
 }
 
-type QualityResult struct {
-	Passed           bool
-	ErrorDescription string
+func NewTestRunner(tests []QualityGuideline) *GuidelineTestRunner {
+	return &GuidelineTestRunner{guidelines: tests, printer: &stdoutPrinter{}}
 }
 
-type Printer interface {
-	Print(message string)
+func (runner *GuidelineTestRunner) Run() error {
+	allPassed := true
+	for _, guideline := range runner.guidelines {
+		runner.printer.Print(fmt.Sprintf("Testing Quality Guideline: %s", guideline.Name()))
+
+		result := guideline.Test()
+		if !result.Passed {
+			runner.printer.Print(fmt.Sprintf("Failed! Guideline description: %s; More infos: %s", guideline.Description(), guideline.ExternalDescription()))
+		}
+
+		allPassed = allPassed && result.Passed
+	}
+
+	if !allPassed {
+		return errors.New("not all tests have passed")
+	}
+	return nil
+}
+
+type stdoutPrinter struct {
+}
+
+func (p *stdoutPrinter) Print(message string) {
+	fmt.Println(message)
 }

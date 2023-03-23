@@ -17,20 +17,35 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package cmd
 
-type QualityGuideline interface {
-	Name() string
-	Description() string
-	ExternalDescription() string
-	Test() *QualityResult
+import (
+	"fmt"
+	txqualitychecks "github.com/eclipse-tractusx/tractusx-quality-checks/internal"
+	"github.com/spf13/cobra"
+	"os"
+)
+
+// checkLocalCmd represents the checkLocal command
+var checkLocalCmd = &cobra.Command{
+	Use:   "checkLocal",
+	Short: "Does run a quality check on local files",
+	Long: `Execute the checkLocal command in any directory you want to check for quality compliance with 
+eclipse-tractusx rules`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("Running local checks for eclipse-tractusx release guidelines")
+		err := txqualitychecks.NewTestRunner([]txqualitychecks.QualityGuideline{txqualitychecks.NewReadmeExists()}).Run()
+
+		if err != nil {
+			fmt.Println("Error occured! Check command output for details on failed checks")
+			os.Exit(1)
+		}
+
+		os.Exit(0)
+	},
 }
 
-type QualityResult struct {
-	Passed           bool
-	ErrorDescription string
-}
+func init() {
+	rootCmd.AddCommand(checkLocalCmd)
 
-type Printer interface {
-	Print(message string)
 }

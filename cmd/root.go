@@ -17,34 +17,34 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package cmd
 
-import "os"
+import (
+	"os"
 
-type ReadmeExists struct {
+	"github.com/spf13/cobra"
+)
+
+// rootCmd represents the base command when called without any subcommands
+var rootCmd = &cobra.Command{
+	Use:   "tractusx-quality-checks",
+	Short: "verifies that quality guidelines for eclipse-tractusx are met",
+	Long: `tractusx-quality-checks is used to automatically verify, if quality guidelines 
+defined for the eclipse-tractusx organization are met.
+Basis are release guidelines defined at: https://eclipse-tractusx.github.io/docs/release`,
+	// Uncomment the following line if your bare application
+	// has an action associated with it:
+	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
-func NewReadmeExists() QualityGuideline {
-	return &ReadmeExists{}
-}
-
-func (r *ReadmeExists) Name() string {
-	return "TRG 1.01 - README.md"
-}
-
-func (r *ReadmeExists) Description() string {
-	return "A good README.md file is the starting point for everyone opening a repository. It should help them find all critical information in an easy way."
-}
-
-func (r *ReadmeExists) ExternalDescription() string {
-	return "https://eclipse-tractusx.github.io/docs/release/trg-1/trg-1-1"
-}
-
-func (r *ReadmeExists) Test() *QualityResult {
-	_, err := os.Stat("README.md")
-
+// Execute adds all child commands to the root command and sets flags appropriately.
+// This is called by main.main(). It only needs to happen once to the rootCmd.
+func Execute() {
+	err := rootCmd.Execute()
 	if err != nil {
-		return &QualityResult{ErrorDescription: "Did not find a README.md file in current directory!"}
+		os.Exit(1)
 	}
-	return &QualityResult{Passed: true}
+}
+
+func init() {
 }

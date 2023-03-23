@@ -11,3 +11,7 @@ are available as library to use in multiple usecases. These could be:
 - Binaries to check code locally (manual run, pre-commit hooks, ...)
 - ...
 
+## Local build
+
+If you want to build the command locally, you just need Golang version 1.20 and run `go build` on the root level of
+this repository.
