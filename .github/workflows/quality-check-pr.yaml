@@ -35,7 +35,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.20
+          go-version-file: "go.mod"
 
       - name: Run quality check command
         uses: eclipse-tractusx/tractusx-quality-checks@v0.1
