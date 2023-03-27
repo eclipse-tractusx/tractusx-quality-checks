@@ -42,7 +42,7 @@ jobs:
 #        working-directory: $GITHUB_WORKSPACE
 
   release:
-    needs: go-build
+    # needs: go-build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
