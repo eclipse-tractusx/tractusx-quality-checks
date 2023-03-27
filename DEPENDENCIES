@@ -1,0 +1,7 @@
+go/golang/github.com%2Fcpuguy83%2Fgo-md2man/v2/v2.0.2, MIT, approved, clearlydefined
+go/golang/github.com%2Finconshreveable/mousetrap/v1.0.1, Apache-2.0, approved, clearlydefined
+go/golang/github.com%2Frussross%2Fblackfriday/v2/v2.1.0, BSD-2-Clause, approved, clearlydefined
+go/golang/github.com%2Fspf13/cobra/v1.6.1, Apache-2.0, approved, clearlydefined
+go/golang/github.com%2Fspf13/pflag/v1.0.5, BSD-3-Clause, approved, clearlydefined
+go/golang/gopkg.in/check.v1/v0.0.0-20161208181325-20d25e280405, BSD-3-Clause AND BSD-2-Clause, approved, #6054
+go/golang/gopkg.in/yaml.v3/v3.0.1, Apache-2.0, approved, clearlydefined
