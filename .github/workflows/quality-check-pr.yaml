@@ -38,4 +38,4 @@ jobs:
           go-version: 1.20
 
       - name: Run quality check command
-        uses: eclipse-tractusx/tractusx-quality-checks@v1
+        uses: eclipse-tractusx/tractusx-quality-checks@v0.1
