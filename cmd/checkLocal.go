@@ -21,20 +21,23 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+
 	txqualitychecks "github.com/eclipse-tractusx/tractusx-quality-checks/internal"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 // checkLocalCmd represents the checkLocal command
 var checkLocalCmd = &cobra.Command{
 	Use:   "checkLocal",
 	Short: "Does run a quality check on local files",
-	Long: `Execute the checkLocal command in any directory you want to check for quality compliance with 
-eclipse-tractusx rules`,
+	Long:  `Execute the checkLocal command in any directory you want to check for quality compliance with eclipse-tractusx rules`,
+
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Running local checks for eclipse-tractusx release guidelines")
-		err := txqualitychecks.NewTestRunner([]txqualitychecks.QualityGuideline{txqualitychecks.NewReadmeExists()}).Run()
+		guidelines := []txqualitychecks.QualityGuideline{txqualitychecks.NewReadmeExists()}
+		runner := txqualitychecks.NewTestRunner(guidelines)
+		err := runner.Run()
 
 		if err != nil {
 			fmt.Println("Error occured! Check command output for details on failed checks")
