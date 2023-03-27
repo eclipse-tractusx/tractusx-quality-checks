@@ -78,12 +78,11 @@ autolabeler:
       - '/^(feat|feature|enhancement)(\(.+\)):.+/'
 
   # label skip-changelog when either title or body or PR indicates GH Action/Workflow
-  # https://regex101.com/r/v15bku/1
-  - label: "skip-changelog"
-    title:
-      - '/([^.+][Gg]it[Hh]ub|[^.+][Gg][Hh][-\s][WwAa][oc][rt]|[^.*][Ww]orkflow|[Aa]ction)/'
-    body:
-      - '/([^.+][Gg]it[Hh]ub|[^.+][Gg][Hh][-\s][WwAa][oc][rt]|[^.*][Ww]orkflow|[Aa]ction)/'
+#  - label: "skip-changelog"
+#    title:
+#      - '/([^.+][Gg]it[Hh]ub|[^.+][Gg][Hh][-\s][WwAa][oc][rt]|[^.*][Ww]orkflow|[Aa]ction)/'
+#    body:
+#      - '/([^.+][Gg]it[Hh]ub|[^.+][Gg][Hh][-\s][WwAa][oc][rt]|[^.*][Ww]orkflow|[Aa]ction)/'
 
   # version-resolver labels
   # if a PR only fixes some bugs the patch should be updated
