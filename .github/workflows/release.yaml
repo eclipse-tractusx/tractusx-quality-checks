@@ -48,13 +48,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # todo: Use Release drafter to release the GH release: https://github.com/release-drafter/release-drafter/blob/master/.github/workflows/release.yml#L45-L65
-      # This will create appropriate tags (vmajorNumber in addition to SemVer tag. With small adjustments tag vminorNum should be possible)
-      - name: Release
-        uses: softprops/action-gh-release@v1
+      - name: version
+        id: version
+        run: |
+          tag=${GITHUB_REF/refs\/tags\//}
+          version=${tag#v}
+          major=${version%%.*}
+          echo "tag=${tag}" >> $GITHUB_OUTPUT
+          echo "version=${version}" >> $GITHUB_OUTPUT
+          echo "major=${major}" >> $GITHUB_OUTPUT
+
+      - name: create GitHub release
+        uses: release-drafter/release-drafter@v5
         with:
-          files: |
-            CHANGELOG.md
-            LICENSE
-            # add build artifact
-          generate_release_notes: true
+          version: ${{ steps.version.outputs.version }}
+          publish: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: force update major tag
+        run: |
+          git tag v${{ steps.version.outputs.major }} ${{ steps.version.outputs.tag }} -f
+          git push origin refs/tags/v${{ steps.version.outputs.major }} -f
