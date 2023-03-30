@@ -19,20 +19,32 @@
 
 package txqualitychecks
 
-var ReleaseGuidelines = []QualityGuideline{NewReadmeExists(), NewChangelogExists()}
+import "os"
 
-type QualityGuideline interface {
-	Name() string
-	Description() string
-	ExternalDescription() string
-	Test() *QualityResult
+type ChangeLogExists struct {
 }
 
-type QualityResult struct {
-	Passed           bool
-	ErrorDescription string
+func NewChangelogExists() *ChangeLogExists {
+	return &ChangeLogExists{}
 }
 
-type Printer interface {
-	Print(message string)
+func (c ChangeLogExists) Name() string {
+	return "TRG 1.03 - CHANGELOG.md"
+}
+
+func (c ChangeLogExists) Description() string {
+	return "Tracking changes in Open Source is critical to have a way of knowing what new features have been introduced, what bugs have been fixed, what security CVEs have been mitigated. In Eclipse Tractus-X we use a CHANGELOG.md to document this"
+}
+
+func (c ChangeLogExists) ExternalDescription() string {
+	return "https://eclipse-tractusx.github.io/docs/release/trg-1/trg-1-3"
+}
+
+func (c ChangeLogExists) Test() *QualityResult {
+	_, err := os.Stat("CHANGELOG.md")
+
+	if err != nil {
+		return &QualityResult{ErrorDescription: "A CHANGELOG.md file has to be present, describing the changes on between your releases"}
+	}
+	return &QualityResult{Passed: true}
 }
