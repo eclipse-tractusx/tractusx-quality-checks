@@ -17,36 +17,43 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package cmd
+package txqualitychecks
 
 import (
-	"fmt"
 	"os"
-
-	txqualitychecks "github.com/eclipse-tractusx/tractusx-quality-checks/internal"
-	"github.com/spf13/cobra"
+	"testing"
 )
 
-// checkLocalCmd represents the checkLocal command
-var checkLocalCmd = &cobra.Command{
-	Use:   "checkLocal",
-	Short: "Does run a quality check on local files",
-	Long:  `Execute the checkLocal command in any directory you want to check for quality compliance with eclipse-tractusx rules`,
+func TestShouldFailIfChangelogFileIsMissing(t *testing.T) {
+	changelogTest := NewChangelogExists()
 
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Running local checks of eclipse-tractusx release guidelines")
-		runner := txqualitychecks.NewTestRunner(txqualitychecks.ReleaseGuidelines)
-		err := runner.Run()
+	result := changelogTest.Test()
 
-		if err != nil {
-			fmt.Println("Error occurred! Check command output for details on failed checks")
-			os.Exit(1)
-		}
-
-		os.Exit(0)
-	},
+	if result.Passed {
+		t.Errorf("ChangelogExist should fail if no Changelog file present")
+	}
 }
 
-func init() {
-	rootCmd.AddCommand(checkLocalCmd)
+func TestShouldPassIfChangelogExists(t *testing.T) {
+	_, _ = os.Create("CHANGELOG.md")
+	defer func() {
+		_ = os.Remove("CHANGELOG.md")
+	}()
+	changelogTest := NewChangelogExists()
+
+	result := changelogTest.Test()
+
+	if !result.Passed {
+		t.Errorf("ChangelogExist should pass, if a CHANGELOG.md exists")
+	}
+}
+
+func TestShouldProvideErrorDescriptionIfFailing(t *testing.T) {
+	changelogTest := NewChangelogExists()
+
+	result := changelogTest.Test()
+
+	if result.ErrorDescription == "" {
+		t.Errorf("Failing tests should provide an error description")
+	}
 }
