@@ -21,10 +21,19 @@ package txqualitychecks
 
 import "fmt"
 
-type FailingQualityGuideline struct {
+type Guideline struct {
 	name                string
 	description         string
 	externalDescription string
+	isOptional          bool
+}
+
+type FailingQualityGuideline struct {
+	Guideline
+}
+
+func (f FailingQualityGuideline) IsOptional() bool {
+	return f.isOptional
 }
 
 func (f FailingQualityGuideline) Name() string {
@@ -44,9 +53,11 @@ func (f FailingQualityGuideline) Test() *QualityResult {
 }
 
 type PassingQualityGuideline struct {
-	name                string
-	description         string
-	externalDescription string
+	Guideline
+}
+
+func (p PassingQualityGuideline) IsOptional() bool {
+	return p.isOptional
 }
 
 func (p PassingQualityGuideline) Name() string {
