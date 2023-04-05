@@ -40,7 +40,7 @@ func TestNewInstallExists(t *testing.T) {
 		installTest := NewInstallExists()
 		_, err := os.Create("INSTALL.md")
 		if err != nil {
-			return
+			t.Errorf("Error creating test preconditions!")
 		}
 
 		result := installTest.Test()
@@ -51,14 +51,14 @@ func TestNewInstallExists(t *testing.T) {
 
 		err = os.Remove("INSTALL.md")
 		if err != nil {
-			return
+			t.Errorf("Error while removing test preconditions!")
 		}
 	})
 	t.Run("No ErrorDescription if test pass", func(t *testing.T) {
 		installTest := NewInstallExists()
 		_, err := os.Create("INSTALL.md")
 		if err != nil {
-			return
+			t.Errorf("Error creating test preconditions!")
 		}
 
 		result := installTest.Test()
@@ -69,7 +69,7 @@ func TestNewInstallExists(t *testing.T) {
 
 		err = os.Remove("INSTALL.md")
 		if err != nil {
-			return
+			t.Errorf("Error while removing test preconditions!")
 		}
 	})
 }
