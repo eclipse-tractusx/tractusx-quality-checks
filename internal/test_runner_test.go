@@ -144,3 +144,21 @@ func allMessages(messages []string) string {
 
 	return result
 }
+
+func TestShouldNotFailIfOptionalTestFail(t *testing.T) {
+	failingGuideline := &FailingQualityGuideline{
+		Guideline{
+			name:                "TRG 1.02 - INSTALL.md",
+			description:         "Optional content should not fail a test",
+			externalDescription: "https://github.com/",
+			isOptional:          true,
+		},
+	}
+
+	runner := NewTestRunner([]QualityGuideline{failingGuideline})
+	err := runner.Run()
+
+	if err != nil {
+		t.Errorf("Optional Guidlines should not make the runner fail!")
+	}
+}
