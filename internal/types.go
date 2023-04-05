@@ -26,6 +26,7 @@ type QualityGuideline interface {
 	Description() string
 	ExternalDescription() string
 	Test() *QualityResult
+	IsOptional() bool
 }
 
 type QualityResult struct {
