@@ -24,6 +24,10 @@ import "os"
 type ReadmeExists struct {
 }
 
+func (r *ReadmeExists) IsOptional() bool {
+	return false
+}
+
 func NewReadmeExists() QualityGuideline {
 	return &ReadmeExists{}
 }

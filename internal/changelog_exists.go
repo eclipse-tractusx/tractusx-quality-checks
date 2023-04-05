@@ -24,6 +24,10 @@ import "os"
 type ChangeLogExists struct {
 }
 
+func (c ChangeLogExists) IsOptional() bool {
+	return false
+}
+
 func NewChangelogExists() *ChangeLogExists {
 	return &ChangeLogExists{}
 }
