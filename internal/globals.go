@@ -19,20 +19,10 @@
 
 package txqualitychecks
 
-// QualityGuideline defines the QualityGuideline interface with its methods.
-type QualityGuideline interface {
-	Name() string
-	Description() string
-	ExternalDescription() string
-	Test() *QualityResult
-	IsOptional() bool
-}
-
-type QualityResult struct {
-	Passed           bool
-	ErrorDescription string
-}
-
-type Printer interface {
-	Print(message string)
+// ReleaseGuidelines defines a slice of QualityGuidelines the test_runner will
+// test.
+var ReleaseGuidelines = []QualityGuideline{
+	NewReadmeExists(),
+	NewInstallExists(),
+	NewChangelogExists(),
 }
