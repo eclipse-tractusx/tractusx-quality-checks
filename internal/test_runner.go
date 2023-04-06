@@ -41,8 +41,8 @@ func (runner *GuidelineTestRunner) Run() error {
 		result := guideline.Test()
 		if guideline.IsOptional() && !result.Passed {
 			runner.printer.Print(
-				fmt.Sprintf("Failed! Test failed, but marked as optional. More infos: %s\n%s",
-					result.ErrorDescription, guideline.ExternalDescription()),
+				fmt.Sprintf("Warning! Test failed, but test '%s' is marked as optional.\nMore infos:\n\t%s\n\t%s",
+					guideline.Name(), result.ErrorDescription, guideline.ExternalDescription()),
 			)
 		} else if !result.Passed {
 			runner.printer.Print(

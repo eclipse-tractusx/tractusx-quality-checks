@@ -63,7 +63,7 @@ func (r *InstallExists) Test() *QualityResult {
 
 	if err != nil {
 		return &QualityResult{
-			ErrorDescription: "Did not find optional INSTALL.md file in current directory.",
+			ErrorDescription: "Optional file INSTALL.md not found in current directory.",
 		}
 	}
 	return &QualityResult{Passed: true}
