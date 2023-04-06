@@ -25,7 +25,7 @@ import "os"
 type InstallExists struct {
 }
 
-// NewInstallExists generates a new check based on QualityGuideline interface.
+// NewInstallExists func return a new check based on QualityGuideline interface.
 func NewInstallExists() QualityGuideline {
 	return &InstallExists{}
 }
@@ -39,7 +39,7 @@ func (r *InstallExists) Name() string {
 // Description implements ExternalDescription from interface
 // QualityGuideline and returns a brief description of this test.
 func (r *InstallExists) Description() string {
-	return "A INSTALL.md file contains comprehensive instructions for installation."
+	return "File INSTALL.md contains comprehensive instructions for installation."
 }
 
 // ExternalDescription implements ExternalDescription from interface
