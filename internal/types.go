@@ -19,15 +19,26 @@
 
 package txqualitychecks
 
-// QualityGuideline defines the QualityGuideline interface with its methods.
+// QualityGuideline represents the QualityGuideline to check as an interface.
+//
+// The interface provide information about Name, Description, ExternalDescription,
+// the Test and the IsOptional bool.
 type QualityGuideline interface {
+	// Name returns the Name to the QualityGuideline to test.
 	Name() string
+	// Description returns a brief description of the tested QualityGuideline.
 	Description() string
+	// ExternalDescription returns a URL to more information about the QualityGuideline.
 	ExternalDescription() string
+	// Test executes the test and returns QualityResult. If any error occurs it
+	// returns QualityResult.Passed false.
 	Test() *QualityResult
+	// IsOptional returns a bool it the test or QualityGuideline is optional or not.
 	IsOptional() bool
 }
 
+// QualityResult implements test result via Passed bool and in case of error a
+// ErrorDescription.
 type QualityResult struct {
 	Passed           bool
 	ErrorDescription string
