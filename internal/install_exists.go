@@ -21,34 +21,37 @@ package txqualitychecks
 
 import "os"
 
-type ChangeLogExists struct {
+type InstallExists struct {
 }
 
-func (c ChangeLogExists) IsOptional() bool {
-	return false
+// NewInstallExists returns a new check based on QualityGuideline interface.
+func NewInstallExists() QualityGuideline {
+	return &InstallExists{}
 }
 
-func NewChangelogExists() *ChangeLogExists {
-	return &ChangeLogExists{}
+func (r *InstallExists) Name() string {
+	return "TRG 1.02 - INSTALL.md"
 }
 
-func (c ChangeLogExists) Name() string {
-	return "TRG 1.03 - CHANGELOG.md"
+func (r *InstallExists) Description() string {
+	return "File INSTALL.md contains comprehensive instructions for installation."
 }
 
-func (c ChangeLogExists) Description() string {
-	return "Tracking changes in Open Source is critical to have a way of knowing what new features have been introduced, what bugs have been fixed, what security CVEs have been mitigated. In Eclipse Tractus-X we use a CHANGELOG.md to document this"
+func (r *InstallExists) ExternalDescription() string {
+	return "https://eclipse-tractusx.github.io/docs/release/trg-1/trg-1-2"
 }
 
-func (c ChangeLogExists) ExternalDescription() string {
-	return "https://eclipse-tractusx.github.io/docs/release/trg-1/trg-1-3"
-}
-
-func (c ChangeLogExists) Test() *QualityResult {
-	_, err := os.Stat("CHANGELOG.md")
+func (r *InstallExists) Test() *QualityResult {
+	_, err := os.Stat("INSTALL.md")
 
 	if err != nil {
-		return &QualityResult{ErrorDescription: "A CHANGELOG.md file has to be present, describing the changes on between your releases"}
+		return &QualityResult{
+			ErrorDescription: "Optional file INSTALL.md not found in current directory.",
+		}
 	}
 	return &QualityResult{Passed: true}
+}
+
+func (r *InstallExists) IsOptional() bool {
+	return true
 }

@@ -39,11 +39,19 @@ func (runner *GuidelineTestRunner) Run() error {
 		runner.printer.Print(fmt.Sprintf("Testing Quality Guideline: %s", guideline.Name()))
 
 		result := guideline.Test()
-		if !result.Passed {
-			runner.printer.Print(fmt.Sprintf("Failed! Guideline description: %s; More infos: %s", guideline.Description(), guideline.ExternalDescription()))
+		if guideline.IsOptional() && !result.Passed {
+			runner.printer.Print(
+				fmt.Sprintf("Warning! Test failed, but test '%s' is marked as optional.\nMore infos:\n\t%s\n\t%s",
+					guideline.Name(), result.ErrorDescription, guideline.ExternalDescription()),
+			)
+		} else if !result.Passed {
+			runner.printer.Print(
+				fmt.Sprintf("Failed! Guideline description: %s\n\t%s\n\tMore infos: %s",
+					guideline.Description(), result.ErrorDescription, guideline.ExternalDescription()),
+			)
 		}
 
-		allPassed = allPassed && result.Passed
+		allPassed = allPassed && (result.Passed || guideline.IsOptional())
 	}
 
 	if !allPassed {

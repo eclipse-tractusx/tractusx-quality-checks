@@ -64,7 +64,9 @@ func TestShouldFailIfAtLeastOneFailingTestIsRun(t *testing.T) {
 }
 
 func TestShouldLogTheGuidelineNameWhenRunningTheTest(t *testing.T) {
-	runner := NewTestRunner([]QualityGuideline{&PassingQualityGuideline{name: "TRG 1 - README test"}})
+	runner := NewTestRunner(
+		[]QualityGuideline{&PassingQualityGuideline{Guideline{name: "TRG 1 - README test"}}},
+	)
 	printerMock := &PrinterMock{}
 	runner.printer = printerMock
 
@@ -81,9 +83,11 @@ func TestShouldLogTheGuidelineNameWhenRunningTheTest(t *testing.T) {
 
 func TestShouldLogDescriptionOfGuidelineIfTheTestIsFailing(t *testing.T) {
 	failingGuideline := &FailingQualityGuideline{
-		name:                "TRG 3000 - ChuckNorris",
-		description:         "Every project should define counter measures against roundhouse kicks",
-		externalDescription: "https://en.wikipedia.org/wiki/Chuck_Norris",
+		Guideline{
+			name:                "TRG 3000 - ChuckNorris",
+			description:         "Every project should define counter measures against roundhouse kicks",
+			externalDescription: "https://en.wikipedia.org/wiki/Chuck_Norris",
+		},
 	}
 	runner := NewTestRunner([]QualityGuideline{failingGuideline})
 	printerMock := &PrinterMock{}
@@ -108,14 +112,18 @@ func TestShouldLogDescriptionOfGuidelineIfTheTestIsFailing(t *testing.T) {
 
 func TestShouldOnlyLogAdditionalDescriptionForFailingTests(t *testing.T) {
 	failingGuideline := &FailingQualityGuideline{
-		name:                "TRG 3000 - ChuckNorris",
-		description:         "Every project should define counter measures against roundhouse kicks",
-		externalDescription: "https://en.wikipedia.org/wiki/Chuck_Norris",
+		Guideline{
+			name:                "TRG 3000 - ChuckNorris",
+			description:         "Every project should define counter measures against roundhouse kicks",
+			externalDescription: "https://en.wikipedia.org/wiki/Chuck_Norris",
+		},
 	}
 	passingGuideline := &PassingQualityGuideline{
-		name:                "TRG 4711 - auto-pass",
-		description:         "automatically passing. result ignored",
-		externalDescription: "https://de.wikipedia.org/wiki//dev/null",
+		Guideline{
+			name:                "TRG 4711 - auto-pass",
+			description:         "automatically passing. result ignored",
+			externalDescription: "https://de.wikipedia.org/wiki//dev/null",
+		},
 	}
 	runner := NewTestRunner([]QualityGuideline{failingGuideline, passingGuideline})
 	printerMock := &PrinterMock{}
@@ -135,4 +143,22 @@ func allMessages(messages []string) string {
 	}
 
 	return result
+}
+
+func TestShouldNotFailIfOptionalTestFail(t *testing.T) {
+	failingGuideline := &FailingQualityGuideline{
+		Guideline{
+			name:                "TRG 1.02 - INSTALL.md",
+			description:         "Optional content should not fail a test",
+			externalDescription: "https://github.com/",
+			isOptional:          true,
+		},
+	}
+
+	runner := NewTestRunner([]QualityGuideline{failingGuideline})
+	err := runner.Run()
+
+	if err != nil {
+		t.Errorf("Optional Guidlines should not make the runner fail!")
+	}
 }

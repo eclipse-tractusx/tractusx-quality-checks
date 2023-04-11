@@ -19,36 +19,10 @@
 
 package txqualitychecks
 
-import "os"
-
-type ReadmeExists struct {
-}
-
-func (r *ReadmeExists) IsOptional() bool {
-	return false
-}
-
-func NewReadmeExists() QualityGuideline {
-	return &ReadmeExists{}
-}
-
-func (r *ReadmeExists) Name() string {
-	return "TRG 1.01 - README.md"
-}
-
-func (r *ReadmeExists) Description() string {
-	return "A good README.md file is the starting point for everyone opening a repository. It should help them find all critical information in an easy way."
-}
-
-func (r *ReadmeExists) ExternalDescription() string {
-	return "https://eclipse-tractusx.github.io/docs/release/trg-1/trg-1-1"
-}
-
-func (r *ReadmeExists) Test() *QualityResult {
-	_, err := os.Stat("README.md")
-
-	if err != nil {
-		return &QualityResult{ErrorDescription: "Did not find a README.md file in current directory!"}
-	}
-	return &QualityResult{Passed: true}
+// ReleaseGuidelines defines a slice of QualityGuidelines the test_runner will
+// test.
+var ReleaseGuidelines = []QualityGuideline{
+	NewReadmeExists(),
+	NewInstallExists(),
+	NewChangelogExists(),
 }
