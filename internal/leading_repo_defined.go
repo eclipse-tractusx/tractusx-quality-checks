@@ -44,6 +44,10 @@ func (l *LeadingRepositoryDefined) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-2/trg-2-4"
 }
 
+func (l *LeadingRepositoryDefined) IsOptional() bool {
+	return false
+}
+
 func (l *LeadingRepositoryDefined) Test() *QualityResult {
 	metadata, err := product_metadata.MetadataFromLocalFile()
 	if err != nil {
