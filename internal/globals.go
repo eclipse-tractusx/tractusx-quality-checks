@@ -25,4 +25,5 @@ var ReleaseGuidelines = []QualityGuideline{
 	NewReadmeExists(),
 	NewInstallExists(),
 	NewChangelogExists(),
+	NewLeadingRepositoryDefined(),
 }
