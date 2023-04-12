@@ -24,7 +24,7 @@ import (
 	"strings"
 	"testing"
 
-	product_metadata "github.com/eclipse-tractusx/tractusx-quality-checks/pkg"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/product"
 	"gopkg.in/yaml.v3"
 )
 
@@ -45,7 +45,7 @@ func TestShouldFailIfMetadataFileIsMissing(t *testing.T) {
 }
 
 func TestShouldFailIfLeadingRepositoryMetadataPropertyIsUndefined(t *testing.T) {
-	metadata := product_metadata.ProductMetadata{
+	metadata := product.Metadata{
 		ProductName:       "ProductWithoutLeadingRepo",
 		LeadingRepository: "",
 		Repositories:      nil,
@@ -62,7 +62,7 @@ func TestShouldFailIfLeadingRepositoryMetadataPropertyIsUndefined(t *testing.T) 
 }
 
 func TestShouldSucceedIfLeadingRepoIsDefinedInMetadata(t *testing.T) {
-	metadata := product_metadata.ProductMetadata{
+	metadata := product.Metadata{
 		ProductName:       "ProductWithoutLeadingRepo",
 		LeadingRepository: "https://github.com/eclipse-tractusx/sig-infra",
 		Repositories:      nil,
@@ -76,7 +76,7 @@ func TestShouldSucceedIfLeadingRepoIsDefinedInMetadata(t *testing.T) {
 	}
 }
 
-func givenProductMetadata(t *testing.T, metadata product_metadata.ProductMetadata) {
+func givenProductMetadata(t *testing.T, metadata product.Metadata) {
 	yamlContent, err := yaml.Marshal(&metadata)
 	if err != nil {
 		t.Errorf("Could not serialize metadata test content")

@@ -17,9 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package product_metadata
+package product
 
-var metadataFromTestTemplate = ProductMetadata{
+import (
+	"os"
+	"reflect"
+	"testing"
+)
+
+var metadataFromTestTemplate = Metadata{
 	ProductName:       "sig-infra",
 	LeadingRepository: "https://github.com/eclipse-tractusx/sig-infra",
 	Repositories: []Repository{
@@ -34,4 +40,42 @@ var metadataFromTestTemplate = ProductMetadata{
 			Url:              "https://github.com/eclipse-tractusx/charts",
 		},
 	},
+}
+
+const metadataTestFile = "./test/metadata_test_template.yaml"
+
+func TestShouldReturnErrorWhenReadingNonExistentDefaultMetadataFile(t *testing.T) {
+	_, err := MetadataFromLocalFile()
+
+	if err == nil {
+		t.Errorf("Reading the product metadata file from default location should fail if not existing")
+	}
+}
+
+// This test works with a predefined metadata file located at ./test/metadata_test_template.yaml (see metadataTestFile const).
+// This is a well known file, so we can confidently assert property names
+func TestShouldReadProductMetadataFromDefaultFile(t *testing.T) {
+	copyTemplateFileTo(".tractusx", t)
+	defer os.Remove(".tractusx")
+
+	metadata, err := MetadataFromLocalFile()
+
+	if err != nil {
+		t.Errorf("Should be able to read metadata file after copying to default location")
+	}
+
+	if !reflect.DeepEqual(metadata, &metadataFromTestTemplate) {
+		t.Errorf("Metadata read from file does not match test template values")
+	}
+}
+
+func copyTemplateFileTo(path string, t *testing.T) {
+	templateFile, err := os.ReadFile(metadataTestFile)
+	if err != nil {
+		t.Errorf("Could not read template file necessary for this test")
+	}
+	err = os.WriteFile(path, templateFile, 0644)
+	if err != nil {
+		t.Errorf("Could not copy template file to designated path")
+	}
 }

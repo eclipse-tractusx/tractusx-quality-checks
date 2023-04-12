@@ -22,7 +22,7 @@ package txqualitychecks
 import (
 	"strings"
 
-	product_metadata "github.com/eclipse-tractusx/tractusx-quality-checks/pkg"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/product"
 )
 
 type LeadingRepositoryDefined struct {
@@ -49,7 +49,7 @@ func (l *LeadingRepositoryDefined) IsOptional() bool {
 }
 
 func (l *LeadingRepositoryDefined) Test() *QualityResult {
-	metadata, err := product_metadata.MetadataFromLocalFile()
+	metadata, err := product.MetadataFromLocalFile()
 	if err != nil {
 		return &QualityResult{ErrorDescription: "Failed! The leadingRepository property must be defined in .tractusx metadata file. Could not load metadata"}
 	}

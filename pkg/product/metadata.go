@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package product_metadata
+package product
 
 import (
 	"fmt"
@@ -28,7 +28,7 @@ import (
 
 const MetadataFilename = ".tractusx"
 
-type ProductMetadata struct {
+type Metadata struct {
 	ProductName       string       `yaml:"product"`
 	LeadingRepository string       `yaml:"leadingRepository"`
 	Repositories      []Repository `yaml:"repositories"`
@@ -40,8 +40,8 @@ type Repository struct {
 	Url              string `yaml:"url"`
 }
 
-func MetadataFromFile(fileContent []byte) (*ProductMetadata, error) {
-	var metadata ProductMetadata
+func MetadataFromFile(fileContent []byte) (*Metadata, error) {
+	var metadata Metadata
 
 	err := yaml.Unmarshal(fileContent, &metadata)
 	if err != nil {
@@ -52,7 +52,7 @@ func MetadataFromFile(fileContent []byte) (*ProductMetadata, error) {
 	return &metadata, nil
 }
 
-func MetadataFromLocalFile() (*ProductMetadata, error) {
+func MetadataFromLocalFile() (*Metadata, error) {
 	metadataFileAsBytes, err := os.ReadFile(MetadataFilename)
 
 	if err != nil {
