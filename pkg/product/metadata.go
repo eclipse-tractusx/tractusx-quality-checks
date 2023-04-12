@@ -40,6 +40,8 @@ type Repository struct {
 	Url              string `yaml:"url"`
 }
 
+// MetadataFromFile does take fileContent as byte slice and tries to deserialize it into Metadata.
+// If the contents cannot be parsed into Metadata, an error is returned and Metadata will be nil
 func MetadataFromFile(fileContent []byte) (*Metadata, error) {
 	var metadata Metadata
 
@@ -52,6 +54,9 @@ func MetadataFromFile(fileContent []byte) (*Metadata, error) {
 	return &metadata, nil
 }
 
+// MetadataFromLocalFile will read a local file '.tractusx', that is supposed to contain information about
+// a product. If the file exists, MetadataFromLocalFile will return the information as an instance of Metadata.
+// If the file cannot be parsed or does not exist, an error is returned and Metadata will be nil
 func MetadataFromLocalFile() (*Metadata, error) {
 	metadataFileAsBytes, err := os.ReadFile(MetadataFilename)
 
