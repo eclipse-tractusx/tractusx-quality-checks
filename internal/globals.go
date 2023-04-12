@@ -26,4 +26,5 @@ var ReleaseGuidelines = []QualityGuideline{
 	NewInstallExists(),
 	NewChangelogExists(),
 	NewLeadingRepositoryDefined(),
+	NewDefaultBranch(),
 }
