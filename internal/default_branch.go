@@ -94,27 +94,27 @@ func getRepoName() (owner string, repo string, local bool) {
 		repo = strings.Split(os.Getenv("GITHUB_REPOSITORY"), "/")[1]
 
 		return owner, repo, false
-	} else {
-		// Parse local git configuration when executing locally
-		cfg, err := ini.Load(".git/config")
-		if err != nil {
-			log.Fatalf("Failed to read file: %v", err)
-		}
-
-		url := cfg.Section(SECTION).Key("url").String()
-
-		var repoInfo []string
-		if strings.Contains(url, BASEURL) {
-			repoInfo = strings.Split(strings.TrimSuffix(strings.TrimPrefix(url, BASEURL), SUFFIX), "/")
-		} else if strings.Contains(url, SSHBASE) {
-			repoInfo = strings.Split(strings.TrimSuffix(strings.TrimPrefix(url, SSHBASE), SUFFIX), "/")
-		}
-
-		owner = repoInfo[0]
-		repo = repoInfo[1]
-
-		return owner, repo, true
 	}
+
+	// Parse local git configuration when executing locally
+	cfg, err := ini.Load(".git/config")
+	if err != nil {
+		log.Fatalf("Failed to read file: %v", err)
+	}
+
+	url := cfg.Section(SECTION).Key("url").String()
+
+	var repoInfo []string
+	if strings.Contains(url, BASEURL) {
+		repoInfo = strings.Split(strings.TrimSuffix(strings.TrimPrefix(url, BASEURL), SUFFIX), "/")
+	} else if strings.Contains(url, SSHBASE) {
+		repoInfo = strings.Split(strings.TrimSuffix(strings.TrimPrefix(url, SSHBASE), SUFFIX), "/")
+	}
+
+	owner = repoInfo[0]
+	repo = repoInfo[1]
+
+	return owner, repo, true
 }
 
 // getRepoInfo returns *github.Repository object and error. If GitHub API call
