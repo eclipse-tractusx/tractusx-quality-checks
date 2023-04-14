@@ -21,13 +21,12 @@ package txqualitychecks
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"os"
 	"strings"
 
 	"github.com/go-ini/ini"
 	"github.com/google/go-github/v50/github"
-	"golang.org/x/oauth2"
 )
 
 type defaultBranch struct {
@@ -46,12 +45,7 @@ func (d defaultBranch) ExternalDescription() string {
 }
 
 func (d defaultBranch) Test() *QualityResult {
-	owner, repoName, isLocal := getRepoName()
-	repo, err := getRepoInfo(owner, repoName, isLocal)
-
-	if err != nil {
-		log.Fatalf("error %v", err)
-	}
+	repo := getRepoMetadata(getRepoBaseInfo())
 
 	if *repo.Fork {
 		return &QualityResult{Passed: false, ErrorDescription: "Check determined running on a fork."}
@@ -75,64 +69,66 @@ func NewDefaultBranch() QualityGuideline {
 	return &defaultBranch{}
 }
 
-// getRepoName returns repoName (string) and local (bool). repoName is either
-// read from GITHUB_REPOSITORY environment variable when running as GH Action or,
-// when executed locally, parsing local Git config.
-//
-// local it true when repoName was parsed from local git config.
-func getRepoName() (owner string, repo string, local bool) {
+// repoInfo struct provides required information to query GitHub API.
+// repoInfo.local shall be true, when running check locally.
+type repoInfo struct {
+	owner    string
+	reponame string
+}
+
+// getRepoBaseInfo returns repoInfo as pointer. Func determines according to
+// available environment variables if running locally or as part of a GitHub
+// Action/Workflow/Check.
+func getRepoBaseInfo() *repoInfo {
 	const (
 		BASEURL = "https://github.com/"
 		SSHBASE = "git@github.com:"
 		SECTION = `remote "origin"`
 		SUFFIX  = ".git"
 	)
-
-	if os.Getenv("GITHUB_REPOSITORY") != "" {
+	if os.Getenv("GITHUB_REPOSITORY") != "" && os.Getenv("GITHUB_REPOSITORY_OWNER") != "" {
 		// env variable is available when executed as GH Action/Workflow/Check
-		owner = os.Getenv("GITHUB_REPOSITORY_OWNER")
-		repo = strings.Split(os.Getenv("GITHUB_REPOSITORY"), "/")[1]
+		result := repoInfo{
+			owner:    os.Getenv("GITHUB_REPOSITORY_OWNER"),
+			reponame: strings.Split(os.Getenv("GITHUB_REPOSITORY"), "/")[1],
+		}
 
-		return owner, repo, false
+		return &result
 	}
 
 	// Parse local git configuration when executing locally
 	cfg, err := ini.Load(".git/config")
 	if err != nil {
-		log.Fatalf("Failed to read file: %v", err)
+		fmt.Printf("Failed to read file: %v", err)
 	}
 
 	url := cfg.Section(SECTION).Key("url").String()
 
-	var repoInfo []string
+	var repoSplitInfo []string
 	if strings.Contains(url, BASEURL) {
-		repoInfo = strings.Split(strings.TrimSuffix(strings.TrimPrefix(url, BASEURL), SUFFIX), "/")
+		repoSplitInfo = strings.Split(strings.TrimSuffix(strings.TrimPrefix(url, BASEURL), SUFFIX), "/")
 	} else if strings.Contains(url, SSHBASE) {
-		repoInfo = strings.Split(strings.TrimSuffix(strings.TrimPrefix(url, SSHBASE), SUFFIX), "/")
+		repoSplitInfo = strings.Split(strings.TrimSuffix(strings.TrimPrefix(url, SSHBASE), SUFFIX), "/")
 	}
 
-	owner = repoInfo[0]
-	repo = repoInfo[1]
+	result := repoInfo{
+		owner:    repoSplitInfo[0],
+		reponame: repoSplitInfo[1],
+	}
 
-	return owner, repo, true
+	return &result
 }
 
 // getRepoInfo returns *github.Repository object and error. If GitHub API call
 // failed, an error is returned.
-func getRepoInfo(owner string, repo string, isLocal bool) (*github.Repository, error) {
-	var client github.Client
+func getRepoMetadata(repo *repoInfo) *github.Repository {
 	ctx := context.Background()
-	if !isLocal {
-		ts := oauth2.StaticTokenSource(
-			&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
-		)
-		tc := oauth2.NewClient(ctx, ts)
-		client = *github.NewClient(tc)
-	} else {
-		client = *github.NewClient(nil)
-	}
-	// Get repository information
-	repoInfo, _, err := client.Repositories.Get(ctx, owner, repo)
+	client := *github.NewClient(nil)
 
-	return repoInfo, err
+	repoInfo, _, err := client.Repositories.Get(ctx, repo.owner, repo.reponame)
+	if err != nil {
+		fmt.Printf("Error querying GitHub API:\n%v\n", err)
+	}
+
+	return repoInfo
 }
