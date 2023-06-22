@@ -54,6 +54,19 @@ func TestShouldPassIfTemurinIsUsedAsBaseImage(t *testing.T) {
 	}
 }
 
+func TestShouldNotFailIfOnlyBuildLayerDeviatesFromTemurin(t *testing.T) {
+	dockerfile := mocks.NewTempDockerfile().
+		AppendCommand("FROM amazoncorretto:8 as builder").
+		AppendCommand("COPY . .").
+		AppendCommand("FROM eclipse/temurin:17")
+	_ = dockerfile.Create()
+	defer dockerfile.Delete()
+
+	if !(AllowedBaseImage{}.Test().Passed) {
+		t.Errorf("Unapproved images in build layers should not let the check fail")
+	}
+}
+
 func createCorrettoDockerfile() *mocks.TempDockerfile {
 	dockerfile := mocks.NewTempDockerfile()
 
