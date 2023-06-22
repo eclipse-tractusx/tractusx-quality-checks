@@ -17,15 +17,39 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+ package txqualitychecks
 
-// ReleaseGuidelines defines a slice of QualityGuidelines the test_runner will
-// test.
-var ReleaseGuidelines = []QualityGuideline{
-	NewReadmeExists(),
-	NewInstallExists(),
-	NewChangelogExists(),
-	NewLeadingRepositoryDefined(),
-	NewDefaultBranch(),
-	NewRepoStructureExist(),
-}
+ import "os"
+ 
+ type RepoStructureExists struct {
+ }
+ 
+ func (c RepoStructureExists) IsOptional() bool {
+	 return false
+ }
+ 
+ func NewRepoStructureExists() *RepoStructureExists {
+	 return &RepoStructureExists{}
+ }
+ 
+ func (c RepoStructureExists) Name() string {
+	 return "TRG 2.03 - Repo structure"
+ }
+ 
+ func (c RepoStructureExists) Description() string {
+	 return "All repositories must follow specified files and folders structure."
+ }
+ 
+ func (c RepoStructureExists) ExternalDescription() string {
+	 return "https://eclipse-tractusx.github.io/docs/release/trg-2/trg-2-3"
+ }
+ 
+ func (c RepoStructureExists) Test() *QualityResult {
+	//  _, err := os.Stat("file or folder to be checked")
+ 
+	//  if err != nil {
+	// 	 return &QualityResult{ErrorDescription: "A file or folder is missing in the structure."}
+	//  }
+	 return &QualityResult{Passed: true}
+ }
+ 

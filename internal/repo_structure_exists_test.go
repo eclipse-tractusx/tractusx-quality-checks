@@ -19,13 +19,11 @@
 
 package txqualitychecks
 
-// ReleaseGuidelines defines a slice of QualityGuidelines the test_runner will
-// test.
-var ReleaseGuidelines = []QualityGuideline{
-	NewReadmeExists(),
-	NewInstallExists(),
-	NewChangelogExists(),
-	NewLeadingRepositoryDefined(),
-	NewDefaultBranch(),
-	NewRepoStructureExist(),
+import (
+	"os"
+	"testing"
+)
+
+func TestShouldPassIfRepoStructureExists(t *testing.T) {
+
 }
