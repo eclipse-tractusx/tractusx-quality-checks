@@ -17,15 +17,49 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package mocks
 
-// ReleaseGuidelines defines a slice of QualityGuidelines the test_runner will
-// test.
-var ReleaseGuidelines = []QualityGuideline{
-	NewReadmeExists(),
-	NewInstallExists(),
-	NewChangelogExists(),
-	NewLeadingRepositoryDefined(),
-	NewDefaultBranch(),
-	NewAllowedBaseImage(),
+import (
+	"os"
+)
+
+type TempDockerfile struct {
+	FileName string
+	Commands []string
+}
+
+func NewTempDockerfile() *TempDockerfile {
+	return &TempDockerfile{FileName: "Dockerfile", Commands: []string{}}
+}
+
+func (f *TempDockerfile) AppendCommand(command string) *TempDockerfile {
+	f.Commands = append(f.Commands, command)
+	return f
+}
+
+func (f *TempDockerfile) AppendEmptyLine() *TempDockerfile {
+	f.Commands = append(f.Commands, "")
+	return f
+}
+
+func (f *TempDockerfile) Create() error {
+	file, err := os.Create(f.FileName)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	for _, command := range f.Commands {
+		file.WriteString(command + "\n")
+	}
+
+	return nil
+}
+
+func (f *TempDockerfile) Delete() error {
+	err := os.Remove(f.FileName)
+	if err != nil {
+		return err
+	}
+	return nil
 }
