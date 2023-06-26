@@ -26,4 +26,54 @@ import (
 
 func TestShouldPassIfRepoStructureExists(t *testing.T) {
 
+	listOfFilesToBeCreated := []string{
+		"AUTHORS.md",
+		"CODE_OF_CONDUCT.md",
+		"CONTRIBUTING.md",
+		"DEPENDENCIES",
+		"LICENSE",
+		"NOTICE.md",
+		"README.md",
+		"INSTALL.md",
+		"SECURITY.md",
+	}
+
+	listOfDirsToBeCreated := []string{
+		"docs",
+		"charts",
+	}
+
+	for _,file := range listOfFilesToBeCreated {
+		os.Create(file)
+		toBeRemoved := file
+		defer func() {
+			_ = os.Remove(toBeRemoved)
+		}()
+	}
+
+	for _,file := range listOfDirsToBeCreated {
+		os.Mkdir(file, 0750)
+		toBeRemoved := file
+		defer func() {
+			_ = os.Remove(toBeRemoved)
+		}()
+	}
+
+	repostructureTest := NewRepoStructureExists()
+
+	result := repostructureTest.Test()
+
+	if !result.Passed {
+		t.Errorf("Structure exists, but test still fails.")
+	}
+}
+
+func TestShouldFailIfRepoStructureIsMissing(t *testing.T) {
+	repostructureTest := NewRepoStructureExists()
+
+	result := repostructureTest.Test()
+
+	if result.Passed {
+		t.Errorf("RepoStructureExist should fail if repo structure exists.")
+	}
 }

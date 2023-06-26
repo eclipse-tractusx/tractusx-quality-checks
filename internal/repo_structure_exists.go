@@ -17,9 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
- package txqualitychecks
+package txqualitychecks
 
- import "os"
+import (
+	"os"
+)
  
  type RepoStructureExists struct {
  }
@@ -45,11 +47,78 @@
  }
  
  func (c RepoStructureExists) Test() *QualityResult {
-	//  _, err := os.Stat("file or folder to be checked")
- 
-	//  if err != nil {
-	// 	 return &QualityResult{ErrorDescription: "A file or folder is missing in the structure."}
-	//  }
-	 return &QualityResult{Passed: true}
+
+	var missingMandatoryFiles []string
+	var missingOptionalFiles []string
+
+	// Slice containing required files and folders in the repo structure.
+	// Before modification make sure you align to TRG 2.03 guideline.
+
+	listOfOptionalFilesToBeChecked := []string{
+		"AUTHORS.md",
+		"INSTALL.md",
+	}
+
+	listOfMandatoryFilesToBeChecked := []string{
+		"CODE_OF_CONDUCT.md",
+		"CONTRIBUTING.md",
+		"DEPENDENCIES",
+		"LICENSE",
+		"NOTICE.md",
+		"README.md",
+		"SECURITY.md",
+		"docs",
+		"charts",
+	}
+
+	missingMandatoryFiles = checkMissingFiles(listOfMandatoryFilesToBeChecked)
+	missingOptionalFiles = checkMissingFiles(listOfOptionalFilesToBeChecked)	
+
+	optionalMessage := "Warning! The check detected following optional files missing: " 
+	mandatoryMassege := "The check detected following mandatory files missing: "
+
+	if len(missingOptionalFiles) > 0 {
+		optionalMessage = fmtMessage(optionalMessage, missingOptionalFiles)+"\n\t"
+	}
+
+	if len(missingMandatoryFiles) > 0 {
+		mandatoryMassege = fmtMessage(mandatoryMassege, missingMandatoryFiles)
+	}
+
+	if len(missingMandatoryFiles) > 0 && len(missingOptionalFiles) == 0 {
+		return &QualityResult{ErrorDescription: mandatoryMassege}
+
+	} else if len(missingMandatoryFiles) > 0 && len(missingOptionalFiles) > 0  {
+		return &QualityResult{ErrorDescription: optionalMessage + mandatoryMassege}
+		
+	} else if len(missingMandatoryFiles) == 0 && len(missingOptionalFiles) > 0 {
+		return &QualityResult{ErrorDescription: optionalMessage, Passed: true}
+	}
+
+	return &QualityResult{Passed: true}
  }
  
+
+ // Function to verify files existance. 
+//  Return missing ones.
+ func checkMissingFiles(listOfFiles []string) []string {
+	var missingFiles []string
+
+	for _, file := range listOfFiles {
+
+		_, err := os.Stat(file)
+		if os.IsNotExist(err) {
+			missingFiles = append(missingFiles, file)
+		}
+	}
+	return missingFiles
+ }
+
+ // Function to format output message containing missing files.
+ func fmtMessage(startingMessage string, listOfFiles []string) string {
+	message := startingMessage
+	for _,missingFile := range listOfFiles {
+		message += missingFile+" "
+	}
+	return message
+ }
