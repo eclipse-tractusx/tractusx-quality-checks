@@ -22,34 +22,31 @@ package txqualitychecks
 import (
 	"os"
 )
- 
- type RepoStructureExists struct {
- }
- 
- func (c RepoStructureExists) IsOptional() bool {
-	 return false
- }
- 
- func NewRepoStructureExists() *RepoStructureExists {
-	 return &RepoStructureExists{}
- }
- 
- func (c RepoStructureExists) Name() string {
-	 return "TRG 2.03 - Repo structure"
- }
- 
- func (c RepoStructureExists) Description() string {
-	 return "All repositories must follow specified files and folders structure."
- }
- 
- func (c RepoStructureExists) ExternalDescription() string {
-	 return "https://eclipse-tractusx.github.io/docs/release/trg-2/trg-2-3"
- }
- 
- func (c RepoStructureExists) Test() *QualityResult {
 
-	var missingMandatoryFiles []string
-	var missingOptionalFiles []string
+type RepoStructureExists struct {
+}
+
+func (c RepoStructureExists) IsOptional() bool {
+	return false
+}
+
+func NewRepoStructureExists() *RepoStructureExists {
+	return &RepoStructureExists{}
+}
+
+func (c RepoStructureExists) Name() string {
+	return "TRG 2.03 - Repo structure"
+}
+
+func (c RepoStructureExists) Description() string {
+	return "All repositories must follow specified files and folders structure."
+}
+
+func (c RepoStructureExists) ExternalDescription() string {
+	return "https://eclipse-tractusx.github.io/docs/release/trg-2/trg-2-3"
+}
+
+func (c RepoStructureExists) Test() *QualityResult {
 
 	// Slice containing required files and folders in the repo structure.
 	// Before modification make sure you align to TRG 2.03 guideline.
@@ -71,54 +68,48 @@ import (
 		"charts",
 	}
 
-	missingMandatoryFiles = checkMissingFiles(listOfMandatoryFilesToBeChecked)
-	missingOptionalFiles = checkMissingFiles(listOfOptionalFilesToBeChecked)	
+	missingMandatoryFiles := checkMissingFiles(listOfMandatoryFilesToBeChecked)
+	missingOptionalFiles := checkMissingFiles(listOfOptionalFilesToBeChecked)
 
-	optionalMessage := "Warning! The check detected following optional files missing: " 
-	mandatoryMassege := "The check detected following mandatory files missing: "
+	optionalMessage := "Warning! The check detected following optional files missing: "
+	mandatoryMassage := "The check detected following mandatory files missing: "
 
 	if len(missingOptionalFiles) > 0 {
-		optionalMessage = fmtMessage(optionalMessage, missingOptionalFiles)+"\n\t"
+		optionalMessage = fmtMessage(optionalMessage, missingOptionalFiles) + "\n\t"
 	}
 
 	if len(missingMandatoryFiles) > 0 {
-		mandatoryMassege = fmtMessage(mandatoryMassege, missingMandatoryFiles)
+		mandatoryMassage = fmtMessage(mandatoryMassage, missingMandatoryFiles)
 	}
 
-	if len(missingMandatoryFiles) > 0 && len(missingOptionalFiles) == 0 {
-		return &QualityResult{ErrorDescription: mandatoryMassege}
-
-	} else if len(missingMandatoryFiles) > 0 && len(missingOptionalFiles) > 0  {
-		return &QualityResult{ErrorDescription: optionalMessage + mandatoryMassege}
-		
-	} else if len(missingMandatoryFiles) == 0 && len(missingOptionalFiles) > 0 {
+	if len(missingMandatoryFiles) == 0 && len(missingOptionalFiles) > 0 {
 		return &QualityResult{ErrorDescription: optionalMessage, Passed: true}
+	} else if len(missingMandatoryFiles) > 0 || len(missingOptionalFiles) > 0 {
+		return &QualityResult{ErrorDescription: optionalMessage + mandatoryMassage}
 	}
 
 	return &QualityResult{Passed: true}
- }
- 
+}
 
- // Function to verify files existance. 
-//  Return missing ones.
- func checkMissingFiles(listOfFiles []string) []string {
+// Function to verify files existance.
+// Return missing ones.
+func checkMissingFiles(listOfFiles []string) []string {
 	var missingFiles []string
 
 	for _, file := range listOfFiles {
 
-		_, err := os.Stat(file)
-		if os.IsNotExist(err) {
+		if _, err := os.Stat(file); os.IsNotExist(err) {
 			missingFiles = append(missingFiles, file)
 		}
 	}
 	return missingFiles
- }
+}
 
- // Function to format output message containing missing files.
- func fmtMessage(startingMessage string, listOfFiles []string) string {
+// Function to format output message containing missing files.
+func fmtMessage(startingMessage string, listOfFiles []string) string {
 	message := startingMessage
-	for _,missingFile := range listOfFiles {
-		message += missingFile+" "
+	for _, missingFile := range listOfFiles {
+		message += missingFile + " "
 	}
 	return message
- }
+}

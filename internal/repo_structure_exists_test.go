@@ -24,48 +24,50 @@ import (
 	"testing"
 )
 
-func TestShouldPassIfRepoStructureExists(t *testing.T) {
+var listOfFilesToBeCreated []string = []string{
+	"CODE_OF_CONDUCT.md",
+	"CONTRIBUTING.md",
+	"DEPENDENCIES",
+	"LICENSE",
+	"NOTICE.md",
+	"README.md",
+	"SECURITY.md",
+}
 
-	listOfFilesToBeCreated := []string{
-		"AUTHORS.md",
-		"CODE_OF_CONDUCT.md",
-		"CONTRIBUTING.md",
-		"DEPENDENCIES",
-		"LICENSE",
-		"NOTICE.md",
-		"README.md",
-		"INSTALL.md",
-		"SECURITY.md",
-	}
+var listOfDirsToBeCreated []string = []string{
+	"docs",
+	"charts",
+}
 
-	listOfDirsToBeCreated := []string{
-		"docs",
-		"charts",
-	}
+func TestShouldPassIfRepoStructureExistsWithoutOptional(t *testing.T) {
 
-	for _,file := range listOfFilesToBeCreated {
-		os.Create(file)
-		toBeRemoved := file
-		defer func() {
-			_ = os.Remove(toBeRemoved)
-		}()
-	}
-
-	for _,file := range listOfDirsToBeCreated {
-		os.Mkdir(file, 0750)
-		toBeRemoved := file
-		defer func() {
-			_ = os.Remove(toBeRemoved)
-		}()
-	}
+	createFiles(listOfFilesToBeCreated)
+	createDirs(listOfDirsToBeCreated)
 
 	repostructureTest := NewRepoStructureExists()
-
 	result := repostructureTest.Test()
+	cleanFiles(append(listOfFilesToBeCreated, listOfDirsToBeCreated...))
 
 	if !result.Passed {
-		t.Errorf("Structure exists, but test still fails.")
+		t.Errorf("Structure exists with optional files, but test still fails.")
 	}
+}
+
+func TestShouldPassIfRepoStructureExistsWithOptional(t *testing.T) {
+
+	listOfFilesToBeCreated = append(listOfFilesToBeCreated, []string{"INSTALL.md", "AUTHORS.md"}...)
+
+	createFiles(listOfFilesToBeCreated)
+	createDirs(listOfDirsToBeCreated)
+
+	repostructureTest := NewRepoStructureExists()
+	result := repostructureTest.Test()
+	cleanFiles(append(listOfFilesToBeCreated, listOfDirsToBeCreated...))
+
+	if !result.Passed {
+		t.Errorf("Structure exists without optional files, but test still fails.")
+	}
+
 }
 
 func TestShouldFailIfRepoStructureIsMissing(t *testing.T) {
@@ -75,5 +77,24 @@ func TestShouldFailIfRepoStructureIsMissing(t *testing.T) {
 
 	if result.Passed {
 		t.Errorf("RepoStructureExist should fail if repo structure exists.")
+	}
+}
+
+func createFiles(files []string) {
+	for _, file := range files {
+		os.Create(file)
+	}
+}
+
+func createDirs(dirs []string) {
+	for _, dir := range dirs {
+		os.Mkdir(dir, 0750)
+	}
+}
+
+func cleanFiles(files []string) {
+
+	for _, file := range files {
+		os.Remove(file)
 	}
 }
