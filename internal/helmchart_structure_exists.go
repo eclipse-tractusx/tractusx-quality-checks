@@ -56,7 +56,7 @@ func (r *HelmStructureExists) Test() *QualityResult {
 	// 	"templates/NOTES.txt",
 	// }
 
-	if fi, err := os.Stat("charts"); err != nil || fi.IsDir() {
+	if fi, err := os.Stat("charts"); err != nil || !fi.IsDir() {
 		fmt.Println("charts nie jest katalogiem lub go nie ma")
 		return &QualityResult{Passed: false}
 	}
@@ -65,5 +65,5 @@ func (r *HelmStructureExists) Test() *QualityResult {
 }
 
 func (r *HelmStructureExists) IsOptional() bool {
-	return true
+	return false
 }
