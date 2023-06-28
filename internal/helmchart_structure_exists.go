@@ -20,7 +20,6 @@
 package txqualitychecks
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -56,10 +55,14 @@ func (r *HelmStructureExists) Test() *QualityResult {
 	// 	"templates/NOTES.txt",
 	// }
 
-	if fi, err := os.Stat("charts"); err != nil || !fi.IsDir() {
-		fmt.Println("charts nie jest katalogiem lub go nie ma")
-		return &QualityResult{Passed: false}
+	mainDir := "charts"
+	if fi, err := os.Stat(mainDir); err != nil || !fi.IsDir() {
+		return &QualityResult{ErrorDescription: "The Helm Charts folder charts/ doesn't exist.", Passed: false}
 	}
+
+	// for _, file := range helmStructureFiles {
+
+	// }
 
 	return &QualityResult{Passed: true}
 }
