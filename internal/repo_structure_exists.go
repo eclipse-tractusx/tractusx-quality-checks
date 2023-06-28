@@ -72,20 +72,20 @@ func (c RepoStructureExists) Test() *QualityResult {
 	missingOptionalFiles := checkMissingFiles(listOfOptionalFilesToBeChecked)
 
 	optionalMessage := "Warning! The check detected following optional files missing: "
-	mandatoryMassage := "The check detected following mandatory files missing: "
+	mandatoryMessage := "The check detected following mandatory files missing: "
 
 	if len(missingOptionalFiles) > 0 {
 		optionalMessage = fmtMessage(optionalMessage, missingOptionalFiles) + "\n\t"
 	}
 
 	if len(missingMandatoryFiles) > 0 {
-		mandatoryMassage = fmtMessage(mandatoryMassage, missingMandatoryFiles)
+		mandatoryMessage = fmtMessage(mandatoryMessage, missingMandatoryFiles)
 	}
 
 	if len(missingMandatoryFiles) == 0 && len(missingOptionalFiles) > 0 {
 		return &QualityResult{ErrorDescription: optionalMessage, Passed: true}
 	} else if len(missingMandatoryFiles) > 0 || len(missingOptionalFiles) > 0 {
-		return &QualityResult{ErrorDescription: optionalMessage + mandatoryMassage}
+		return &QualityResult{ErrorDescription: optionalMessage + mandatoryMessage}
 	}
 
 	return &QualityResult{Passed: true}
