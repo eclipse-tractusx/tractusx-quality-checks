@@ -21,6 +21,7 @@ package txqualitychecks
 
 import (
 	"os"
+	"fmt"
 )
 
 type HelmStructureExists struct {
@@ -45,24 +46,31 @@ func (r *HelmStructureExists) ExternalDescription() string {
 
 func (r *HelmStructureExists) Test() *QualityResult {
 
-	// helmStructureFiles := []string{
-	// 	".helmignore",
-	// 	"Chart.yaml",
-	// 	"LICENSE",
-	// 	"README.md",
-	// 	"values.yaml",
-	// 	"templates",
-	// 	"templates/NOTES.txt",
-	// }
+	helmStructureFiles := []string{
+		".helmignore",
+		"Chart.yaml",
+		"LICENSE",
+		"README.md",
+		"values.yaml",
+		"templates",
+		"templates/NOTES.txt",
+	}
 
 	mainDir := "charts"
 	if fi, err := os.Stat(mainDir); err != nil || !fi.IsDir() {
 		return &QualityResult{ErrorDescription: "The Helm Charts folder charts/ doesn't exist.", Passed: false}
 	}
 
-	// for _, file := range helmStructureFiles {
+	for i,fname := range helmStructureFiles {
+		helmStructureFiles[i] = mainDir+"/"+fname
+	}
 
-	// }
+	missingFiles := checkMissingFiles(helmStructureFiles)
+	message := "Following files are missing: "
+	fmt.Println(fmtMessage(message, missingFiles))
+	if len(missingFiles) > 0 {
+		return &QualityResult{ErrorDescription: message}
+	}
 
 	return &QualityResult{Passed: true}
 }
