@@ -32,10 +32,5 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version-file: "go.mod"
-
       - name: Run quality check command
-        uses: eclipse-tractusx/tractusx-quality-checks@v0.1
+        uses: eclipse-tractusx/tractusx-quality-checks@v0.2
