@@ -20,6 +20,7 @@
 package txqualitychecks
 
 import (
+	"fmt"
 	"os"
 )
 
@@ -71,21 +72,16 @@ func (c RepoStructureExists) Test() *QualityResult {
 	missingMandatoryFiles := checkMissingFiles(listOfMandatoryFilesToBeChecked)
 	missingOptionalFiles := checkMissingFiles(listOfOptionalFilesToBeChecked)
 
-	optionalMessage := "Warning! The check detected following optional files missing: "
+	optionalMessage := "The check detected following optional files missing: "
 	mandatoryMessage := "The check detected following mandatory files missing: "
 
 	if len(missingOptionalFiles) > 0 {
-		optionalMessage = fmtMessage(optionalMessage, missingOptionalFiles) + "\n\t"
+		fmt.Printf("Warning! Guideline description: %s\n\t%s\n\tMore infos: %s\n",
+			c.Description(), fmtMessage(optionalMessage, missingOptionalFiles), c.ExternalDescription())
 	}
 
 	if len(missingMandatoryFiles) > 0 {
-		mandatoryMessage = fmtMessage(mandatoryMessage, missingMandatoryFiles)
-	}
-
-	if len(missingMandatoryFiles) == 0 && len(missingOptionalFiles) > 0 {
-		return &QualityResult{ErrorDescription: optionalMessage, Passed: true}
-	} else if len(missingMandatoryFiles) > 0 || len(missingOptionalFiles) > 0 {
-		return &QualityResult{ErrorDescription: optionalMessage + mandatoryMessage}
+		return &QualityResult{ErrorDescription: fmtMessage(mandatoryMessage, missingMandatoryFiles)}
 	}
 
 	return &QualityResult{Passed: true}
