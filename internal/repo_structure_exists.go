@@ -21,6 +21,7 @@ package txqualitychecks
 
 import (
 	"fmt"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/product"
 	"os"
 )
 
@@ -65,8 +66,12 @@ func (c RepoStructureExists) Test() *QualityResult {
 		"NOTICE.md",
 		"README.md",
 		"SECURITY.md",
-		"docs",
-		"charts",
+	}
+
+	mandatoryForLeadingRepo := []string{"docs", "charts"}
+
+	if product.IsLeadingRepo() {
+		listOfMandatoryFilesToBeChecked = append(listOfMandatoryFilesToBeChecked, mandatoryForLeadingRepo...)
 	}
 
 	missingMandatoryFiles := checkMissingFiles(listOfMandatoryFilesToBeChecked)

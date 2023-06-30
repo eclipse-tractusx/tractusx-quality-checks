@@ -69,6 +69,29 @@ func TestShouldReadProductMetadataFromDefaultFile(t *testing.T) {
 	}
 }
 
+func TestShouldPassIsLeadingRepoValidEnvVariable(t *testing.T) {
+	copyTemplateFileTo(".tractusx", t)
+	defer os.Remove(".tractusx")
+	os.Setenv("GITHUB_REPOSITORY", "eclipse-tractusx/sig-infra")
+	os.Setenv("GITHUB_REPOSITORY_OWNER", "tester")
+
+	if !IsLeadingRepo() {
+		t.Errorf("Test should pass, but $GITHUB_REPOSITORY is not equal leadingRepo from .tractusx")
+	}
+
+}
+
+func TestShouldFailIsLeadingRepoFakeEnvVariable(t *testing.T) {
+	copyTemplateFileTo(".tractusx", t)
+	defer os.Remove(".tractusx")
+	os.Setenv("GITHUB_REPOSITORY", "repo/fake_reponame")
+	os.Setenv("GITHUB_REPOSITORY_OWNER", "tester")
+
+	if IsLeadingRepo() {
+		t.Errorf("Repo shouldn't be identified as leading one, there is fake env variable $GITHUB_REPOSITORY.")
+	}
+}
+
 func copyTemplateFileTo(path string, t *testing.T) {
 	templateFile, err := os.ReadFile(metadataTestFile)
 	if err != nil {
