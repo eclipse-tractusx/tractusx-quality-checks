@@ -24,31 +24,23 @@ on:
     tags:
       - "v*.*.*"
 
-jobs:
-# todo (CARSLEN): setup/adjust go build routine according to needs if we're ready to build
-#  go-build:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#        with:
-#          fetch-depth: 0
-#      - name: Set up Go
-#        uses: actions/setup-go@v3
-#        with:
-#          go-version-file: 'main.go'
-#
-#      - name: Run
-#        run: go build -ldflags "-s -w" -o $GITHUB_WORKSPACE/.github/bin/
-#        working-directory: $GITHUB_WORKSPACE
+env:
+  APP_NAME: "tractusx-quality-checks"
 
+jobs:
   release:
-    # needs: go-build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      - name: version
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: "go.mod"
+
+      - name: Gather version facts
         id: version
         run: |
           tag=${GITHUB_REF/refs\/tags\//}
@@ -58,7 +50,12 @@ jobs:
           echo "version=${version}" >> $GITHUB_OUTPUT
           echo "major=${major}" >> $GITHUB_OUTPUT
 
-      - name: create GitHub release
+      - name: Build binary
+        run: go build -o $GITHUB_WORKSPACE/bin/${{env.APP_NAME}}-${{ steps.version.outputs.version }}
+        working-directory: $GITHUB_WORKSPACE
+
+      - name: Create GitHub release
+        id: create_release
         uses: release-drafter/release-drafter@v5
         with:
           config-name: release-drafter.yaml
@@ -67,7 +64,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: force update major tag
+      - name: Upload release assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: $GITHUB_WORKSPACE/bin/${{env.APP_NAME}}-${{ steps.version.outputs.version }}
+          asset_name: ${{env.APP_NAME}}-${{ steps.version.outputs.version }}
+          asset_content_type: application/octet-stream
+
+      - name: Force update major tag
         run: |
           git tag v${{ steps.version.outputs.major }} ${{ steps.version.outputs.tag }} -f
           git push origin refs/tags/v${{ steps.version.outputs.major }} -f
