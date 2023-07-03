@@ -51,8 +51,8 @@ jobs:
           echo "major=${major}" >> $GITHUB_OUTPUT
 
       - name: Build binary
-        run: go build -o $GITHUB_WORKSPACE/bin/${{ env.APP_NAME }}-${{ steps.version.outputs.version }}
-        working-directory: $GITHUB_WORKSPACE
+        run: go build -o ${{ github.workspace }}/bin/${{ env.APP_NAME }}-${{ steps.version.outputs.version }}
+        working-directory: ${{ github.workspace }}
 
       - name: Create GitHub release
         id: create_release
@@ -70,7 +70,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: $GITHUB_WORKSPACE/bin/${{ env.APP_NAME }}-${{ steps.version.outputs.version }}
+          asset_path: ${{ github.workspace }}/bin/${{ env.APP_NAME }}-${{ steps.version.outputs.version }}
           asset_name: ${{ env.APP_NAME }}-${{ steps.version.outputs.version }}
           asset_content_type: application/octet-stream
 
