@@ -19,5 +19,9 @@
 ---
 
 product: "tractusx-quality-checks"
-leadingRepository: "https://github.com/eclipse-tractusx/tractusx-quality-checks"
-repositories: []
+leadingRepository: "https://github.com/eclipse-tractusx/sig-infra"
+repositories:
+    - "https://github.com/eclipse-tractusx/sig-infra"
+    - "https://github.com/eclipse-tractusx/tractusx-quality-checks"
+    - "https://github.com/eclipse-tractusx/charts"
+]
