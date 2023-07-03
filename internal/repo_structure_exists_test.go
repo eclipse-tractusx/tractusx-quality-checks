@@ -39,7 +39,12 @@ var listOfDirsToBeCreated []string = []string{
 	"charts",
 }
 
+const metadataTestFile = "../pkg/product/test/metadata_test_template.yaml"
+
 func TestShouldPassIfRepoStructureExistsWithoutOptional(t *testing.T) {
+
+	setEnv(t)
+	defer os.Remove(".tractusx")
 
 	createFiles(listOfFilesToBeCreated)
 	createDirs(listOfDirsToBeCreated)
@@ -54,6 +59,9 @@ func TestShouldPassIfRepoStructureExistsWithoutOptional(t *testing.T) {
 }
 
 func TestShouldPassIfRepoStructureExistsWithOptional(t *testing.T) {
+
+	setEnv(t)
+	defer os.Remove(".tractusx")
 
 	listOfFilesToBeCreated = append(listOfFilesToBeCreated, []string{"INSTALL.md", "AUTHORS.md"}...)
 
@@ -71,6 +79,10 @@ func TestShouldPassIfRepoStructureExistsWithOptional(t *testing.T) {
 }
 
 func TestShouldFailIfRepoStructureIsMissing(t *testing.T) {
+
+	setEnv(t)
+	defer os.Remove(".tractusx")
+
 	repostructureTest := NewRepoStructureExists()
 
 	result := repostructureTest.Test()
@@ -96,5 +108,22 @@ func cleanFiles(files []string) {
 
 	for _, file := range files {
 		os.Remove(file)
+	}
+}
+
+func setEnv(t *testing.T) {
+	copyTemplateFileTo(".tractusx", t)
+	os.Setenv("GITHUB_REPOSITORY", "eclipse-tractusx/sig-infra")
+	os.Setenv("GITHUB_REPOSITORY_OWNER", "tester")
+}
+
+func copyTemplateFileTo(path string, t *testing.T) {
+	templateFile, err := os.ReadFile(metadataTestFile)
+	if err != nil {
+		t.Errorf("Could not read template file necessary for this test")
+	}
+	err = os.WriteFile(path, templateFile, 0644)
+	if err != nil {
+		t.Errorf("Could not copy template file to designated path")
 	}
 }

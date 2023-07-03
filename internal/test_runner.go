@@ -49,11 +49,6 @@ func (runner *GuidelineTestRunner) Run() error {
 				fmt.Sprintf("Failed! Guideline description: %s\n\t%s\n\tMore infos: %s",
 					guideline.Description(), result.ErrorDescription, guideline.ExternalDescription()),
 			)
-		} else if result.Passed && result.ErrorDescription != "" {
-			runner.printer.Print(
-				fmt.Sprintf("Warning! Guideline description: %s\n\t%s\n\tMore infos: %s",
-					guideline.Description(), result.ErrorDescription, guideline.ExternalDescription()),
-			)
 		}
 
 		allPassed = allPassed && (result.Passed || guideline.IsOptional())
