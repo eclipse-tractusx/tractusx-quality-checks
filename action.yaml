@@ -19,14 +19,24 @@
 
 name: "eclipse-tractusx-quality-checks"
 description: "Run quality checks based on the release guidelines"
+inputs:
+  version:
+    description: The version of the quality checks release to use
+    required: true
+    default: "0.3.0"
 
 runs:
   using: composite
   steps:
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version-file: "go.mod"
-    - run: go run main.go checkLocal
+    - name: Download quality checks binary
+      run: curl -OL https://github.com/eclipse-tractusx/tractusx-quality-checks/releases/download/v${{ inputs.version }}/tractusx-quality-checks-${{ inputs.version }}
+      shell: bash
+
+    - name: Make binary executable
+      run: chmod +x ./tractusx-quality-checks-${{ inputs.version }}
+      shell: bash
+
+    - name: Run quality checks
+      run: ./tractusx-quality-checks-${{ inputs.version }} checkLocal
       shell: bash
 
