@@ -21,7 +21,12 @@
 product: "tractusx-quality-checks"
 leadingRepository: "https://github.com/eclipse-tractusx/sig-infra"
 repositories:
-    - "https://github.com/eclipse-tractusx/sig-infra"
-    - "https://github.com/eclipse-tractusx/tractusx-quality-checks"
-    - "https://github.com/eclipse-tractusx/charts"
-]
+    - name: "Tractus-X quality checks"
+      usage: "automated release guidelines checks"
+      url: "https://github.com/eclipse-tractusx/tractusx-quality-checks"
+    - name: "SIG Infra"
+      usage: "Special interest group for infra topics (repos, workflows, consortium infra, etc.)"
+      url: "https://github.com/eclipse-tractusx/sig-infra"
+    - name: "Charts"
+      usage: "Acts as central Helm Chart repository"
+      url: "https://github.com/eclipse-tractusx/charts"
