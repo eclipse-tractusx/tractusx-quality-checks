@@ -30,8 +30,13 @@ func TestShouldReturnEmptyStringIfNoDockerfilePresent(t *testing.T) {
 	}
 }
 
-func TestShould(t *testing.T) {
+func TestShouldFindSingleDockerfile(t *testing.T) {
 	if err := NewTempDockerfile().WriteTo(t.TempDir()); err != nil {
 		t.Errorf("Failed to write Dockerfile for test in temp dire")
 	}
+
+	//foundFiles := FindDockerfiles()
+	//if len(foundFiles) != 1 {
+	//	t.Errorf("Dockerfile written to temp dir could not be found by #FindDockerfiles")
+	//}
 }

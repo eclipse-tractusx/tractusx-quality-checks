@@ -17,12 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package repo
 
 import (
 	"fmt"
-	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/product"
 	"os"
+
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/product"
 )
 
 type RepoStructureExists struct {
@@ -48,7 +50,7 @@ func (c RepoStructureExists) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-2/trg-2-3"
 }
 
-func (c RepoStructureExists) Test() *QualityResult {
+func (c RepoStructureExists) Test() *txqualitychecks.QualityResult {
 
 	// Slice containing required files and folders in the repo structure.
 	// Before modification make sure you align to TRG 2.03 guideline.
@@ -86,10 +88,10 @@ func (c RepoStructureExists) Test() *QualityResult {
 	}
 
 	if len(missingMandatoryFiles) > 0 {
-		return &QualityResult{ErrorDescription: fmtMessage(mandatoryMessage, missingMandatoryFiles)}
+		return &txqualitychecks.QualityResult{ErrorDescription: fmtMessage(mandatoryMessage, missingMandatoryFiles)}
 	}
 
-	return &QualityResult{Passed: true}
+	return &txqualitychecks.QualityResult{Passed: true}
 }
 
 // Function to verify files existance.

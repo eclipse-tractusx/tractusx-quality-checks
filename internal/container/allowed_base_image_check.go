@@ -24,7 +24,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
+	txqualitychecks "github.com/eclipse-tractusx/tractusx-quality-checks/internal"
 )
 
 type AllowedBaseImage struct {

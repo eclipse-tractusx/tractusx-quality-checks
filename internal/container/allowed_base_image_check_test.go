@@ -58,7 +58,7 @@ func TestShouldNotFailIfOnlyBuildLayerDeviatesFromTemurin(t *testing.T) {
 		AppendCommand("COPY . .").
 		AppendCommand("FROM eclipse/temurin:17")
 	_ = dockerfile.Create()
-	//defer container.Delete()
+	defer dockerfile.Delete()
 
 	if !(AllowedBaseImage{}.Test().Passed) {
 		t.Errorf("Unapproved images in build layers should not let the check fail")
