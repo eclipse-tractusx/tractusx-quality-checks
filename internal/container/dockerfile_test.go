@@ -17,18 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package container
 
-import "github.com/eclipse-tractusx/tractusx-quality-checks/internal/container"
+import (
+	"testing"
+)
 
-// ReleaseGuidelines defines a slice of QualityGuidelines the test_runner will
-// test.
-var ReleaseGuidelines = []QualityGuideline{
-	NewReadmeExists(),
-	NewInstallExists(),
-	NewChangelogExists(),
-	NewLeadingRepositoryDefined(),
-	NewDefaultBranch(),
-	container.NewAllowedBaseImage(),
-	NewRepoStructureExists(),
+func TestShouldReturnEmptyStringIfNoDockerfilePresent(t *testing.T) {
+	foundFiles := FindDockerfiles()
+	if len(foundFiles) != 0 {
+		t.Errorf("#FindDockerfiles should return empty string if no file could be found")
+	}
+}
+
+func TestShould(t *testing.T) {
+	if err := NewTempDockerfile().WriteTo(t.TempDir()); err != nil {
+		t.Errorf("Failed to write Dockerfile for test in temp dire")
+	}
 }

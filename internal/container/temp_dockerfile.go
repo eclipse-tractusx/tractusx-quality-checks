@@ -17,10 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package mocks
+package container
 
 import (
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 type TempDockerfile struct {
@@ -43,7 +45,22 @@ func (f *TempDockerfile) AppendEmptyLine() *TempDockerfile {
 }
 
 func (f *TempDockerfile) Create() error {
-	file, err := os.Create(f.FileName)
+	return f.WriteTo("./")
+}
+
+func (f *TempDockerfile) Delete() error {
+	if err := os.Remove(f.FileName); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (f *TempDockerfile) WriteTo(path string) error {
+	if err := os.MkdirAll(filepath.Dir(path), 0770); err != nil {
+		return err
+	}
+
+	file, err := os.Create(strings.TrimRight(path, "/") + "/" + f.FileName)
 	if err != nil {
 		return err
 	}
@@ -53,13 +70,5 @@ func (f *TempDockerfile) Create() error {
 		file.WriteString(command + "\n")
 	}
 
-	return nil
-}
-
-func (f *TempDockerfile) Delete() error {
-	err := os.Remove(f.FileName)
-	if err != nil {
-		return err
-	}
 	return nil
 }

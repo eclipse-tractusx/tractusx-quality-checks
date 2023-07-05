@@ -17,12 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package container
 
 import (
 	"testing"
-
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/mocks"
 )
 
 func TestShouldPassIfNoDockerfilePresent(t *testing.T) {
@@ -45,7 +43,7 @@ func TestShouldFailIfDockerfileWithUnapprovedBaseImagePresent(t *testing.T) {
 }
 
 func TestShouldPassIfTemurinIsUsedAsBaseImage(t *testing.T) {
-	dockerfile := mocks.NewTempDockerfile().AppendCommand("FROM eclipse/temurin:17")
+	dockerfile := NewTempDockerfile().AppendCommand("FROM eclipse/temurin:17")
 	_ = dockerfile.Create()
 	defer dockerfile.Delete()
 
@@ -55,20 +53,20 @@ func TestShouldPassIfTemurinIsUsedAsBaseImage(t *testing.T) {
 }
 
 func TestShouldNotFailIfOnlyBuildLayerDeviatesFromTemurin(t *testing.T) {
-	dockerfile := mocks.NewTempDockerfile().
+	dockerfile := NewTempDockerfile().
 		AppendCommand("FROM amazoncorretto:8 as builder").
 		AppendCommand("COPY . .").
 		AppendCommand("FROM eclipse/temurin:17")
 	_ = dockerfile.Create()
-	defer dockerfile.Delete()
+	//defer container.Delete()
 
 	if !(AllowedBaseImage{}.Test().Passed) {
 		t.Errorf("Unapproved images in build layers should not let the check fail")
 	}
 }
 
-func createCorrettoDockerfile() *mocks.TempDockerfile {
-	dockerfile := mocks.NewTempDockerfile()
+func createCorrettoDockerfile() *TempDockerfile {
+	dockerfile := NewTempDockerfile()
 
 	dockerfile.AppendCommand("FROM amazoncorreto:8").AppendEmptyLine().AppendCommand("COPY . .")
 

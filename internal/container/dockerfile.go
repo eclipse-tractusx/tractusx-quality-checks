@@ -17,18 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package container
 
-import "github.com/eclipse-tractusx/tractusx-quality-checks/internal/container"
-
-// ReleaseGuidelines defines a slice of QualityGuidelines the test_runner will
-// test.
-var ReleaseGuidelines = []QualityGuideline{
-	NewReadmeExists(),
-	NewInstallExists(),
-	NewChangelogExists(),
-	NewLeadingRepositoryDefined(),
-	NewDefaultBranch(),
-	container.NewAllowedBaseImage(),
-	NewRepoStructureExists(),
+// FindDockerfiles will search the current repository recursively for Dockerfiles.
+// If a file is found, the relative path to the file is returned in the result slice.
+// If no Dockerfile is found the result will be an empty slice
+func FindDockerfiles() []string {
+	return []string{}
 }

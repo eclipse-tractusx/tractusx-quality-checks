@@ -17,12 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package container
 
 import (
 	"bufio"
 	"os"
 	"strings"
+
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
 )
 
 type AllowedBaseImage struct {
@@ -44,25 +46,25 @@ func (a AllowedBaseImage) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-4/trg-4-02"
 }
 
-func (a AllowedBaseImage) Test() *QualityResult {
+func (a AllowedBaseImage) Test() *txqualitychecks.QualityResult {
 	_, err := os.Stat("Dockerfile")
 	if err != nil {
-		return &QualityResult{Passed: true}
+		return &txqualitychecks.QualityResult{Passed: true}
 	}
 
 	file, err := os.Open("Dockerfile")
 	defer file.Close()
 
 	if err != nil {
-		return &QualityResult{ErrorDescription: "Could not read file 'Dockerfile'"}
+		return &txqualitychecks.QualityResult{ErrorDescription: "Could not read file 'Dockerfile'"}
 	}
 	baseImage := readBaseImage(file)
 
 	if !strings.Contains(baseImage, "eclipse/temurin") {
-		return &QualityResult{ErrorDescription: "Docker base images other than eclipse/temurin are not approved. Please switch to Temurin"}
+		return &txqualitychecks.QualityResult{ErrorDescription: "Docker base images other than eclipse/temurin are not approved. Please switch to Temurin"}
 	}
 
-	return &QualityResult{Passed: true}
+	return &txqualitychecks.QualityResult{Passed: true}
 }
 
 func readBaseImage(file *os.File) string {
