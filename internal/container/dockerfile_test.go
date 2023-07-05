@@ -20,23 +20,75 @@
 package container
 
 import (
+	"os"
+	"path"
 	"testing"
 )
 
 func TestShouldReturnEmptyStringIfNoDockerfilePresent(t *testing.T) {
-	foundFiles := FindDockerfiles()
+	foundFiles := FindDockerfilesAt("./")
 	if len(foundFiles) != 0 {
-		t.Errorf("#FindDockerfiles should return empty string if no file could be found")
+		t.Errorf("#FindDockerfilesAt should return empty string if no file could be found")
 	}
 }
 
 func TestShouldFindSingleDockerfile(t *testing.T) {
-	if err := NewTempDockerfile().WriteTo(t.TempDir()); err != nil {
+	tempDir := t.TempDir()
+	if err := NewTempDockerfile().WriteTo(tempDir); err != nil {
 		t.Errorf("Failed to write Dockerfile for test in temp dire")
 	}
 
-	//foundFiles := FindDockerfiles()
-	//if len(foundFiles) != 1 {
-	//	t.Errorf("Dockerfile written to temp dir could not be found by #FindDockerfiles")
-	//}
+	foundFiles := FindDockerfilesAt(tempDir)
+	if len(foundFiles) != 1 {
+		t.Errorf("Dockerfile written to temp dir could not be found by #FindDockerfilesAt")
+	}
+}
+
+func TestShouldFindDockerfileInSubdirectory(t *testing.T) {
+	tempDir := t.TempDir()
+	desiredPath := tempDir + "/abc/def"
+	if err := os.MkdirAll(desiredPath, 0777); err != nil {
+		t.Errorf("Could not create folder structure for test; err %s", err)
+	}
+
+	if err := NewTempDockerfile().WriteTo(desiredPath); err != nil {
+		t.Errorf("Could not write test Dockerfile to desired temp subdirectory")
+	}
+
+	foundFiles := FindDockerfilesAt(tempDir)
+
+	if len(foundFiles) == 0 {
+		t.Errorf("Could not find Dockerfile in subdirectory")
+	}
+}
+
+func TestShouldFindMultipleDockerfiles(t *testing.T) {
+	tempDir := t.TempDir()
+	secondTempDir := t.TempDir()
+
+	NewTempDockerfile().WriteTo(tempDir)
+	NewTempDockerfile().WriteTo(secondTempDir)
+
+	foundFiles := FindDockerfilesAt(path.Join(tempDir, "../"))
+
+	if len(foundFiles) != 2 {
+		t.Errorf("Did not find all Dockerfiles")
+	}
+}
+
+func TestShouldFindDockerfilesWithUnusualNames(t *testing.T) {
+	tempDir := t.TempDir()
+	dockerfile := NewTempDockerfile()
+	dockerfile.FileName = "Dockerfile.full"
+	dockerfile.WriteTo(tempDir)
+	dockerfile.FileName = "db.Dockerfile"
+	dockerfile.WriteTo(tempDir)
+	dockerfile.FileName = "Dockerfile-dev"
+	dockerfile.WriteTo(tempDir)
+
+	foundFiles := FindDockerfilesAt(tempDir)
+
+	if len(foundFiles) != 3 {
+		t.Errorf("Could not find all uncommonly named Dockerfiles! Found %s", foundFiles)
+	}
 }

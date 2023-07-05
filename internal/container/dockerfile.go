@@ -19,9 +19,27 @@
 
 package container
 
-// FindDockerfiles will search the current repository recursively for Dockerfiles.
+import (
+	"fmt"
+	"io/fs"
+	"path/filepath"
+	"strings"
+)
+
+// FindDockerfilesAt will search the current repository recursively for Dockerfiles.
 // If a file is found, the relative path to the file is returned in the result slice.
 // If no Dockerfile is found the result will be an empty slice
-func FindDockerfiles() []string {
-	return []string{}
+func FindDockerfilesAt(dir string) []string {
+	fmt.Println("Start finding Dockerfiles at " + dir)
+	var foundFiles []string
+
+	filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
+		if !info.IsDir() && strings.Contains(info.Name(), "Dockerfile") {
+			foundFiles = append(foundFiles, path)
+		}
+		return nil
+	})
+
+	fmt.Println("Found Dockerfiles: " + strings.Join(foundFiles, ", \n\t"))
+	return foundFiles
 }

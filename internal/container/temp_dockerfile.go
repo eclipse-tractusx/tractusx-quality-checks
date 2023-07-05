@@ -21,8 +21,7 @@ package container
 
 import (
 	"os"
-	"path/filepath"
-	"strings"
+	pathUtil "path"
 )
 
 type TempDockerfile struct {
@@ -56,11 +55,11 @@ func (f *TempDockerfile) Delete() error {
 }
 
 func (f *TempDockerfile) WriteTo(path string) error {
-	if err := os.MkdirAll(filepath.Dir(path), 0770); err != nil {
+	if err := os.MkdirAll(path, 0770); err != nil {
 		return err
 	}
 
-	file, err := os.Create(strings.TrimRight(path, "/") + "/" + f.FileName)
+	file, err := os.Create(pathUtil.Join(path, f.FileName))
 	if err != nil {
 		return err
 	}
