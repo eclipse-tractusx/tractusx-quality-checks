@@ -20,7 +20,6 @@
 package container
 
 import (
-	"bufio"
 	"os"
 	"strings"
 
@@ -82,16 +81,4 @@ func readBaseImage(file *os.File) string {
 
 	baseImage := strings.Trim(baseImageLine, "FROM ")
 	return baseImage
-}
-
-func readLines(file *os.File) []string {
-	var lines []string
-
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanLines)
-
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	return lines
 }

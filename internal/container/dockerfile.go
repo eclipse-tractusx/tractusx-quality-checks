@@ -20,6 +20,8 @@
 package container
 
 import (
+	"bufio"
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -37,6 +39,20 @@ type dockerfile struct {
 
 func newDockerfile() *dockerfile {
 	return &dockerfile{filename: "Dockerfile", commands: []string{}}
+}
+
+func dockerfileFromPath(path string) (*dockerfile, error) {
+	fileInfo, err := os.Stat(path)
+	if err != nil || fileInfo.IsDir() {
+		return nil, errors.New("Could not find Dockerfile from path: " + path)
+	}
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, errors.New("Could not read Dockerfile from path: " + path)
+	}
+
+	// TODO: #readLines is a too simple approach. Multiline commands are perfectly valid
+	return &dockerfile{filename: filepath.Base(fileInfo.Name()), commands: readLines(file)}, nil
 }
 
 func (d *dockerfile) appendCommand(command string) *dockerfile {
@@ -83,4 +99,16 @@ func findDockerfilesAt(dir string) []string {
 
 	fmt.Println("Found Dockerfiles: " + strings.Join(foundFiles, ", \n\t"))
 	return foundFiles
+}
+
+func readLines(file *os.File) []string {
+	var lines []string
+
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
+
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines
 }

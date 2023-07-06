@@ -92,3 +92,26 @@ func TestShouldFindDockerfilesWithUnusualNames(t *testing.T) {
 		t.Errorf("Could not find all uncommonly named Dockerfiles! Found %s", foundFiles)
 	}
 }
+
+func TestShouldReturnErrorIfNoDockerfileFoundAtPath(t *testing.T) {
+	if _, err := dockerfileFromPath(t.TempDir()); err == nil {
+		t.Errorf("#dockerfileFromPath should return an error if the file to read does not exist!")
+	}
+}
+
+func TestShouldReadDockerfileIfPresent(t *testing.T) {
+	tempDir := t.TempDir()
+	testDockerfilePath := path.Join(tempDir, "Dockerfile")
+	if err := os.WriteFile(testDockerfilePath, []byte("FROM ubuntu"), 0777); err != nil {
+		t.Errorf("Could not write test Dockerfile")
+	}
+
+	dockerfile, err := dockerfileFromPath(testDockerfilePath)
+	if err != nil {
+		t.Errorf("Reading a dockerifle from path should not result in an error")
+	}
+
+	if dockerfile.commands[0] != "FROM ubuntu" {
+		t.Errorf("Did not read dockerfile contents from path")
+	}
+}
