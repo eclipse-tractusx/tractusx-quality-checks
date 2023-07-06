@@ -26,10 +26,10 @@ import (
 	"strings"
 )
 
-// FindDockerfilesAt will search the current repository recursively for Dockerfiles.
+// findDockerfilesAt will search the current repository recursively for Dockerfiles.
 // If a file is found, the relative path to the file is returned in the result slice.
 // If no Dockerfile is found the result will be an empty slice
-func FindDockerfilesAt(dir string) []string {
+func findDockerfilesAt(dir string) []string {
 	fmt.Println("Start finding Dockerfiles at " + dir)
 	var foundFiles []string
 

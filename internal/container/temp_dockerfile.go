@@ -24,37 +24,37 @@ import (
 	pathUtil "path"
 )
 
-type TempDockerfile struct {
+type tempDockerfile struct {
 	FileName string
 	Commands []string
 }
 
-func NewTempDockerfile() *TempDockerfile {
-	return &TempDockerfile{FileName: "Dockerfile", Commands: []string{}}
+func newTempDockerfile() *tempDockerfile {
+	return &tempDockerfile{FileName: "Dockerfile", Commands: []string{}}
 }
 
-func (f *TempDockerfile) AppendCommand(command string) *TempDockerfile {
+func (f *tempDockerfile) appendCommand(command string) *tempDockerfile {
 	f.Commands = append(f.Commands, command)
 	return f
 }
 
-func (f *TempDockerfile) AppendEmptyLine() *TempDockerfile {
+func (f *tempDockerfile) appendEmptyLine() *tempDockerfile {
 	f.Commands = append(f.Commands, "")
 	return f
 }
 
-func (f *TempDockerfile) Create() error {
-	return f.WriteTo("./")
+func (f *tempDockerfile) create() error {
+	return f.writeTo("./")
 }
 
-func (f *TempDockerfile) Delete() error {
+func (f *tempDockerfile) delete() error {
 	if err := os.Remove(f.FileName); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (f *TempDockerfile) WriteTo(path string) error {
+func (f *tempDockerfile) writeTo(path string) error {
 	if err := os.MkdirAll(path, 0770); err != nil {
 		return err
 	}

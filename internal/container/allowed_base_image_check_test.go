@@ -33,7 +33,7 @@ func TestShouldPassIfNoDockerfilePresent(t *testing.T) {
 
 func TestShouldFailIfDockerfileWithUnapprovedBaseImagePresent(t *testing.T) {
 	dockerfile := createCorrettoDockerfile()
-	defer dockerfile.Delete()
+	defer dockerfile.delete()
 
 	result := AllowedBaseImage{}.Test()
 
@@ -43,9 +43,9 @@ func TestShouldFailIfDockerfileWithUnapprovedBaseImagePresent(t *testing.T) {
 }
 
 func TestShouldPassIfTemurinIsUsedAsBaseImage(t *testing.T) {
-	dockerfile := NewTempDockerfile().AppendCommand("FROM eclipse/temurin:17")
-	_ = dockerfile.Create()
-	defer dockerfile.Delete()
+	dockerfile := newTempDockerfile().appendCommand("FROM eclipse/temurin:17")
+	_ = dockerfile.create()
+	defer dockerfile.delete()
 
 	if !(AllowedBaseImage{}.Test().Passed) {
 		t.Errorf("eclipse/temurin should be recognized as approved base image")
@@ -53,23 +53,23 @@ func TestShouldPassIfTemurinIsUsedAsBaseImage(t *testing.T) {
 }
 
 func TestShouldNotFailIfOnlyBuildLayerDeviatesFromTemurin(t *testing.T) {
-	dockerfile := NewTempDockerfile().
-		AppendCommand("FROM amazoncorretto:8 as builder").
-		AppendCommand("COPY . .").
-		AppendCommand("FROM eclipse/temurin:17")
-	_ = dockerfile.Create()
-	defer dockerfile.Delete()
+	dockerfile := newTempDockerfile().
+		appendCommand("FROM amazoncorretto:8 as builder").
+		appendCommand("COPY . .").
+		appendCommand("FROM eclipse/temurin:17")
+	_ = dockerfile.create()
+	defer dockerfile.delete()
 
 	if !(AllowedBaseImage{}.Test().Passed) {
 		t.Errorf("Unapproved images in build layers should not let the check fail")
 	}
 }
 
-func createCorrettoDockerfile() *TempDockerfile {
-	dockerfile := NewTempDockerfile()
+func createCorrettoDockerfile() *tempDockerfile {
+	dockerfile := newTempDockerfile()
 
-	dockerfile.AppendCommand("FROM amazoncorreto:8").AppendEmptyLine().AppendCommand("COPY . .")
+	dockerfile.appendCommand("FROM amazoncorreto:8").appendEmptyLine().appendCommand("COPY . .")
 
-	_ = dockerfile.Create()
+	_ = dockerfile.create()
 	return dockerfile
 }

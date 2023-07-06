@@ -67,6 +67,10 @@ func (a AllowedBaseImage) Test() *txqualitychecks.QualityResult {
 	return &txqualitychecks.QualityResult{Passed: true}
 }
 
+func (a AllowedBaseImage) IsOptional() bool {
+	return false
+}
+
 func readBaseImage(file *os.File) string {
 	lines := readLines(file)
 	var baseImageLine string
@@ -90,8 +94,4 @@ func readLines(file *os.File) []string {
 		lines = append(lines, scanner.Text())
 	}
 	return lines
-}
-
-func (a AllowedBaseImage) IsOptional() bool {
-	return false
 }
