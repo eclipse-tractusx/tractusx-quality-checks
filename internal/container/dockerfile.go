@@ -22,9 +22,50 @@ package container
 import (
 	"fmt"
 	"io/fs"
+	"os"
+	pathUtil "path"
 	"path/filepath"
 	"strings"
 )
+
+// dockerfile is a simple utility to create or read dockerfiles.
+// the commands are supposed to contain every single instruction of the Dockerfile it represents
+type dockerfile struct {
+	filename string
+	commands []string
+}
+
+func newDockerfile() *dockerfile {
+	return &dockerfile{filename: "Dockerfile", commands: []string{}}
+}
+
+func (d *dockerfile) appendCommand(command string) *dockerfile {
+	d.commands = append(d.commands, command)
+	return d
+}
+
+func (d *dockerfile) appendEmptyLine() *dockerfile {
+	d.commands = append(d.commands, "")
+	return d
+}
+
+func (d *dockerfile) writeTo(path string) error {
+	if err := os.MkdirAll(path, 0770); err != nil {
+		return err
+	}
+
+	file, err := os.Create(pathUtil.Join(path, d.filename))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	for _, command := range d.commands {
+		file.WriteString(command + "\n")
+	}
+
+	return nil
+}
 
 // findDockerfilesAt will search the current repository recursively for Dockerfiles.
 // If a file is found, the relative path to the file is returned in the result slice.

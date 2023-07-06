@@ -34,7 +34,7 @@ func TestShouldReturnEmptyStringIfNoDockerfilePresent(t *testing.T) {
 
 func TestShouldFindSingleDockerfile(t *testing.T) {
 	tempDir := t.TempDir()
-	if err := newTempDockerfile().writeTo(tempDir); err != nil {
+	if err := newDockerfile().writeTo(tempDir); err != nil {
 		t.Errorf("Failed to write Dockerfile for test in temp dire")
 	}
 
@@ -51,7 +51,7 @@ func TestShouldFindDockerfileInSubdirectory(t *testing.T) {
 		t.Errorf("Could not create folder structure for test; err %s", err)
 	}
 
-	if err := newTempDockerfile().writeTo(desiredPath); err != nil {
+	if err := newDockerfile().writeTo(desiredPath); err != nil {
 		t.Errorf("Could not write test Dockerfile to desired temp subdirectory")
 	}
 
@@ -66,8 +66,8 @@ func TestShouldFindMultipleDockerfiles(t *testing.T) {
 	tempDir := t.TempDir()
 	secondTempDir := t.TempDir()
 
-	newTempDockerfile().writeTo(tempDir)
-	newTempDockerfile().writeTo(secondTempDir)
+	newDockerfile().writeTo(tempDir)
+	newDockerfile().writeTo(secondTempDir)
 
 	foundFiles := findDockerfilesAt(path.Join(tempDir, "../"))
 
@@ -78,12 +78,12 @@ func TestShouldFindMultipleDockerfiles(t *testing.T) {
 
 func TestShouldFindDockerfilesWithUnusualNames(t *testing.T) {
 	tempDir := t.TempDir()
-	dockerfile := newTempDockerfile()
-	dockerfile.FileName = "Dockerfile.full"
+	dockerfile := newDockerfile()
+	dockerfile.filename = "Dockerfile.full"
 	dockerfile.writeTo(tempDir)
-	dockerfile.FileName = "db.Dockerfile"
+	dockerfile.filename = "db.Dockerfile"
 	dockerfile.writeTo(tempDir)
-	dockerfile.FileName = "Dockerfile-dev"
+	dockerfile.filename = "Dockerfile-dev"
 	dockerfile.writeTo(tempDir)
 
 	foundFiles := findDockerfilesAt(tempDir)
