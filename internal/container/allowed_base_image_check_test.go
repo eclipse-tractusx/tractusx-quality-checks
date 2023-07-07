@@ -26,7 +26,7 @@ import (
 )
 
 func TestShouldPassIfNoDockerfilePresent(t *testing.T) {
-	result := AllowedBaseImage{}.Test()
+	result := NewAllowedBaseImage().Test()
 
 	if result == nil || result.Passed == false {
 		t.Errorf("Allowed base image check should pass, if there is no Dockerfile found")
@@ -38,7 +38,7 @@ func TestShouldFailIfDockerfileWithUnapprovedBaseImagePresent(t *testing.T) {
 	_ = file.writeTo("./")
 	defer os.Remove(file.filename)
 
-	result := AllowedBaseImage{}.Test()
+	result := NewAllowedBaseImage().Test()
 
 	if result.Passed {
 		t.Errorf("Allowed based image check should fail, if Dockerfile with unapproved base image found")
@@ -50,7 +50,7 @@ func TestShouldPassIfTemurinIsUsedAsBaseImage(t *testing.T) {
 	_ = file.writeTo("./")
 	defer os.Remove(file.filename)
 
-	if !(AllowedBaseImage{}.Test().Passed) {
+	if !(NewAllowedBaseImage().Test().Passed) {
 		t.Errorf("eclipse/temurin should be recognized as approved base image")
 	}
 }
@@ -63,7 +63,7 @@ func TestShouldNotFailIfOnlyBuildLayerDeviatesFromTemurin(t *testing.T) {
 	_ = file.writeTo("./")
 	defer os.Remove(file.filename)
 
-	if !(AllowedBaseImage{}.Test().Passed) {
+	if !(NewAllowedBaseImage().Test().Passed) {
 		t.Errorf("Unapproved images in build layers should not let the check fail")
 	}
 }

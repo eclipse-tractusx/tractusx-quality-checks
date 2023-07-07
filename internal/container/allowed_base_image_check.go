@@ -36,23 +36,23 @@ var baseImageAllowList = []string{
 type AllowedBaseImage struct {
 }
 
-func NewAllowedBaseImage() *AllowedBaseImage {
+func NewAllowedBaseImage() txqualitychecks.QualityGuideline {
 	return &AllowedBaseImage{}
 }
 
-func (a AllowedBaseImage) Name() string {
+func (a *AllowedBaseImage) Name() string {
 	return "TRG 4.02 - Base images"
 }
 
-func (a AllowedBaseImage) Description() string {
+func (a *AllowedBaseImage) Description() string {
 	return "We are aligning all product Docker images to a set of approved ones. This also makes it easier to properly annotate the used images as dependency"
 }
 
-func (a AllowedBaseImage) ExternalDescription() string {
+func (a *AllowedBaseImage) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-4/trg-4-02"
 }
 
-func (a AllowedBaseImage) Test() *txqualitychecks.QualityResult {
+func (a *AllowedBaseImage) Test() *txqualitychecks.QualityResult {
 	foundDockerFiles := findDockerfilesAt("./")
 
 	for _, dockerfilePath := range foundDockerFiles {
@@ -71,7 +71,7 @@ func (a AllowedBaseImage) Test() *txqualitychecks.QualityResult {
 	return &txqualitychecks.QualityResult{Passed: true}
 }
 
-func (a AllowedBaseImage) IsOptional() bool {
+func (a *AllowedBaseImage) IsOptional() bool {
 	return false
 }
 
