@@ -83,6 +83,18 @@ func (d *dockerfile) writeTo(path string) error {
 	return nil
 }
 
+func (d *dockerfile) baseImage() string {
+	var baseImageLine string
+
+	for _, command := range d.commands {
+		if strings.HasPrefix(strings.TrimSpace(command), "FROM ") {
+			baseImageLine = strings.TrimSpace(command)
+		}
+	}
+
+	return strings.Trim(baseImageLine, "FROM ")
+}
+
 // findDockerfilesAt will search the current repository recursively for Dockerfiles.
 // If a file is found, the relative path to the file is returned in the result slice.
 // If no Dockerfile is found the result will be an empty slice

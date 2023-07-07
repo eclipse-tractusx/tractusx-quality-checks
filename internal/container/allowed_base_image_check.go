@@ -20,7 +20,7 @@
 package container
 
 import (
-	"os"
+	"fmt"
 	"strings"
 
 	txqualitychecks "github.com/eclipse-tractusx/tractusx-quality-checks/internal"
@@ -46,21 +46,17 @@ func (a AllowedBaseImage) ExternalDescription() string {
 }
 
 func (a AllowedBaseImage) Test() *txqualitychecks.QualityResult {
-	_, err := os.Stat("Dockerfile")
-	if err != nil {
-		return &txqualitychecks.QualityResult{Passed: true}
-	}
+	foundDockerFiles := findDockerfilesAt("./")
 
-	file, err := os.Open("Dockerfile")
-	defer file.Close()
+	for _, dockerfilePath := range foundDockerFiles {
+		dockerFile, err := dockerfileFromPath(dockerfilePath)
+		if err != nil {
+			fmt.Printf("Could not read dockerfile from Path %s\n", dockerfilePath)
+		}
 
-	if err != nil {
-		return &txqualitychecks.QualityResult{ErrorDescription: "Could not read file 'Dockerfile'"}
-	}
-	baseImage := readBaseImage(file)
-
-	if !strings.Contains(baseImage, "eclipse/temurin") {
-		return &txqualitychecks.QualityResult{ErrorDescription: "Docker base images other than eclipse/temurin are not approved. Please switch to Temurin"}
+		if !strings.Contains(dockerFile.baseImage(), "eclipse/temurin") {
+			return &txqualitychecks.QualityResult{ErrorDescription: "Docker base images other than eclipse/temurin are not approved. Please switch to Temurin"}
+		}
 	}
 
 	return &txqualitychecks.QualityResult{Passed: true}
@@ -68,17 +64,4 @@ func (a AllowedBaseImage) Test() *txqualitychecks.QualityResult {
 
 func (a AllowedBaseImage) IsOptional() bool {
 	return false
-}
-
-func readBaseImage(file *os.File) string {
-	lines := readLines(file)
-	var baseImageLine string
-	for _, line := range lines {
-		if strings.HasPrefix(strings.TrimSpace(line), "FROM ") {
-			baseImageLine = strings.TrimSpace(line)
-		}
-	}
-
-	baseImage := strings.Trim(baseImageLine, "FROM ")
-	return baseImage
 }

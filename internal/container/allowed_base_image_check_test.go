@@ -20,6 +20,7 @@
 package container
 
 import (
+	"math/rand"
 	"os"
 	"testing"
 )
@@ -67,9 +68,38 @@ func TestShouldNotFailIfOnlyBuildLayerDeviatesFromTemurin(t *testing.T) {
 	}
 }
 
+func TestShouldFailForUnallowedBaseImageInSubdirectory(t *testing.T) {
+	subdirectory := randomSubDir(t)
+	dockerfile := correttoDockerfile()
+	_ = dockerfile.writeTo(subdirectory)
+	defer os.RemoveAll(subdirectory)
+
+	result := NewAllowedBaseImage().Test()
+
+	if result.Passed {
+		t.Errorf("Unapproved base images should also be detected in sub directories")
+	}
+}
+
 func correttoDockerfile() *dockerfile {
 	return newDockerfile().
 		appendCommand("FROM amazoncorreto:8").
 		appendEmptyLine().
 		appendCommand("COPY . .")
+}
+
+func randomSubDir(t *testing.T) string {
+	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	b := make([]rune, 10)
+
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+
+	subDirPath := string(b)
+	if err := os.MkdirAll(subDirPath, 0770); err != nil {
+		t.Errorf("Could not create random subdirectory at path: " + subDirPath)
+	}
+
+	return subDirPath
 }
