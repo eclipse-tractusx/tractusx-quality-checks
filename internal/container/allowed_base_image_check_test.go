@@ -81,11 +81,60 @@ func TestShouldFailForUnallowedBaseImageInSubdirectory(t *testing.T) {
 	}
 }
 
+func TestShouldFailIfAtLeastOneDockerfileWithUnallowedBaseImageIsFound(t *testing.T) {
+	firstSubdir := randomSubDir(t)
+	secondSubDir := randomSubDir(t)
+	corretto := correttoDockerfile()
+	temurin := temurinDockerfile()
+
+	_ = corretto.writeTo(firstSubdir)
+	_ = temurin.writeTo(secondSubDir)
+	defer os.RemoveAll(firstSubdir)
+	defer os.RemoveAll(secondSubDir)
+
+	result := NewAllowedBaseImage().Test()
+
+	if result.Passed {
+		t.Errorf("Base image check should fail, if at least one Dockerfile with unallowed base image is found!")
+	}
+}
+
+func TestShouldAllowBaseImagesFromWhitelist(t *testing.T) {
+	baseImageAllowList = []string{"my/baseimage", "my/other/baseimage"}
+
+	firstSubdir := randomSubDir(t)
+	secondSubDir := randomSubDir(t)
+	allowedBaseImage := dockerFileWithBaseImage(baseImageAllowList[0])
+	otherAllowedBaseImage := dockerFileWithBaseImage(baseImageAllowList[1])
+	_ = allowedBaseImage.writeTo(firstSubdir)
+	_ = otherAllowedBaseImage.writeTo(secondSubDir)
+	defer os.RemoveAll(firstSubdir)
+	defer os.RemoveAll(secondSubDir)
+
+	result := NewAllowedBaseImage().Test()
+
+	if !result.Passed {
+		t.Errorf("Should allow base images from whitelist")
+	}
+}
+
+func dockerFileWithBaseImage(baseImage string) *dockerfile {
+	return newDockerfile().appendCommand("FROM " + baseImage)
+}
+
 func correttoDockerfile() *dockerfile {
 	return newDockerfile().
 		appendCommand("FROM amazoncorreto:8").
 		appendEmptyLine().
 		appendCommand("COPY . .")
+}
+
+func temurinDockerfile() *dockerfile {
+	return newDockerfile().
+		appendCommand("FROM distroless").
+		appendEmptyLine().
+		appendCommand("COPY . .").
+		appendCommand("FROM eclipse/temurin")
 }
 
 func randomSubDir(t *testing.T) string {

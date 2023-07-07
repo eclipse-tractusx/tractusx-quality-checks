@@ -26,6 +26,13 @@ import (
 	txqualitychecks "github.com/eclipse-tractusx/tractusx-quality-checks/internal"
 )
 
+var baseImageAllowList = []string{
+	"eclipse/temurin",
+	"nginxinc/nginx-unprivileged",
+	"mcr.microsoft.com/dotnet/runtime",
+	"mcr.microsoft.com/dotnet/aspnet",
+}
+
 type AllowedBaseImage struct {
 }
 
@@ -49,12 +56,12 @@ func (a AllowedBaseImage) Test() *txqualitychecks.QualityResult {
 	foundDockerFiles := findDockerfilesAt("./")
 
 	for _, dockerfilePath := range foundDockerFiles {
-		dockerFile, err := dockerfileFromPath(dockerfilePath)
+		file, err := dockerfileFromPath(dockerfilePath)
 		if err != nil {
 			fmt.Printf("Could not read dockerfile from Path %s\n", dockerfilePath)
 		}
 
-		if !strings.Contains(dockerFile.baseImage(), "eclipse/temurin") {
+		if !isAllowedBaseImage(file.baseImage()) {
 			return &txqualitychecks.QualityResult{ErrorDescription: "Docker base images other than eclipse/temurin are not approved. Please switch to Temurin"}
 		}
 	}
@@ -63,5 +70,14 @@ func (a AllowedBaseImage) Test() *txqualitychecks.QualityResult {
 }
 
 func (a AllowedBaseImage) IsOptional() bool {
+	return false
+}
+
+func isAllowedBaseImage(image string) bool {
+	for _, imageFromAllowList := range baseImageAllowList {
+		if strings.Contains(image, imageFromAllowList) {
+			return true
+		}
+	}
 	return false
 }
