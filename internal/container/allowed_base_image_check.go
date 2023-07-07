@@ -62,7 +62,9 @@ func (a AllowedBaseImage) Test() *txqualitychecks.QualityResult {
 		}
 
 		if !isAllowedBaseImage(file.baseImage()) {
-			return &txqualitychecks.QualityResult{ErrorDescription: "Docker base images other than eclipse/temurin are not approved. Please switch to Temurin"}
+			return &txqualitychecks.QualityResult{ErrorDescription: "We want to align on docker base images. We detected a Dockerfile specifying " +
+				file.baseImage() + "\n\tAllowed images are: \n\t - " +
+				strings.Join(baseImageAllowList, "\n\t - ")}
 		}
 	}
 
