@@ -55,6 +55,8 @@ func (a *AllowedBaseImage) ExternalDescription() string {
 func (a *AllowedBaseImage) Test() *txqualitychecks.QualityResult {
 	foundDockerFiles := findDockerfilesAt("./")
 
+	checkPassed := true
+	var deniedBaseImages []string
 	for _, dockerfilePath := range foundDockerFiles {
 		file, err := dockerfileFromPath(dockerfilePath)
 		if err != nil {
@@ -62,19 +64,26 @@ func (a *AllowedBaseImage) Test() *txqualitychecks.QualityResult {
 		}
 
 		if !isAllowedBaseImage(file.baseImage()) {
-			return &txqualitychecks.QualityResult{ErrorDescription: "We want to align on docker base images. We detected a Dockerfile specifying " +
-				file.baseImage() + "\n\tAllowed images are: \n\t - " +
-				strings.Join(baseImageAllowList, "\n\t - ")}
+			checkPassed = false
+			deniedBaseImages = append(deniedBaseImages, file.baseImage())
 		}
 	}
 
-	return &txqualitychecks.QualityResult{Passed: true}
+	return &txqualitychecks.QualityResult{Passed: checkPassed, ErrorDescription: buildErrorDescription(deniedBaseImages)}
 }
 
 func (a *AllowedBaseImage) IsOptional() bool {
 	return false
 }
 
+func buildErrorDescription(deniedImages []string) string {
+	if len(deniedImages) == 0 {
+		return ""
+	}
+	return "We want to align on docker base images. We detected a Dockerfile specifying " +
+		strings.Join(deniedImages, ", ") + "\n\tAllowed images are: \n\t - " +
+		strings.Join(baseImageAllowList, "\n\t - ")
+}
 func isAllowedBaseImage(image string) bool {
 	for _, imageFromAllowList := range baseImageAllowList {
 		if strings.Contains(image, imageFromAllowList) {

@@ -22,6 +22,7 @@ package container
 import (
 	"math/rand"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -116,6 +117,22 @@ func TestShouldAllowBaseImagesFromWhitelist(t *testing.T) {
 	if !result.Passed {
 		t.Errorf("Should allow base images from whitelist")
 	}
+}
+
+func TestShouldIncludeAllUnallowedBaseImagesInErrorDescription(t *testing.T) {
+	firstSubdir := randomSubDir(t)
+	secondSubDir := randomSubDir(t)
+	_ = dockerFileWithBaseImage("badBaseImage").writeTo(firstSubdir)
+	_ = dockerFileWithBaseImage("another/unallowed").writeTo(secondSubDir)
+	defer os.RemoveAll(firstSubdir)
+	defer os.RemoveAll(secondSubDir)
+
+	result := NewAllowedBaseImage().Test()
+
+	if !strings.Contains(result.ErrorDescription, "badBaseImage") || !strings.Contains(result.ErrorDescription, "another/unallowed") {
+		t.Errorf("Error message should contain all denied base images")
+	}
+
 }
 
 func dockerFileWithBaseImage(baseImage string) *dockerfile {
