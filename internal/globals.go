@@ -28,4 +28,5 @@ var ReleaseGuidelines = []QualityGuideline{
 	NewLeadingRepositoryDefined(),
 	NewDefaultBranch(),
 	NewRepoStructureExists(),
+	NewHelmStructureExists(),
 }

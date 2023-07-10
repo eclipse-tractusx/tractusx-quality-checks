@@ -21,38 +21,43 @@ package txqualitychecks
 
 import (
 	"testing"
+	"os"
 )
 
+func TestShouldPassIfHelmDirIsMissing(t *testing.T) {
+	helmStructureTest := NewHelmStructureExists()
+
+	result := helmStructureTest.Test()
+
+	if !result.Passed {
+		t.Errorf("Helm directory doesn't exist hence test should pass.")
+	}
+}
+
+func TestShouldFailIfNoHelmChartsFound(t *testing.T) {
+	os.Mkdir("charts", 0750)
+	defer os.Remove("charts")
+
+	helmStructureTest := NewHelmStructureExists()
+	result := helmStructureTest.Test()
+	if result.Passed {
+		t.Errorf("Helm directory doesn't contain any charts hence test should fail.")
+	}
+
+}
+
 func TestShouldFailIfHelmStructureIsMissing(t *testing.T) {
+	
+	os.Mkdir("charts", 0750)
+	os.Mkdir("charts/exampleChart", 0750)
+	defer os.Remove("charts")
+
+
 	helmStructureTest := NewHelmStructureExists()
 
 	result := helmStructureTest.Test()
 
 	if result.Passed {
-		t.Errorf("HelmStructureExists should fail if Helm structure is missing.")
+		t.Errorf("Helm structure is missing hence test should fail.")
 	}
 }
-
-//  func TestShouldPassIfHelmStructureExists(t *testing.T) {
-// 	 _, _ = os.Create("CHANGELOG.md")
-// 	 defer func() {
-// 		 _ = os.Remove("CHANGELOG.md")
-// 	 }()
-// 	 helmStructureTest := NewHelmStructureExists()
-
-// 	 result := helmStructureTest.Test()
-
-// 	 if !result.Passed {
-// 		 t.Errorf("ChangelogExist should pass, if a CHANGELOG.md exists")
-// 	 }
-//  }
-
-//  func TestShouldProvideErrorDescriptionForHelmStructureIfFailing(t *testing.T) {
-// 	helmStructureTest := NewHelmStructureExists()
-
-// 	 result := helmStructureTest.Test()
-
-// 	 if result.ErrorDescription == "" {
-// 		 t.Errorf("Failing tests should provide an error description")
-// 	 }
-//  }

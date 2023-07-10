@@ -21,7 +21,6 @@ package txqualitychecks
 
 import (
 	"os"
-	"fmt"
 )
 
 type HelmStructureExists struct {
@@ -37,7 +36,7 @@ func (r *HelmStructureExists) Name() string {
 }
 
 func (r *HelmStructureExists) Description() string {
-	return "Each Helm chart should follow a specific structure."
+	return "Helm Chart should follow a specific structure."
 }
 
 func (r *HelmStructureExists) ExternalDescription() string {
@@ -56,20 +55,32 @@ func (r *HelmStructureExists) Test() *QualityResult {
 		"templates/NOTES.txt",
 	}
 
+	
 	mainDir := "charts"
 	if fi, err := os.Stat(mainDir); err != nil || !fi.IsDir() {
-		return &QualityResult{ErrorDescription: "The Helm Charts folder charts/ doesn't exist.", Passed: false}
+		return &QualityResult{Passed: true}
 	}
 
-	for i,fname := range helmStructureFiles {
-		helmStructureFiles[i] = mainDir+"/"+fname
+	helmCharts, err := os.ReadDir(mainDir)
+	if err != nil || len(helmCharts) == 0 {
+		return &QualityResult{ErrorDescription: "Can't read Helm Charts."}
 	}
 
-	missingFiles := checkMissingFiles(helmStructureFiles)
-	message := "Following files are missing: "
-	fmt.Println(fmtMessage(message, missingFiles))
+	missingFiles := []string{}
+	for _, hc := range helmCharts {
+		if hc.IsDir() {
+			// do the check
+			tmpFilesStructure := []string{}
+			for _, fname := range helmStructureFiles {
+				tmpFilesStructure = append(tmpFilesStructure, mainDir + "/" + hc.Name() + "/" + fname)
+			}
+			missingFiles = append(missingFiles, checkMissingFiles(tmpFilesStructure)...)
+		}
+	}
+	
 	if len(missingFiles) > 0 {
-		return &QualityResult{ErrorDescription: message}
+		message := "Following files are missing: "
+		return &QualityResult{ErrorDescription: fmtMessage(message, missingFiles)}
 	}
 
 	return &QualityResult{Passed: true}
