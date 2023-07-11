@@ -17,9 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package helm
 
 import (
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/repo"
 	"os"
 )
 
@@ -27,7 +29,7 @@ type HelmStructureExists struct {
 }
 
 // NewHelmStructureExists returns a new check based on QualityGuideline interface.
-func NewHelmStructureExists() QualityGuideline {
+func NewHelmStructureExists() txqualitychecks.QualityGuideline {
 	return &HelmStructureExists{}
 }
 
@@ -43,7 +45,7 @@ func (r *HelmStructureExists) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-5/trg-5-02"
 }
 
-func (r *HelmStructureExists) Test() *QualityResult {
+func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
 
 	helmStructureFiles := []string{
 		".helmignore",
@@ -57,12 +59,12 @@ func (r *HelmStructureExists) Test() *QualityResult {
 
 	mainDir := "charts"
 	if fi, err := os.Stat(mainDir); err != nil || !fi.IsDir() {
-		return &QualityResult{Passed: true}
+		return &txqualitychecks.QualityResult{Passed: true}
 	}
 
 	helmCharts, err := os.ReadDir(mainDir)
 	if err != nil || len(helmCharts) == 0 {
-		return &QualityResult{ErrorDescription: "Can't read Helm Charts."}
+		return &txqualitychecks.QualityResult{ErrorDescription: "Can't read Helm Charts at charts/."}
 	}
 
 	missingFiles := []string{}
@@ -72,16 +74,16 @@ func (r *HelmStructureExists) Test() *QualityResult {
 			for _, fname := range helmStructureFiles {
 				tmpFilesStructure = append(tmpFilesStructure, mainDir+"/"+hc.Name()+"/"+fname)
 			}
-			missingFiles = append(missingFiles, checkMissingFiles(tmpFilesStructure)...)
+			missingFiles = append(missingFiles, repo.CheckMissingFiles(tmpFilesStructure)...)
 		}
 	}
 
 	if len(missingFiles) > 0 {
 		message := "Following files are missing: "
-		return &QualityResult{ErrorDescription: fmtMessage(message, missingFiles)}
+		return &txqualitychecks.QualityResult{ErrorDescription: repo.FmtMessage(message, missingFiles)}
 	}
 
-	return &QualityResult{Passed: true}
+	return &txqualitychecks.QualityResult{Passed: true}
 }
 
 func (r *HelmStructureExists) IsOptional() bool {

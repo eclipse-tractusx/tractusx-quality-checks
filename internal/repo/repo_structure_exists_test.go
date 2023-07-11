@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package repo
 
 import (
 	"os"
@@ -46,12 +46,12 @@ func TestShouldPassIfRepoStructureExistsWithoutOptional(t *testing.T) {
 	setEnv(t)
 	defer os.Remove(".tractusx")
 
-	createFiles(listOfFilesToBeCreated)
-	createDirs(listOfDirsToBeCreated)
+	CreateFiles(listOfFilesToBeCreated)
+	CreateDirs(listOfDirsToBeCreated)
 
 	repostructureTest := NewRepoStructureExists()
 	result := repostructureTest.Test()
-	cleanFiles(append(listOfFilesToBeCreated, listOfDirsToBeCreated...))
+	CleanFiles(append(listOfFilesToBeCreated, listOfDirsToBeCreated...))
 
 	if !result.Passed {
 		t.Errorf("Structure exists with optional files, but test still fails.")
@@ -65,12 +65,12 @@ func TestShouldPassIfRepoStructureExistsWithOptional(t *testing.T) {
 
 	listOfFilesToBeCreated = append(listOfFilesToBeCreated, []string{"INSTALL.md", "AUTHORS.md"}...)
 
-	createFiles(listOfFilesToBeCreated)
-	createDirs(listOfDirsToBeCreated)
+	CreateFiles(listOfFilesToBeCreated)
+	CreateDirs(listOfDirsToBeCreated)
 
 	repostructureTest := NewRepoStructureExists()
 	result := repostructureTest.Test()
-	cleanFiles(append(listOfFilesToBeCreated, listOfDirsToBeCreated...))
+	CleanFiles(append(listOfFilesToBeCreated, listOfDirsToBeCreated...))
 
 	if !result.Passed {
 		t.Errorf("Structure exists without optional files, but test still fails.")
@@ -89,25 +89,6 @@ func TestShouldFailIfRepoStructureIsMissing(t *testing.T) {
 
 	if result.Passed {
 		t.Errorf("RepoStructureExist should fail if repo structure exists.")
-	}
-}
-
-func createFiles(files []string) {
-	for _, file := range files {
-		os.Create(file)
-	}
-}
-
-func createDirs(dirs []string) {
-	for _, dir := range dirs {
-		os.Mkdir(dir, 0750)
-	}
-}
-
-func cleanFiles(files []string) {
-
-	for _, file := range files {
-		os.Remove(file)
 	}
 }
 

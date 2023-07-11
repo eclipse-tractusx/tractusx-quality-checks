@@ -17,9 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package helm
 
 import (
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/repo"
 	"os"
 	"testing"
 )
@@ -77,8 +78,8 @@ func TestShouldPassIfHelmStructureExist(t *testing.T) {
 		"charts/exampleChart/templates/NOTES.txt",
 	}
 
-	createHCDirs(helmStructureDirsExample)
-	createHCFiles(helmStructureFilesExample)
+	repo.CreateDirs(helmStructureDirsExample)
+	repo.CreateFiles(helmStructureFilesExample)
 	defer os.RemoveAll("charts")
 
 	helmStructureTest := NewHelmStructureExists()
@@ -89,16 +90,4 @@ func TestShouldPassIfHelmStructureExist(t *testing.T) {
 		t.Errorf("Helm structure exists hence test should pass.")
 	}
 
-}
-
-func createHCFiles(files []string) {
-	for _, file := range files {
-		os.Create(file)
-	}
-}
-
-func createHCDirs(dirs []string) {
-	for _, dir := range dirs {
-		os.Mkdir(dir, 0750)
-	}
 }

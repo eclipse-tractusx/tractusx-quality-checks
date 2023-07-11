@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package docs
 
 import (
 	"os"
@@ -27,7 +27,7 @@ import (
 func TestNewInstallExists(t *testing.T) {
 	t.Run("Provide ErrorDescription on Fail", func(t *testing.T) {
 		installTest := NewInstallExists()
-		expectedError := "Did not find optional INSTALL.md file in current directory."
+		expectedError := "Optional file INSTALL.md not found in current directory."
 
 		result := installTest.Test()
 
