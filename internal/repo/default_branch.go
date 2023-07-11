@@ -17,9 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package repo
 
 import (
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/repo"
 )
 
@@ -38,27 +39,27 @@ func (d defaultBranch) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-2/trg-2-1"
 }
 
-func (d defaultBranch) Test() *QualityResult {
+func (d defaultBranch) Test() *txqualitychecks.QualityResult {
 	repoinfo := repo.GetRepoMetadata(repo.GetRepoBaseInfo())
 
 	if *repoinfo.Fork {
-		return &QualityResult{Passed: false, ErrorDescription: "Check determined running on a fork."}
+		return &txqualitychecks.QualityResult{Passed: false, ErrorDescription: "Check determined running on a fork."}
 	}
 
 	if *repoinfo.DefaultBranch != "main" {
-		return &QualityResult{
+		return &txqualitychecks.QualityResult{
 			Passed:           false,
 			ErrorDescription: "Default branch not set to 'main'.",
 		}
 	}
 
-	return &QualityResult{Passed: true}
+	return &txqualitychecks.QualityResult{Passed: true}
 }
 
 func (d defaultBranch) IsOptional() bool {
 	return false
 }
 
-func NewDefaultBranch() QualityGuideline {
+func NewDefaultBranch() txqualitychecks.QualityGuideline {
 	return &defaultBranch{}
 }

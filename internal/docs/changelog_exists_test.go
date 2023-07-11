@@ -17,38 +17,43 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package docs
 
-import "os"
+import (
+	"os"
+	"testing"
+)
 
-type ReadmeExists struct {
-}
+func TestShouldFailIfChangelogFileIsMissing(t *testing.T) {
+	changelogTest := NewChangelogExists()
 
-func (r *ReadmeExists) IsOptional() bool {
-	return false
-}
+	result := changelogTest.Test()
 
-func NewReadmeExists() QualityGuideline {
-	return &ReadmeExists{}
-}
-
-func (r *ReadmeExists) Name() string {
-	return "TRG 1.01 - README.md"
-}
-
-func (r *ReadmeExists) Description() string {
-	return "A good README.md file is the starting point for everyone opening a repository. It should help them find all critical information in an easy way."
-}
-
-func (r *ReadmeExists) ExternalDescription() string {
-	return "https://eclipse-tractusx.github.io/docs/release/trg-1/trg-1-1"
-}
-
-func (r *ReadmeExists) Test() *QualityResult {
-	_, err := os.Stat("README.md")
-
-	if err != nil {
-		return &QualityResult{ErrorDescription: "Did not find a README.md file in current directory!"}
+	if result.Passed {
+		t.Errorf("ChangelogExist should fail if no Changelog file present")
 	}
-	return &QualityResult{Passed: true}
+}
+
+func TestShouldPassIfChangelogExists(t *testing.T) {
+	_, _ = os.Create("CHANGELOG.md")
+	defer func() {
+		_ = os.Remove("CHANGELOG.md")
+	}()
+	changelogTest := NewChangelogExists()
+
+	result := changelogTest.Test()
+
+	if !result.Passed {
+		t.Errorf("ChangelogExist should pass, if a CHANGELOG.md exists")
+	}
+}
+
+func TestShouldProvideErrorDescriptionIfFailing(t *testing.T) {
+	changelogTest := NewChangelogExists()
+
+	result := changelogTest.Test()
+
+	if result.ErrorDescription == "" {
+		t.Errorf("Failing tests should provide an error description")
+	}
 }

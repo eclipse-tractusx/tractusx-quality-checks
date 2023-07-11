@@ -17,15 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package docs
 
-import "os"
+import (
+	"os"
+
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
+)
 
 type InstallExists struct {
 }
 
 // NewInstallExists returns a new check based on QualityGuideline interface.
-func NewInstallExists() QualityGuideline {
+func NewInstallExists() txqualitychecks.QualityGuideline {
 	return &InstallExists{}
 }
 
@@ -41,15 +45,15 @@ func (r *InstallExists) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-1/trg-1-2"
 }
 
-func (r *InstallExists) Test() *QualityResult {
+func (r *InstallExists) Test() *txqualitychecks.QualityResult {
 	_, err := os.Stat("INSTALL.md")
 
 	if err != nil {
-		return &QualityResult{
+		return &txqualitychecks.QualityResult{
 			ErrorDescription: "Optional file INSTALL.md not found in current directory.",
 		}
 	}
-	return &QualityResult{Passed: true}
+	return &txqualitychecks.QualityResult{Passed: true}
 }
 
 func (r *InstallExists) IsOptional() bool {

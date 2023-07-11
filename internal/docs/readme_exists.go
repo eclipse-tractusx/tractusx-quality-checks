@@ -17,38 +17,42 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package docs
 
-import "os"
+import (
+	"os"
 
-type ChangeLogExists struct {
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
+)
+
+type ReadmeExists struct {
 }
 
-func (c ChangeLogExists) IsOptional() bool {
+func (r *ReadmeExists) IsOptional() bool {
 	return false
 }
 
-func NewChangelogExists() *ChangeLogExists {
-	return &ChangeLogExists{}
+func NewReadmeExists() txqualitychecks.QualityGuideline {
+	return &ReadmeExists{}
 }
 
-func (c ChangeLogExists) Name() string {
-	return "TRG 1.03 - CHANGELOG.md"
+func (r *ReadmeExists) Name() string {
+	return "TRG 1.01 - README.md"
 }
 
-func (c ChangeLogExists) Description() string {
-	return "Tracking changes in Open Source is critical to have a way of knowing what new features have been introduced, what bugs have been fixed, what security CVEs have been mitigated. In Eclipse Tractus-X we use a CHANGELOG.md to document this"
+func (r *ReadmeExists) Description() string {
+	return "A good README.md file is the starting point for everyone opening a repository. It should help them find all critical information in an easy way."
 }
 
-func (c ChangeLogExists) ExternalDescription() string {
-	return "https://eclipse-tractusx.github.io/docs/release/trg-1/trg-1-3"
+func (r *ReadmeExists) ExternalDescription() string {
+	return "https://eclipse-tractusx.github.io/docs/release/trg-1/trg-1-1"
 }
 
-func (c ChangeLogExists) Test() *QualityResult {
-	_, err := os.Stat("CHANGELOG.md")
+func (r *ReadmeExists) Test() *txqualitychecks.QualityResult {
+	_, err := os.Stat("README.md")
 
 	if err != nil {
-		return &QualityResult{ErrorDescription: "A CHANGELOG.md file has to be present, describing the changes on between your releases"}
+		return &txqualitychecks.QualityResult{ErrorDescription: "Did not find a README.md file in current directory!"}
 	}
-	return &QualityResult{Passed: true}
+	return &txqualitychecks.QualityResult{Passed: true}
 }

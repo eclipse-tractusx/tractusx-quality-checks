@@ -17,18 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package repo
 
 import (
 	"strings"
 
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/product"
 )
 
 type LeadingRepositoryDefined struct {
 }
 
-func NewLeadingRepositoryDefined() QualityGuideline {
+func NewLeadingRepositoryDefined() txqualitychecks.QualityGuideline {
 	return &LeadingRepositoryDefined{}
 }
 
@@ -48,15 +49,15 @@ func (l *LeadingRepositoryDefined) IsOptional() bool {
 	return false
 }
 
-func (l *LeadingRepositoryDefined) Test() *QualityResult {
+func (l *LeadingRepositoryDefined) Test() *txqualitychecks.QualityResult {
 	metadata, err := product.MetadataFromLocalFile()
 	if err != nil {
-		return &QualityResult{ErrorDescription: "Failed! The leadingRepository property must be defined in .tractusx metadata file. Could not load metadata"}
+		return &txqualitychecks.QualityResult{ErrorDescription: "Failed! The leadingRepository property must be defined in .tractusx metadata file. Could not load metadata"}
 	}
 
 	if strings.TrimSpace(metadata.LeadingRepository) == "" {
-		return &QualityResult{ErrorDescription: "Failed! The leadingRepository property must be defined in .tractusx metadata file"}
+		return &txqualitychecks.QualityResult{ErrorDescription: "Failed! The leadingRepository property must be defined in .tractusx metadata file"}
 	}
 
-	return &QualityResult{Passed: true}
+	return &txqualitychecks.QualityResult{Passed: true}
 }
