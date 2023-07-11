@@ -55,7 +55,6 @@ func (r *HelmStructureExists) Test() *QualityResult {
 		"templates/NOTES.txt",
 	}
 
-	
 	mainDir := "charts"
 	if fi, err := os.Stat(mainDir); err != nil || !fi.IsDir() {
 		return &QualityResult{Passed: true}
@@ -69,15 +68,14 @@ func (r *HelmStructureExists) Test() *QualityResult {
 	missingFiles := []string{}
 	for _, hc := range helmCharts {
 		if hc.IsDir() {
-			// do the check
 			tmpFilesStructure := []string{}
 			for _, fname := range helmStructureFiles {
-				tmpFilesStructure = append(tmpFilesStructure, mainDir + "/" + hc.Name() + "/" + fname)
+				tmpFilesStructure = append(tmpFilesStructure, mainDir+"/"+hc.Name()+"/"+fname)
 			}
 			missingFiles = append(missingFiles, checkMissingFiles(tmpFilesStructure)...)
 		}
 	}
-	
+
 	if len(missingFiles) > 0 {
 		message := "Following files are missing: "
 		return &QualityResult{ErrorDescription: fmtMessage(message, missingFiles)}

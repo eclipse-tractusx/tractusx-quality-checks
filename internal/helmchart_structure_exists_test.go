@@ -20,8 +20,8 @@
 package txqualitychecks
 
 import (
-	"testing"
 	"os"
+	"testing"
 )
 
 func TestShouldPassIfHelmDirIsMissing(t *testing.T) {
@@ -47,11 +47,10 @@ func TestShouldFailIfNoHelmChartsFound(t *testing.T) {
 }
 
 func TestShouldFailIfHelmStructureIsMissing(t *testing.T) {
-	
+
 	os.Mkdir("charts", 0750)
 	os.Mkdir("charts/exampleChart", 0750)
 	defer os.Remove("charts")
-
 
 	helmStructureTest := NewHelmStructureExists()
 
@@ -59,5 +58,47 @@ func TestShouldFailIfHelmStructureIsMissing(t *testing.T) {
 
 	if result.Passed {
 		t.Errorf("Helm structure is missing hence test should fail.")
+	}
+}
+
+func TestShouldPassIfHelmStructureExist(t *testing.T) {
+
+	helmStructureDirsExample := []string{
+		"charts",
+		"charts/exampleChart",
+		"charts/exampleChart/templates",
+	}
+	helmStructureFilesExample := []string{
+		"charts/exampleChart/.helmignore",
+		"charts/exampleChart/Chart.yaml",
+		"charts/exampleChart/LICENSE",
+		"charts/exampleChart/README.md",
+		"charts/exampleChart/values.yaml",
+		"charts/exampleChart/templates/NOTES.txt",
+	}
+
+	createHCDirs(helmStructureDirsExample)
+	createHCFiles(helmStructureFilesExample)
+	defer os.RemoveAll("charts")
+
+	helmStructureTest := NewHelmStructureExists()
+
+	result := helmStructureTest.Test()
+
+	if !result.Passed {
+		t.Errorf("Helm structure exists hence test should pass.")
+	}
+
+}
+
+func createHCFiles(files []string) {
+	for _, file := range files {
+		os.Create(file)
+	}
+}
+
+func createHCDirs(dirs []string) {
+	for _, dir := range dirs {
+		os.Mkdir(dir, 0750)
 	}
 }
