@@ -23,6 +23,7 @@ import (
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/repo"
 	"os"
+	"strings"
 )
 
 type HelmStructureExists struct {
@@ -79,8 +80,7 @@ func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
 	}
 
 	if len(missingFiles) > 0 {
-		message := "Following files are missing: "
-		return &txqualitychecks.QualityResult{ErrorDescription: repo.FmtMessage(message, missingFiles)}
+		return &txqualitychecks.QualityResult{ErrorDescription: "Following files are missing: " + strings.Join(missingFiles, " ")}
 	}
 
 	return &txqualitychecks.QualityResult{Passed: true}
