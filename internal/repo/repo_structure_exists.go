@@ -76,19 +76,19 @@ func (c RepoStructureExists) Test() *txqualitychecks.QualityResult {
 		listOfMandatoryFilesToBeChecked = append(listOfMandatoryFilesToBeChecked, mandatoryForLeadingRepo...)
 	}
 
-	missingMandatoryFiles := checkMissingFiles(listOfMandatoryFilesToBeChecked)
-	missingOptionalFiles := checkMissingFiles(listOfOptionalFilesToBeChecked)
+	missingMandatoryFiles := CheckMissingFiles(listOfMandatoryFilesToBeChecked)
+	missingOptionalFiles := CheckMissingFiles(listOfOptionalFilesToBeChecked)
 
 	optionalMessage := "The check detected following optional files missing: "
 	mandatoryMessage := "The check detected following mandatory files missing: "
 
 	if len(missingOptionalFiles) > 0 {
 		fmt.Printf("Warning! Guideline description: %s\n\t%s\n\tMore infos: %s\n",
-			c.Description(), fmtMessage(optionalMessage, missingOptionalFiles), c.ExternalDescription())
+			c.Description(), FmtMessage(optionalMessage, missingOptionalFiles), c.ExternalDescription())
 	}
 
 	if len(missingMandatoryFiles) > 0 {
-		return &txqualitychecks.QualityResult{ErrorDescription: fmtMessage(mandatoryMessage, missingMandatoryFiles)}
+		return &txqualitychecks.QualityResult{ErrorDescription: FmtMessage(mandatoryMessage, missingMandatoryFiles)}
 	}
 
 	return &txqualitychecks.QualityResult{Passed: true}
@@ -96,7 +96,7 @@ func (c RepoStructureExists) Test() *txqualitychecks.QualityResult {
 
 // Function to verify files existance.
 // Return missing ones.
-func checkMissingFiles(listOfFiles []string) []string {
+func CheckMissingFiles(listOfFiles []string) []string {
 	var missingFiles []string
 
 	for _, file := range listOfFiles {
@@ -109,10 +109,29 @@ func checkMissingFiles(listOfFiles []string) []string {
 }
 
 // Function to format output message containing missing files.
-func fmtMessage(startingMessage string, listOfFiles []string) string {
+func FmtMessage(startingMessage string, listOfFiles []string) string {
 	message := startingMessage
 	for _, missingFile := range listOfFiles {
 		message += missingFile + " "
 	}
 	return message
+}
+
+func CreateFiles(files []string) {
+	for _, file := range files {
+		os.Create(file)
+	}
+}
+
+func CreateDirs(dirs []string) {
+	for _, dir := range dirs {
+		os.Mkdir(dir, 0750)
+	}
+}
+
+func CleanFiles(files []string) {
+
+	for _, file := range files {
+		os.Remove(file)
+	}
 }
