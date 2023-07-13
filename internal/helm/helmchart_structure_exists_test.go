@@ -20,7 +20,7 @@
 package helm
 
 import (
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/repo"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/filesystem"
 	"os"
 	"testing"
 )
@@ -44,14 +44,11 @@ func TestShouldFailIfNoHelmChartsFound(t *testing.T) {
 	if result.Passed {
 		t.Errorf("Helm directory doesn't contain any charts hence test should fail.")
 	}
-
 }
 
 func TestShouldFailIfHelmStructureIsMissing(t *testing.T) {
-
-	os.Mkdir("charts", 0750)
-	os.Mkdir("charts/exampleChart", 0750)
-	defer os.Remove("charts")
+	os.MkdirAll("charts/exampleChart", 0750)
+	defer os.RemoveAll("charts")
 
 	helmStructureTest := NewHelmStructureExists()
 
@@ -63,12 +60,10 @@ func TestShouldFailIfHelmStructureIsMissing(t *testing.T) {
 }
 
 func TestShouldPassIfHelmStructureExist(t *testing.T) {
-
 	helmStructureDirsExample := []string{
-		"charts",
-		"charts/exampleChart",
 		"charts/exampleChart/templates",
 	}
+
 	helmStructureFilesExample := []string{
 		"charts/exampleChart/.helmignore",
 		"charts/exampleChart/Chart.yaml",
@@ -78,8 +73,8 @@ func TestShouldPassIfHelmStructureExist(t *testing.T) {
 		"charts/exampleChart/templates/NOTES.txt",
 	}
 
-	repo.CreateDirs(helmStructureDirsExample)
-	repo.CreateFiles(helmStructureFilesExample)
+	filesystem.CreateDirs(helmStructureDirsExample)
+	filesystem.CreateFiles(helmStructureFilesExample)
 	defer os.RemoveAll("charts")
 
 	helmStructureTest := NewHelmStructureExists()
@@ -89,5 +84,4 @@ func TestShouldPassIfHelmStructureExist(t *testing.T) {
 	if !result.Passed {
 		t.Errorf("Helm structure exists hence test should pass.")
 	}
-
 }

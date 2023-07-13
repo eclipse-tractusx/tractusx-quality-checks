@@ -21,10 +21,10 @@ package repo
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/filesystem"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/product"
 )
 
@@ -52,10 +52,8 @@ func (c RepoStructureExists) ExternalDescription() string {
 }
 
 func (c RepoStructureExists) Test() *txqualitychecks.QualityResult {
-
-	// Slice containing required files and folders in the repo structure.
+	// Slices containing required files and folders in the repo structure.
 	// Before modification make sure you align to TRG 2.03 guideline.
-
 	listOfOptionalFilesToBeChecked := []string{
 		"AUTHORS.md",
 		"INSTALL.md",
@@ -77,8 +75,8 @@ func (c RepoStructureExists) Test() *txqualitychecks.QualityResult {
 		listOfMandatoryFilesToBeChecked = append(listOfMandatoryFilesToBeChecked, mandatoryForLeadingRepo...)
 	}
 
-	missingMandatoryFiles := CheckMissingFiles(listOfMandatoryFilesToBeChecked)
-	missingOptionalFiles := CheckMissingFiles(listOfOptionalFilesToBeChecked)
+	missingMandatoryFiles := filesystem.CheckMissingFiles(listOfMandatoryFilesToBeChecked)
+	missingOptionalFiles := filesystem.CheckMissingFiles(listOfOptionalFilesToBeChecked)
 
 	if len(missingOptionalFiles) > 0 {
 		fmt.Printf("Warning! Guideline description: %s\n\t%s\n\tMore infos: %s\n",
@@ -91,37 +89,4 @@ func (c RepoStructureExists) Test() *txqualitychecks.QualityResult {
 	}
 
 	return &txqualitychecks.QualityResult{Passed: true}
-}
-
-// Function to verify files existance.
-// Return missing ones.
-func CheckMissingFiles(listOfFiles []string) []string {
-	var missingFiles []string
-
-	for _, file := range listOfFiles {
-
-		if _, err := os.Stat(file); os.IsNotExist(err) {
-			missingFiles = append(missingFiles, file)
-		}
-	}
-	return missingFiles
-}
-
-func CreateFiles(files []string) {
-	for _, file := range files {
-		os.Create(file)
-	}
-}
-
-func CreateDirs(dirs []string) {
-	for _, dir := range dirs {
-		os.Mkdir(dir, 0750)
-	}
-}
-
-func CleanFiles(files []string) {
-
-	for _, file := range files {
-		os.Remove(file)
-	}
 }

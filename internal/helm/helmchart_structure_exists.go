@@ -21,7 +21,7 @@ package helm
 
 import (
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/repo"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/filesystem"
 	"os"
 	"strings"
 )
@@ -47,7 +47,6 @@ func (r *HelmStructureExists) ExternalDescription() string {
 }
 
 func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
-
 	helmStructureFiles := []string{
 		".helmignore",
 		"Chart.yaml",
@@ -75,7 +74,7 @@ func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
 			for _, fname := range helmStructureFiles {
 				tmpFilesStructure = append(tmpFilesStructure, mainDir+"/"+hc.Name()+"/"+fname)
 			}
-			missingFiles = append(missingFiles, repo.CheckMissingFiles(tmpFilesStructure)...)
+			missingFiles = append(missingFiles, filesystem.CheckMissingFiles(tmpFilesStructure)...)
 		}
 	}
 
