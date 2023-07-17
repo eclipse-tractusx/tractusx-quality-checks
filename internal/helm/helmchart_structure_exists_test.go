@@ -85,3 +85,19 @@ func TestShouldPassIfHelmStructureExist(t *testing.T) {
 		t.Errorf("Helm structure exists hence test should pass.")
 	}
 }
+
+func TestShouldPassIfChartYamlIsValid(t *testing.T) {
+	chartYmlTestFile := "test/TestChartValid.yaml"
+
+	if len(verifyChartYaml(chartYmlTestFile)) > 0 {
+		t.Errorf("TestChartValid.yaml is valid but test still fails.")
+	}
+}
+
+func TestShouldFailIfChartYamlIsInValid(t *testing.T) {
+	chartYmlTestFile := "test/TestChartInValid.yaml"
+
+	if len(verifyChartYaml(chartYmlTestFile)) == 0 {
+		t.Errorf("TestChartInvalid.yaml is invalid hence the test should pass.")
+	}
+}

@@ -20,10 +20,16 @@
 package helm
 
 import (
+	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"reflect"
+	"strings"
+
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/filesystem"
-	"os"
-	"strings"
+	"gopkg.in/yaml.v3"
 )
 
 type HelmStructureExists struct {
@@ -68,18 +74,23 @@ func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
 	}
 
 	missingFiles := []string{}
+	missingHCFields := []string{}
 	for _, hc := range helmCharts {
 		if hc.IsDir() {
-			tmpFilesStructure := []string{}
 			for _, fname := range helmStructureFiles {
-				tmpFilesStructure = append(tmpFilesStructure, mainDir+"/"+hc.Name()+"/"+fname)
+				fpath := filepath.Join(mainDir, hc.Name(), fname)
+				isMissing := filesystem.CheckMissingFiles([]string{fpath})
+				if fname == "Chart.yaml" &&  isMissing == nil  {
+					missingHCFields = verifyChartYaml(fpath)
+				} else if isMissing != nil {
+					missingFiles = append(missingFiles, isMissing...)
+				}
 			}
-			missingFiles = append(missingFiles, filesystem.CheckMissingFiles(tmpFilesStructure)...)
 		}
 	}
 
-	if len(missingFiles) > 0 {
-		return &txqualitychecks.QualityResult{ErrorDescription: "Following files are missing: " + strings.Join(missingFiles, " ")}
+	if len(missingFiles) > 0 || len(missingHCFields) > 0 {
+		return &txqualitychecks.QualityResult{ErrorDescription: buildErrorDescription(missingFiles, missingHCFields)}
 	}
 
 	return &txqualitychecks.QualityResult{Passed: true}
@@ -87,4 +98,73 @@ func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
 
 func (r *HelmStructureExists) IsOptional() bool {
 	return false
+}
+
+func verifyChartYaml(ymlfile string) []string {
+	type Chart struct {
+		ApiVersion   string   `yaml:"apiVersion"`
+		Name         string   `yaml:"name"`
+		Description  string   `yaml:"description"`
+		AppVersion   string   `yaml:"appVersion"`
+		Version      string   `yaml:"version"`
+		Home         string   `yaml:"home"`
+		Sources      []string `yaml:"sources"`
+		Dependencies []struct {
+			Name       string `yaml:"name"`
+			Repository string `yaml:"repository"`
+			Version    string `yaml:"version"`
+			Condition  string `yaml:"condition"`
+		} `yaml:"dependencies"`
+		Maintainers []struct {
+			Name  string `yaml:"name"`
+			Email string `yaml:"email"`
+			Url   string `yaml:"url"`
+		} `yaml:"maintainers"`
+	}
+
+	data, err := ioutil.ReadFile(ymlfile)
+	if err != nil {
+		fmt.Printf("Unable to read %v.\n", ymlfile)
+		return nil
+	}
+
+	var chart Chart
+	err = yaml.Unmarshal(data, &chart)
+	if err != nil {
+		fmt.Printf("Unable to parse YAML file: %v.\n", ymlfile)
+		return nil
+	}
+
+	chartValues := reflect.ValueOf(chart)
+	numFields := chartValues.NumField()
+	chartType := chartValues.Type()
+
+	missingFields := []string{} 
+
+	for i := 0; i < numFields; i++ {
+		field := chartType.Field(i)
+		fieldValue := chartValues.Field(i)
+	
+		if fieldValue.Len() == 0 {
+			missingFields = append(missingFields, field.Name)
+		} 
+	}
+	if len(missingFields) > 0 {
+		fmt.Println(missingFields)
+		return missingFields
+	}
+	
+	return nil
+}
+
+func buildErrorDescription(missingFiles []string, missingHCFields []string) string {
+	errorDescription := ""
+
+	if len(missingFiles) != 0 {
+		errorDescription += "\n\tFollowing Helm Chart structure files are missing: "+strings.Join(missingFiles, ", ")
+	}
+	if len(missingHCFields) != 0 {
+		errorDescription += "\n\tChart.yaml doesn't contain required fields: "+strings.Join(missingHCFields, ", ")
+	}
+	return errorDescription
 }
