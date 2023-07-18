@@ -21,9 +21,10 @@ package repo
 
 import (
 	"fmt"
-	"os"
+	"strings"
 
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/filesystem"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/product"
 )
 
@@ -51,10 +52,8 @@ func (c RepoStructureExists) ExternalDescription() string {
 }
 
 func (c RepoStructureExists) Test() *txqualitychecks.QualityResult {
-
-	// Slice containing required files and folders in the repo structure.
+	// Slices containing required files and folders in the repo structure.
 	// Before modification make sure you align to TRG 2.03 guideline.
-
 	listOfOptionalFilesToBeChecked := []string{
 		"AUTHORS.md",
 		"INSTALL.md",
@@ -76,43 +75,18 @@ func (c RepoStructureExists) Test() *txqualitychecks.QualityResult {
 		listOfMandatoryFilesToBeChecked = append(listOfMandatoryFilesToBeChecked, mandatoryForLeadingRepo...)
 	}
 
-	missingMandatoryFiles := checkMissingFiles(listOfMandatoryFilesToBeChecked)
-	missingOptionalFiles := checkMissingFiles(listOfOptionalFilesToBeChecked)
-
-	optionalMessage := "The check detected following optional files missing: "
-	mandatoryMessage := "The check detected following mandatory files missing: "
+	missingMandatoryFiles := filesystem.CheckMissingFiles(listOfMandatoryFilesToBeChecked)
+	missingOptionalFiles := filesystem.CheckMissingFiles(listOfOptionalFilesToBeChecked)
 
 	if len(missingOptionalFiles) > 0 {
 		fmt.Printf("Warning! Guideline description: %s\n\t%s\n\tMore infos: %s\n",
-			c.Description(), fmtMessage(optionalMessage, missingOptionalFiles), c.ExternalDescription())
+			c.Description(), "The check detected following optional files missing: "+strings.Join(missingOptionalFiles, " "),
+			c.ExternalDescription())
 	}
 
 	if len(missingMandatoryFiles) > 0 {
-		return &txqualitychecks.QualityResult{ErrorDescription: fmtMessage(mandatoryMessage, missingMandatoryFiles)}
+		return &txqualitychecks.QualityResult{ErrorDescription: "The check detected following mandatory files missing: " + strings.Join(missingMandatoryFiles, " ")}
 	}
 
 	return &txqualitychecks.QualityResult{Passed: true}
-}
-
-// Function to verify files existance.
-// Return missing ones.
-func checkMissingFiles(listOfFiles []string) []string {
-	var missingFiles []string
-
-	for _, file := range listOfFiles {
-
-		if _, err := os.Stat(file); os.IsNotExist(err) {
-			missingFiles = append(missingFiles, file)
-		}
-	}
-	return missingFiles
-}
-
-// Function to format output message containing missing files.
-func fmtMessage(startingMessage string, listOfFiles []string) string {
-	message := startingMessage
-	for _, missingFile := range listOfFiles {
-		message += missingFile + " "
-	}
-	return message
 }

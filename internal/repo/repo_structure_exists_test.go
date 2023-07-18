@@ -20,6 +20,7 @@
 package repo
 
 import (
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/filesystem"
 	"os"
 	"testing"
 )
@@ -39,19 +40,18 @@ var listOfDirsToBeCreated []string = []string{
 	"charts",
 }
 
-const metadataTestFile = "../pkg/product/test/metadata_test_template.yaml"
+const metadataTestFile = "../../pkg/product/test/metadata_test_template.yaml"
 
 func TestShouldPassIfRepoStructureExistsWithoutOptional(t *testing.T) {
-
 	setEnv(t)
 	defer os.Remove(".tractusx")
 
-	createFiles(listOfFilesToBeCreated)
-	createDirs(listOfDirsToBeCreated)
+	filesystem.CreateFiles(listOfFilesToBeCreated)
+	filesystem.CreateDirs(listOfDirsToBeCreated)
 
 	repostructureTest := NewRepoStructureExists()
 	result := repostructureTest.Test()
-	cleanFiles(append(listOfFilesToBeCreated, listOfDirsToBeCreated...))
+	filesystem.CleanFiles(append(listOfFilesToBeCreated, listOfDirsToBeCreated...))
 
 	if !result.Passed {
 		t.Errorf("Structure exists with optional files, but test still fails.")
@@ -59,18 +59,17 @@ func TestShouldPassIfRepoStructureExistsWithoutOptional(t *testing.T) {
 }
 
 func TestShouldPassIfRepoStructureExistsWithOptional(t *testing.T) {
-
 	setEnv(t)
 	defer os.Remove(".tractusx")
 
 	listOfFilesToBeCreated = append(listOfFilesToBeCreated, []string{"INSTALL.md", "AUTHORS.md"}...)
 
-	createFiles(listOfFilesToBeCreated)
-	createDirs(listOfDirsToBeCreated)
+	filesystem.CreateFiles(listOfFilesToBeCreated)
+	filesystem.CreateDirs(listOfDirsToBeCreated)
 
 	repostructureTest := NewRepoStructureExists()
 	result := repostructureTest.Test()
-	cleanFiles(append(listOfFilesToBeCreated, listOfDirsToBeCreated...))
+	filesystem.CleanFiles(append(listOfFilesToBeCreated, listOfDirsToBeCreated...))
 
 	if !result.Passed {
 		t.Errorf("Structure exists without optional files, but test still fails.")
@@ -79,7 +78,6 @@ func TestShouldPassIfRepoStructureExistsWithOptional(t *testing.T) {
 }
 
 func TestShouldFailIfRepoStructureIsMissing(t *testing.T) {
-
 	setEnv(t)
 	defer os.Remove(".tractusx")
 
@@ -89,25 +87,6 @@ func TestShouldFailIfRepoStructureIsMissing(t *testing.T) {
 
 	if result.Passed {
 		t.Errorf("RepoStructureExist should fail if repo structure exists.")
-	}
-}
-
-func createFiles(files []string) {
-	for _, file := range files {
-		os.Create(file)
-	}
-}
-
-func createDirs(dirs []string) {
-	for _, dir := range dirs {
-		os.Mkdir(dir, 0750)
-	}
-}
-
-func cleanFiles(files []string) {
-
-	for _, file := range files {
-		os.Remove(file)
 	}
 }
 
