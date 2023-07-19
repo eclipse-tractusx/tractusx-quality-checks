@@ -22,22 +22,23 @@ package repo
 import (
 	"context"
 	"fmt"
-	"github.com/go-ini/ini"
-	"github.com/google/go-github/v50/github"
 	"os"
 	"strings"
+
+	"github.com/go-ini/ini"
+	"github.com/google/go-github/v50/github"
 )
 
-// RepoInfo struct provides required information to query GitHub API.
-// RepoInfo.local shall be true, when running check locally.
+// RepoInfo provides basic infor
 type RepoInfo struct {
 	Owner    string
 	Reponame string
 }
 
-// getRepoBaseInfo returns RepoInfo as pointer. Func determines according to
-// available environment variables if running locally or as part of a GitHub
-// Action/Workflow/Check.
+// GetRepoBaseInfo gathers information about repo owner and name.
+// It leverages environment variables typically available in GitHub workflows.
+// As fallback option, the local git config (.git/config) file is used.
+// Results are returned as *RepoInfo
 func GetRepoBaseInfo() *RepoInfo {
 	const (
 		BASEURL = "https://github.com/"
