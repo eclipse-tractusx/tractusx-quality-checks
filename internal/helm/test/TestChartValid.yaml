@@ -2,22 +2,22 @@
 apiVersion: v2
 name: test-application
 description: A Test Helm chart 
-home: https://eclipse-tractusx.github.io/
 type: application
 version: 1.0.0
 appVersion: "2.0.0"
-sources:
-  - https://github.com/eclipse-tractusx/test-application
-dependencies:
-  - name: postgresql
-    repository: https://charts.bitnami.com/bitnami
-    version: 11.x.x
-    condition: postgresql.enabled
-  - name: pgadmin4
-    repository: https://helm.runix.net
-    version: 1.13.6
-    condition: pgadmin4.enabled
-maintainers:
-  - name: Joe
-    email: joe@email.com
-    url: https://joe.website.com
+# home: https://eclipse-tractusx.github.io/
+# sources:
+#   - https://github.com/eclipse-tractusx/test-application
+# dependencies:
+#   - name: postgresql
+#     repository: https://charts.bitnami.com/bitnami
+#     version: 11.x.x
+#     condition: postgresql.enabled
+#   - name: pgadmin4
+#     repository: https://helm.runix.net
+#     version: 1.13.6
+#     condition: pgadmin4.enabled
+# maintainers:
+#   - name: Joe
+#     email: joe@email.com
+#     url: https://joe.website.com

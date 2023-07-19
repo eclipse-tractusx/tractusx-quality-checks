@@ -4,7 +4,7 @@ name: test-application
 description: A Test Helm chart 
 home: https://eclipse-tractusx.github.io/
 type: application
-version: 1.0.0
+version: 1.0.abc
 appVersion: "2.0.0"
 sources:
   - https://github.com/eclipse-tractusx/test-application

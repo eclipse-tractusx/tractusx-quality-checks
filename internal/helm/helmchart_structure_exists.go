@@ -20,16 +20,11 @@
 package helm
 
 import (
-	"fmt"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"reflect"
-	"strings"
-
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/filesystem"
-	"gopkg.in/yaml.v3"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 type HelmStructureExists struct {
@@ -59,8 +54,8 @@ func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
 		"LICENSE",
 		"README.md",
 		"values.yaml",
-		"templates",
-		"templates/NOTES.txt",
+		// "templates",
+		// "templates/NOTES.txt",
 	}
 
 	mainDir := "charts"
@@ -73,15 +68,16 @@ func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
 		return &txqualitychecks.QualityResult{ErrorDescription: "Can't read Helm Charts at charts/."}
 	}
 
+	// Check if the files/dir structure exists.
 	missingFiles := []string{}
-	missingHCFields := []string{}
+	chartYamlFiles := []string{}
 	for _, hc := range helmCharts {
 		if hc.IsDir() {
 			for _, fname := range helmStructureFiles {
 				fpath := filepath.Join(mainDir, hc.Name(), fname)
 				isMissing := filesystem.CheckMissingFiles([]string{fpath})
-				if fname == "Chart.yaml" &&  isMissing == nil  {
-					missingHCFields = verifyChartYaml(fpath)
+				if fname == "Chart.yaml" && isMissing == nil {
+					chartYamlFiles = append(chartYamlFiles, fpath)
 				} else if isMissing != nil {
 					missingFiles = append(missingFiles, isMissing...)
 				}
@@ -89,82 +85,32 @@ func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
 		}
 	}
 
-	if len(missingFiles) > 0 || len(missingHCFields) > 0 {
-		return &txqualitychecks.QualityResult{ErrorDescription: buildErrorDescription(missingFiles, missingHCFields)}
+	// Validate Chart.yaml files found in Helm Charts.
+	errorDescriptionChartYaml := ""
+	isChartYamlIssue := false
+	if len(chartYamlFiles) > 0 {
+		for _, fpath := range chartYamlFiles {
+			errorDescriptionChartYaml += "\n\t+ Analysis for " + fpath + ": "
+			cy := chartYamlFromFile(fpath)
+			missingFields := cy.checkMandatoryFields()
+			if len(missingFields) > 0 {
+				isChartYamlIssue = true
+				errorDescriptionChartYaml += "\n\t\t - Missing mandatory fields: " + strings.Join(missingFields, ", ")
+			}
+			if !cy.isVersionValid() {
+				isChartYamlIssue = true
+				errorDescriptionChartYaml += "\n\t\t - " + cy.Version + "Version of the Helm Chart is incorrect. It needs to follow Semantic Version"
+			}
+		}
 	}
 
+	if len(missingFiles) > 0 || isChartYamlIssue {
+		return &txqualitychecks.QualityResult{ErrorDescription: "+ Following Helm Chart structure files are missing: " + strings.Join(missingFiles, ", ") +
+			errorDescriptionChartYaml}
+	}
 	return &txqualitychecks.QualityResult{Passed: true}
 }
 
 func (r *HelmStructureExists) IsOptional() bool {
 	return false
-}
-
-func verifyChartYaml(ymlfile string) []string {
-	type Chart struct {
-		ApiVersion   string   `yaml:"apiVersion"`
-		Name         string   `yaml:"name"`
-		Description  string   `yaml:"description"`
-		AppVersion   string   `yaml:"appVersion"`
-		Version      string   `yaml:"version"`
-		Home         string   `yaml:"home"`
-		Sources      []string `yaml:"sources"`
-		Dependencies []struct {
-			Name       string `yaml:"name"`
-			Repository string `yaml:"repository"`
-			Version    string `yaml:"version"`
-			Condition  string `yaml:"condition"`
-		} `yaml:"dependencies"`
-		Maintainers []struct {
-			Name  string `yaml:"name"`
-			Email string `yaml:"email"`
-			Url   string `yaml:"url"`
-		} `yaml:"maintainers"`
-	}
-
-	data, err := ioutil.ReadFile(ymlfile)
-	if err != nil {
-		fmt.Printf("Unable to read %v.\n", ymlfile)
-		return nil
-	}
-
-	var chart Chart
-	err = yaml.Unmarshal(data, &chart)
-	if err != nil {
-		fmt.Printf("Unable to parse YAML file: %v.\n", ymlfile)
-		return nil
-	}
-
-	chartValues := reflect.ValueOf(chart)
-	numFields := chartValues.NumField()
-	chartType := chartValues.Type()
-
-	missingFields := []string{} 
-
-	for i := 0; i < numFields; i++ {
-		field := chartType.Field(i)
-		fieldValue := chartValues.Field(i)
-	
-		if fieldValue.Len() == 0 {
-			missingFields = append(missingFields, field.Name)
-		} 
-	}
-	if len(missingFields) > 0 {
-		fmt.Println(missingFields)
-		return missingFields
-	}
-	
-	return nil
-}
-
-func buildErrorDescription(missingFiles []string, missingHCFields []string) string {
-	errorDescription := ""
-
-	if len(missingFiles) != 0 {
-		errorDescription += "\n\tFollowing Helm Chart structure files are missing: "+strings.Join(missingFiles, ", ")
-	}
-	if len(missingHCFields) != 0 {
-		errorDescription += "\n\tChart.yaml doesn't contain required fields: "+strings.Join(missingHCFields, ", ")
-	}
-	return errorDescription
 }

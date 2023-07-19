@@ -23,15 +23,15 @@ import (
 	"errors"
 	"fmt"
 )
+
 const (
 	ResetColor = "\033[0m"
 	Red        = "\033[31m"
 	Green      = "\033[32m"
 	Yellow     = "\033[33m"
 	Blue       = "\033[34m"
-	Bold	   = "\033[1m"
-	)
-
+	Bold       = "\033[1m"
+)
 
 type GuidelineTestRunner struct {
 	guidelines []QualityGuideline
@@ -39,22 +39,22 @@ type GuidelineTestRunner struct {
 }
 
 func NewTestRunner(tests []QualityGuideline) *GuidelineTestRunner {
-	return &GuidelineTestRunner{guidelines: tests, printer: &stdoutPrinter{}}
+	return &GuidelineTestRunner{guidelines: tests, printer: &StdoutPrinter{}}
 }
 
 func (runner *GuidelineTestRunner) Run() error {
 	allPassed := true
 	for _, guideline := range runner.guidelines {
-		runner.printer.Print(fmt.Sprintf(Bold+"Testing Quality Guideline: %s"+ResetColor, guideline.Name()))
+		runner.printer.PrintTitle(fmt.Sprintf("Testing Quality Guideline: %s", guideline.Name()))
 
 		result := guideline.Test()
 		if guideline.IsOptional() && !result.Passed {
-			runner.printer.Print(
-				fmt.Sprintf(Yellow+"Warning! Test failed, but test '%s' is marked as optional.\nMore infos:\n\t%s\n\t%s"+ResetColor,
+			runner.printer.LogWarning(
+				fmt.Sprintf("Warning! Test failed, but test '%s' is marked as optional.\nMore infos:\n\t%s\n\t%s",
 					guideline.Name(), result.ErrorDescription, guideline.ExternalDescription()),
 			)
 		} else if !result.Passed {
-			runner.printer.Print(
+			runner.printer.LogError(
 				fmt.Sprintf(Red+"Failed! Guideline description: %s\n\t%s\n\tMore infos: %s"+ResetColor,
 					guideline.Description(), result.ErrorDescription, guideline.ExternalDescription()),
 			)
@@ -69,9 +69,25 @@ func (runner *GuidelineTestRunner) Run() error {
 	return nil
 }
 
-type stdoutPrinter struct {
+type StdoutPrinter struct {
 }
 
-func (p *stdoutPrinter) Print(message string) {
+func (p *StdoutPrinter) Print(message string) {
 	fmt.Println(message)
+}
+
+func (p *StdoutPrinter) PrintTitle(title string) {
+	fmt.Println(Bold + title + ResetColor)
+}
+
+func (p *StdoutPrinter) LogWarning(warning string) {
+	fmt.Println(Yellow + warning + ResetColor)
+}
+
+func (p *StdoutPrinter) LogError(err string) {
+	fmt.Println(Red + err + ResetColor)
+}
+
+func (p *StdoutPrinter) LogInfo(info string) {
+	fmt.Println(Blue + info + ResetColor)
 }

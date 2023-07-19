@@ -27,14 +27,15 @@ import (
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/filesystem"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/product"
 )
+
 const (
 	ResetColor = "\033[0m"
 	Red        = "\033[31m"
 	Green      = "\033[32m"
 	Yellow     = "\033[33m"
 	Blue       = "\033[34m"
-	Bold	   = "\033[1m"
-	)
+	Bold       = "\033[1m"
+)
 
 type RepoStructureExists struct {
 }
@@ -78,6 +79,7 @@ func (c RepoStructureExists) Test() *txqualitychecks.QualityResult {
 	}
 
 	mandatoryForLeadingRepo := []string{"docs", "charts"}
+	printer := &txqualitychecks.StdoutPrinter{}
 
 	if product.IsLeadingRepo() {
 		listOfMandatoryFilesToBeChecked = append(listOfMandatoryFilesToBeChecked, mandatoryForLeadingRepo...)
@@ -87,9 +89,10 @@ func (c RepoStructureExists) Test() *txqualitychecks.QualityResult {
 	missingOptionalFiles := filesystem.CheckMissingFiles(listOfOptionalFilesToBeChecked)
 
 	if len(missingOptionalFiles) > 0 {
-		fmt.Printf(Yellow+"Warning! Guideline description: %s\n\t%s\n\tMore infos: %s\n"+ResetColor,
-			c.Description(), "The check detected following optional files missing: "+strings.Join(missingOptionalFiles, ", "),
-			c.ExternalDescription())
+		printer.LogWarning(
+			fmt.Sprintf("Warning! Guideline description: %s\n\t%s\n\tMore infos: %s\n",
+				c.Description(), "The check detected following optional files missing: "+strings.Join(missingOptionalFiles, ", "),
+				c.ExternalDescription()))
 	}
 
 	if len(missingMandatoryFiles) > 0 {
