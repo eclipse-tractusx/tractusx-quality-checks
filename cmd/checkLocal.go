@@ -31,12 +31,13 @@ import (
 )
 
 var releaseGuidelines = []txqualitychecks.QualityGuideline{
-	docs.NewReadmeExists(),
-	docs.NewInstallExists(),
-	docs.NewChangelogExists(),
-	repo.NewLeadingRepositoryDefined(),
-	repo.NewDefaultBranch(),
 	container.NewAllowedBaseImage(),
+	container.NewNonRootContainer(),
+	docs.NewChangelogExists(),
+	docs.NewInstallExists(),
+	docs.NewReadmeExists(),
+	repo.NewDefaultBranch(),
+	repo.NewLeadingRepositoryDefined(),
 	repo.NewRepoStructureExists(),
 }
 

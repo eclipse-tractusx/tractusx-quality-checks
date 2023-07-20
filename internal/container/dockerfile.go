@@ -30,11 +30,18 @@ import (
 	"strings"
 )
 
+const NoUserFound = "No User found"
+
 // dockerfile is a simple utility to create or read dockerfiles.
 // the commands are supposed to contain every single instruction of the Dockerfile it represents
 type dockerfile struct {
 	filename string
 	commands []string
+}
+
+type user struct {
+	user  string
+	group string
 }
 
 func newDockerfile() *dockerfile {
@@ -95,6 +102,27 @@ func (d *dockerfile) baseImage() string {
 	return strings.Trim(baseImageLine, "FROM ")
 }
 
+// func user() extracts the value of USER declaration from a given Dockerfile.
+func (d *dockerfile) user() *user {
+	var foundUSER *user
+
+	for _, command := range d.commands {
+		if strings.HasPrefix(strings.TrimSpace(command), "USER ") {
+			command = strings.Trim(command, "USER ") // remove prefix
+
+			if strings.Contains(command, ":") {
+				s := strings.Split(command, ":")
+				foundUSER.user = s[0]
+				foundUSER.group = s[1]
+			} else {
+				foundUSER.user, foundUSER.group = command, ""
+			}
+		}
+	}
+
+	return foundUSER
+}
+
 // findDockerfilesAt will search the current repository recursively for Dockerfiles.
 // If a file is found, the relative path to the file is returned in the result slice.
 // If no Dockerfile is found the result will be an empty slice
@@ -109,7 +137,11 @@ func findDockerfilesAt(dir string) []string {
 		return nil
 	})
 
-	fmt.Println("Found Dockerfiles: " + strings.Join(foundFiles, ", \n\t"))
+	if len(foundFiles) >= 1 {
+		fmt.Println("Found Dockerfiles:\n\t" + strings.Join(foundFiles, ", \n\t"))
+	} else {
+		fmt.Println("No Dockerfile found.")
+	}
 	return foundFiles
 }
 
