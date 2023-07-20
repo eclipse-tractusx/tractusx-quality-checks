@@ -27,7 +27,7 @@ import (
 )
 
 var baseImageAllowList = []string{
-	"eclipse/temurin",
+	"eclipse-temurin",
 	"nginxinc/nginx-unprivileged",
 	"mcr.microsoft.com/dotnet/runtime",
 	"mcr.microsoft.com/dotnet/aspnet",
