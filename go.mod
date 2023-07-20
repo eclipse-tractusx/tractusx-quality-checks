@@ -3,6 +3,7 @@ module github.com/eclipse-tractusx/tractusx-quality-checks
 go 1.20
 
 require (
+	github.com/fatih/color v1.15.0
 	github.com/go-ini/ini v1.67.0
 	github.com/google/go-github/v50 v50.2.0
 	github.com/spf13/cobra v1.7.0
@@ -13,7 +14,6 @@ require (
 	github.com/ProtonMail/go-crypto v0.0.0-20230710112148-e01326fd72eb // indirect
 	github.com/cloudflare/circl v1.3.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/fatih/color v1.15.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
