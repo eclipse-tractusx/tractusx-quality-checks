@@ -17,15 +17,36 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package filesystem
 
-// ReleaseGuidelines defines a slice of QualityGuidelines the test_runner will
-// test.
-var ReleaseGuidelines = []QualityGuideline{
-	NewReadmeExists(),
-	NewInstallExists(),
-	NewChangelogExists(),
-	NewLeadingRepositoryDefined(),
-	NewDefaultBranch(),
-	NewRepoStructureExists(),
+import "os"
+
+func CreateFiles(files []string) {
+	for _, file := range files {
+		os.Create(file)
+	}
+}
+
+func CreateDirs(dirs []string) {
+	for _, dir := range dirs {
+		os.MkdirAll(dir, 0750)
+	}
+}
+
+func CleanFiles(files []string) {
+	for _, file := range files {
+		os.Remove(file)
+	}
+}
+
+func CheckMissingFiles(listOfFiles []string) []string {
+	var missingFiles []string
+
+	for _, file := range listOfFiles {
+
+		if _, err := os.Stat(file); os.IsNotExist(err) {
+			missingFiles = append(missingFiles, file)
+		}
+	}
+	return missingFiles
 }

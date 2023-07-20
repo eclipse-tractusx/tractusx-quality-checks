@@ -24,8 +24,23 @@ import (
 	"os"
 
 	txqualitychecks "github.com/eclipse-tractusx/tractusx-quality-checks/internal"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/container"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/docs"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/repo"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/helm"
 	"github.com/spf13/cobra"
 )
+
+var releaseGuidelines = []txqualitychecks.QualityGuideline{
+	docs.NewReadmeExists(),
+	docs.NewInstallExists(),
+	docs.NewChangelogExists(),
+	repo.NewLeadingRepositoryDefined(),
+	repo.NewDefaultBranch(),
+	container.NewAllowedBaseImage(),
+	repo.NewRepoStructureExists(),
+	helm.NewHelmStructureExists(),
+}
 
 // checkLocalCmd represents the checkLocal command
 var checkLocalCmd = &cobra.Command{
@@ -35,7 +50,7 @@ var checkLocalCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Running local checks of eclipse-tractusx release guidelines")
-		runner := txqualitychecks.NewTestRunner(txqualitychecks.ReleaseGuidelines)
+		runner := txqualitychecks.NewTestRunner(releaseGuidelines)
 		err := runner.Run()
 
 		if err != nil {
