@@ -50,4 +50,5 @@ type Printer interface {
 	LogWarning(warning string)
 	LogError(err string)
 	LogInfo(info string)
+	LogSuccess(msg string)
 }

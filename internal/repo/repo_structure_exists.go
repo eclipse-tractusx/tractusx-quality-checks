@@ -28,15 +28,6 @@ import (
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/product"
 )
 
-const (
-	ResetColor = "\033[0m"
-	Red        = "\033[31m"
-	Green      = "\033[32m"
-	Yellow     = "\033[33m"
-	Blue       = "\033[34m"
-	Bold       = "\033[1m"
-)
-
 type RepoStructureExists struct {
 }
 

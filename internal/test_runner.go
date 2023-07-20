@@ -22,15 +22,7 @@ package txqualitychecks
 import (
 	"errors"
 	"fmt"
-)
-
-const (
-	ResetColor = "\033[0m"
-	Red        = "\033[31m"
-	Green      = "\033[32m"
-	Yellow     = "\033[33m"
-	Blue       = "\033[34m"
-	Bold       = "\033[1m"
+	"github.com/fatih/color"
 )
 
 type GuidelineTestRunner struct {
@@ -44,8 +36,8 @@ func NewTestRunner(tests []QualityGuideline) *GuidelineTestRunner {
 
 func (runner *GuidelineTestRunner) Run() error {
 	allPassed := true
-	for _, guideline := range runner.guidelines {
-		runner.printer.PrintTitle(fmt.Sprintf("Testing Quality Guideline: %s", guideline.Name()))
+	for i, guideline := range runner.guidelines {
+		runner.printer.PrintTitle(fmt.Sprintf("\n%v. Testing Quality Guideline: %s", i+1, guideline.Name()))
 
 		result := guideline.Test()
 		if guideline.IsOptional() && !result.Passed {
@@ -55,9 +47,11 @@ func (runner *GuidelineTestRunner) Run() error {
 			)
 		} else if !result.Passed {
 			runner.printer.LogError(
-				fmt.Sprintf(Red+"Failed! Guideline description: %s\n\t%s\n\tMore infos: %s"+ResetColor,
+				fmt.Sprintf("Failed! Guideline description: %s\n\t%s\n\tMore infos: %s",
 					guideline.Description(), result.ErrorDescription, guideline.ExternalDescription()),
 			)
+		} else {
+			runner.printer.LogSuccess("Skipped or passed!")
 		}
 
 		allPassed = allPassed && (result.Passed || guideline.IsOptional())
@@ -66,6 +60,7 @@ func (runner *GuidelineTestRunner) Run() error {
 	if !allPassed {
 		return errors.New("not all tests have passed")
 	}
+
 	return nil
 }
 
@@ -77,17 +72,22 @@ func (p *StdoutPrinter) Print(message string) {
 }
 
 func (p *StdoutPrinter) PrintTitle(title string) {
-	fmt.Println(Bold + title + ResetColor)
+	printTitle := color.New(color.Bold, color.FgHiWhite).PrintlnFunc()
+	printTitle(title)
 }
 
 func (p *StdoutPrinter) LogWarning(warning string) {
-	fmt.Println(Yellow + warning + ResetColor)
+	color.Yellow(warning)
 }
 
 func (p *StdoutPrinter) LogError(err string) {
-	fmt.Println(Red + err + ResetColor)
+	color.Red(err)
 }
 
 func (p *StdoutPrinter) LogInfo(info string) {
-	fmt.Println(Blue + info + ResetColor)
+	color.Cyan(info)
+}
+
+func (p *StdoutPrinter) LogSuccess(msg string) {
+	color.Green(msg)
 }
