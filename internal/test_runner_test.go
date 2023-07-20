@@ -131,8 +131,8 @@ func TestShouldOnlyLogAdditionalDescriptionForFailingTests(t *testing.T) {
 
 	_ = runner.Run()
 
-	if len(printerMock.messages) != 3 {
-		t.Errorf("Expected exactly 3 logged messages. \n1. Name of guideline; 2. Additional info for failing; 3 Name of passing guideline. Got %d messages", len(printerMock.messages))
+	if len(printerMock.messages) != 4 {
+		t.Errorf("Expected exactly 4 logged messages. \n1. Name of guideline; 2. Additional info for failing; 3 Name of passing guideline. Got %d messages", len(printerMock.messages))
 	}
 }
 
