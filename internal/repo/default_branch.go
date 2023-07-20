@@ -27,6 +27,10 @@ import (
 type defaultBranch struct {
 }
 
+func NewDefaultBranch() txqualitychecks.QualityGuideline {
+	return &defaultBranch{}
+}
+
 func (d defaultBranch) Name() string {
 	return "TRG 2.01 - Default Branch"
 }
@@ -40,13 +44,15 @@ func (d defaultBranch) ExternalDescription() string {
 }
 
 func (d defaultBranch) Test() *txqualitychecks.QualityResult {
-	repoinfo := repo.GetRepoMetadata(repo.GetRepoBaseInfo())
+	repoInfo := repo.GetRepoMetadata(repo.GetRepoBaseInfo())
 
-	if *repoinfo.Fork {
-		return &txqualitychecks.QualityResult{Passed: false, ErrorDescription: "Check determined running on a fork."}
+	if *repoInfo.Fork {
+		// There is no need to enforce default branches on forks
+		// Since all the other checks should be executable on forks, we cannot let this single check break a workflow
+		return &txqualitychecks.QualityResult{Passed: true}
 	}
 
-	if *repoinfo.DefaultBranch != "main" {
+	if *repoInfo.DefaultBranch != "main" {
 		return &txqualitychecks.QualityResult{
 			Passed:           false,
 			ErrorDescription: "Default branch not set to 'main'.",
@@ -58,8 +64,4 @@ func (d defaultBranch) Test() *txqualitychecks.QualityResult {
 
 func (d defaultBranch) IsOptional() bool {
 	return false
-}
-
-func NewDefaultBranch() txqualitychecks.QualityGuideline {
-	return &defaultBranch{}
 }
