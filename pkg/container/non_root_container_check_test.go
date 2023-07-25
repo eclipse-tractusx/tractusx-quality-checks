@@ -20,6 +20,8 @@
 package container
 
 import (
+	"fmt"
+	"os"
 	"testing"
 )
 
@@ -83,7 +85,7 @@ func TestUserMethod(t *testing.T) {
 	}
 }
 
-func TestQualityCheckPass2(t *testing.T) {
+func TestQualityCheckPass(t *testing.T) {
 	testCases := []struct {
 		file *dockerfile
 		want bool
@@ -97,11 +99,17 @@ func TestQualityCheckPass2(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		_ = tc.file.writeTo(".")
+		if err := tc.file.writeTo("."); err != nil {
+			fmt.Printf("could not write %s", tc.file.filename)
+		}
 		result := NewNonRootContainer().Test()
 
 		if result.Passed != tc.want {
 			t.Errorf("got '%t', expected '%t' as result", result.Passed, tc.want)
+		}
+		err := os.Remove(tc.file.filename)
+		if err != nil {
+			return
 		}
 	}
 }
