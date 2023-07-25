@@ -122,6 +122,13 @@ func (d *dockerfile) user() *user {
 	return foundUSER
 }
 
+func (u *user) equals(other *user) bool {
+	if other == nil {
+		return false
+	}
+	return u.user == other.user && u.group == other.group
+}
+
 // findDockerfilesAt will search the current repository recursively for Dockerfiles.
 // If a file is found, the relative path to the file is returned in the result slice.
 // If no Dockerfile is found the result will be an empty slice
