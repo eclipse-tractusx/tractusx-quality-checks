@@ -59,7 +59,7 @@ func (n NonRootContainer) Test() *txqualitychecks.QualityResult {
 		fmt.Printf("Found User:\n\t%s", file.user().user+"\n")
 		if !validateUser(file.user()) {
 			checkPassed = false
-			errorDescription = ""
+			errorDescription = "Invalid user specified in Dockerfile"
 		}
 	}
 
@@ -70,8 +70,9 @@ func (n NonRootContainer) IsOptional() bool {
 	return false
 }
 
-// TODO: carslen, 12.07.23: uid:gid handling missing
-// validateUser validates USER instruction in Dockerfiles.
+// validateUser validates USER instruction in Dockerfiles and return a bool if a valid USER has been found.
+// To return true username/group-name must not be root or contain upper case letters, or must not be 0 or greater 65536
+// for uid/gid.
 func validateUser(u *user) bool {
 	if u == nil {
 		return false
