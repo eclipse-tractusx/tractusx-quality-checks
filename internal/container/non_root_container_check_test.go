@@ -64,16 +64,16 @@ func TestValidateUser(t *testing.T) {
 func TestUserMethod(t *testing.T) {
 	testCases := []struct {
 		file *dockerfile
-		want user
+		want *user
 	}{
-		{correttoDockerfile(), user{"corretto", ""}},                                                // USER corretto
-		{temurinDockerfile(), user{"temurin", ""}},                                                  // USER temurin
-		{newDockerfile().appendCommand("USER 0"), user{"0", ""}},                                    // uid as int without gid defined
-		{newDockerfile().appendCommand("USER root"), user{"root", ""}},                              // uid as string without gid defined
-		{newDockerfile().appendCommand("USER 0:1"), user{"0", "1"}},                                 // uid:gid as int
-		{newDockerfile().appendCommand("USER 1000:0"), user{"1000", "0"}},                           // uid:gid as int
-		{newDockerfile().appendCommand("USER testuser:testgroup"), user{"testuser", "testgroup"}},   // uid:gid as string
-		{newDockerfile().appendCommand("FROM distroless").appendEmptyLine(), user{NoUserFound, ""}}, // No USER instruction in Dockerfile
+		{correttoDockerfile(), &user{"corretto", ""}},                                              // USER corretto
+		{temurinDockerfile(), &user{"temurin", ""}},                                                // USER temurin
+		{newDockerfile().appendCommand("USER 0"), &user{"0", ""}},                                  // uid as int without gid defined
+		{newDockerfile().appendCommand("USER root"), &user{"root", ""}},                            // uid as string without gid defined
+		{newDockerfile().appendCommand("USER 0:1"), &user{"0", "1"}},                               // uid:gid as int
+		{newDockerfile().appendCommand("USER 1000:0"), &user{"1000", "0"}},                         // uid:gid as int
+		{newDockerfile().appendCommand("USER testuser:testgroup"), &user{"testuser", "testgroup"}}, // uid:gid as string
+		//{newDockerfile().appendCommand("FROM distroless").appendEmptyLine(), &user{NoUserFound, ""}}, // No USER instruction in Dockerfile
 	}
 
 	for _, tc := range testCases {

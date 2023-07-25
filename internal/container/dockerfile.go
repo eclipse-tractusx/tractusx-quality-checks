@@ -112,10 +112,9 @@ func (d *dockerfile) user() *user {
 
 			if strings.Contains(command, ":") {
 				s := strings.Split(command, ":")
-				foundUSER.user = s[0]
-				foundUSER.group = s[1]
+				foundUSER = &user{s[0], s[1]}
 			} else {
-				foundUSER.user, foundUSER.group = command, ""
+				foundUSER = &user{command, ""}
 			}
 		}
 	}
