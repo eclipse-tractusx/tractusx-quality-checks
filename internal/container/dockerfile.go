@@ -133,7 +133,7 @@ func (u *user) equals(other *user) bool {
 // If a file is found, the relative path to the file is returned in the result slice.
 // If no Dockerfile is found the result will be an empty slice
 func findDockerfilesAt(dir string) []string {
-	fmt.Println("Start finding Dockerfiles at " + dir)
+	//fmt.Println("Start finding Dockerfiles at " + dir)
 	var foundFiles []string
 
 	filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
@@ -144,7 +144,7 @@ func findDockerfilesAt(dir string) []string {
 	})
 
 	if len(foundFiles) >= 1 {
-		fmt.Println("Found Dockerfiles:\n\t" + strings.Join(foundFiles, ", \n\t"))
+		//fmt.Println("Found Dockerfiles:\n\t" + strings.Join(foundFiles, ", \n\t"))
 	} else {
 		fmt.Println("No Dockerfile found.")
 	}
