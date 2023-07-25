@@ -20,7 +20,6 @@
 package container
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -79,11 +78,9 @@ func TestUserMethod(t *testing.T) {
 	for _, tc := range testCases {
 		result := tc.file.user()
 
-		// TODO: carslen, 12.07.23: datt tut nicht
-		if result != &tc.want {
-			t.Errorf("got user: '%s' group: '%s', expected user: '%s' group: '%s'", tc.file.user().user, tc.file.user().user, tc.want.user, tc.want.group)
+		if !tc.want.equals(result) {
+			t.Errorf("expected user: '%s' group: '%s'", tc.want.user, tc.want.group)
 		}
-		fmt.Println(tc.file.filename)
 	}
 }
 
