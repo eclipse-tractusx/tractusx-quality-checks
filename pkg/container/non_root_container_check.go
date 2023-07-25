@@ -56,7 +56,6 @@ func (n NonRootContainer) Test() *txqualitychecks.QualityResult {
 			fmt.Printf("Could not read Dockerfile from path %s\n", dockerfilePath)
 		}
 
-		fmt.Printf("Found User:\n\t%s", file.user().user+"\n")
 		if !validateUser(file.user()) {
 			checkPassed = false
 			errorDescription = "Invalid user specified in Dockerfile"
