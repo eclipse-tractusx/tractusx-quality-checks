@@ -27,6 +27,7 @@ import (
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/container"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/docs"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/repo"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/helm"
 	"github.com/spf13/cobra"
 )
 
@@ -39,6 +40,7 @@ var releaseGuidelines = []txqualitychecks.QualityGuideline{
 	repo.NewDefaultBranch(),
 	repo.NewLeadingRepositoryDefined(),
 	repo.NewRepoStructureExists(),
+	helm.NewHelmStructureExists(),
 }
 
 // checkLocalCmd represents the checkLocal command

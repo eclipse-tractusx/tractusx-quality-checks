@@ -47,7 +47,7 @@ func TestShouldFailIfDockerfileWithUnapprovedBaseImagePresent(t *testing.T) {
 }
 
 func TestShouldPassIfTemurinIsUsedAsBaseImage(t *testing.T) {
-	file := newDockerfile().appendCommand("FROM eclipse/temurin:17")
+	file := newDockerfile().appendCommand("FROM eclipse-temurin:17")
 	_ = file.writeTo("./")
 	defer os.Remove(file.filename)
 
@@ -60,7 +60,7 @@ func TestShouldNotFailIfOnlyBuildLayerDeviatesFromTemurin(t *testing.T) {
 	file := newDockerfile().
 		appendCommand("FROM amazoncorretto:8 as builder").
 		appendCommand("COPY . .").
-		appendCommand("FROM eclipse/temurin:17")
+		appendCommand("FROM eclipse-temurin:17")
 	_ = file.writeTo("./")
 	defer os.Remove(file.filename)
 
