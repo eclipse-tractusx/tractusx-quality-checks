@@ -26,6 +26,9 @@ import (
 	txqualitychecks "github.com/eclipse-tractusx/tractusx-quality-checks/internal"
 )
 
+// validateUserRegex is used to match valid username/uid, group-name/gid
+const validateUserRegex = `(^(\d|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-6])$)|(^[a-z_][a-z0-9_-]*[$]?$)`
+
 type NonRootContainer struct{}
 
 // NewNonRootContainer returns a new check based on txqualitychecks.QualityGuideline interface.
@@ -77,21 +80,17 @@ func validateUser(u *user) bool {
 		return false
 	}
 
-	validUser, _ := regexp.Match(
-		`(^(\d|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-6])$)|(^[a-z_][a-z0-9_-]*[$]?$)`,
-		[]byte(u.user))
+	validUser, _ := regexp.Match(validateUserRegex, []byte(u.user))
 
 	var validGroup bool
 
 	if u.group == "" {
 		validGroup = true
 	} else {
-		validGroup, _ = regexp.Match(
-			`(^(\d|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-6])$)|(^[a-z_][a-z0-9_-]*[$]?$)`,
-			[]byte(u.group))
+		validGroup, _ = regexp.Match(validateUserRegex, []byte(u.group))
 	}
 
-	// return false if user is malformed (uppercase, alphanum or uid > 65536) or a root or missing USER instruction is detected.
+	// return false if user is malformed (uppercase, or uid > 65536) or a root or missing USER instruction is detected.
 	return validUser && validGroup && !isRootUser(u.user) && !isRootGroup(u.group)
 }
 
