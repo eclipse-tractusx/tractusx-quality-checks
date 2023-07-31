@@ -28,7 +28,7 @@ func TestShouldPassIfCanReadChartYaml(t *testing.T) {
 	}
 }
 
-func TestShouldPassIfChartVersionIsValid(t *testing.T) {
+func TestShouldBeValidForSemanticVersion(t *testing.T) {
 	c := newChartYaml()
 	c.Version = "1.2.3"
 	if !c.isVersionValid() {
@@ -36,7 +36,7 @@ func TestShouldPassIfChartVersionIsValid(t *testing.T) {
 	}
 }
 
-func TestShouldFailIfChartVersionIsInvalid(t *testing.T) {
+func TestShouldBeInValidForSemanticVersion(t *testing.T) {
 	c := newChartYaml()
 	c.Version = "1.2.ABC"
 	if c.isVersionValid() {
@@ -44,20 +44,20 @@ func TestShouldFailIfChartVersionIsInvalid(t *testing.T) {
 	}
 }
 
-func TestShouldPassIfMandatoryFieldsPresent(t *testing.T) {
+func TestShouldPassIfConfigurationSettingsArePresent(t *testing.T) {
 	c := chartYamlFromFile("test/TestChartValid.yaml")
-	missingFields := c.checkMandatoryFields()
+	missingFields := c.getMissingMandatoryFields()
 
 	if len(missingFields) > 0 {
-		t.Errorf("Test should pass since all mandatory fields are set.")
+		t.Errorf("Test should pass since all configuration settings are set.")
 	}
 }
 
-func TestShouldFailIfMandatoryFieldsIsMissing(t *testing.T) {
+func TestShouldFailIfConfigurationSettingsAreMissing(t *testing.T) {
 	c := chartYamlFromFile("test/TestChartInValid.yaml")
-	missingFields := c.checkMandatoryFields()
+	missingFields := c.getMissingMandatoryFields()
 
 	if len(missingFields) == 0 {
-		t.Errorf("Test should fail since one mandatory field is missing.")
+		t.Errorf("Test should fail since one configuration setting is missing.")
 	}
 }

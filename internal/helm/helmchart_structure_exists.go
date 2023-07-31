@@ -30,7 +30,6 @@ import (
 type HelmStructureExists struct {
 }
 
-// NewHelmStructureExists returns a new check based on QualityGuideline interface.
 func NewHelmStructureExists() txqualitychecks.QualityGuideline {
 	return &HelmStructureExists{}
 }
@@ -54,8 +53,6 @@ func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
 		"LICENSE",
 		"README.md",
 		"values.yaml",
-		// "templates",
-		// "templates/NOTES.txt",
 	}
 
 	mainDir := "charts"
@@ -68,7 +65,6 @@ func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
 		return &txqualitychecks.QualityResult{ErrorDescription: "Can't read Helm Charts at charts/."}
 	}
 
-	// Check if the files/dir structure exists.
 	missingFiles := []string{}
 	chartYamlFiles := []string{}
 	for _, hc := range helmCharts {
@@ -85,32 +81,42 @@ func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
 		}
 	}
 
-	// Validate Chart.yaml files found in Helm Charts.
-	errorDescriptionChartYaml := ""
-	isChartYamlIssue := false
+	errorDescriptionCharts := ""
+	chartsValid := true
 	if len(chartYamlFiles) > 0 {
+
 		for _, fpath := range chartYamlFiles {
-			errorDescriptionChartYaml += "\n\t+ Analysis for " + fpath + ": "
-			cy := chartYamlFromFile(fpath)
-			missingFields := cy.checkMandatoryFields()
-			if len(missingFields) > 0 {
-				isChartYamlIssue = true
-				errorDescriptionChartYaml += "\n\t\t - Missing mandatory fields: " + strings.Join(missingFields, ", ")
-			}
-			if !cy.isVersionValid() {
-				isChartYamlIssue = true
-				errorDescriptionChartYaml += "\n\t\t - " + cy.Version + "Version of the Helm Chart is incorrect. It needs to follow Semantic Version"
-			}
+			isValid, msg := validateChart(fpath)
+			chartsValid = chartsValid && isValid
+			errorDescriptionCharts += msg
 		}
 	}
 
-	if len(missingFiles) > 0 || isChartYamlIssue {
+	if len(missingFiles) > 0 || !chartsValid {
 		return &txqualitychecks.QualityResult{ErrorDescription: "+ Following Helm Chart structure files are missing: " + strings.Join(missingFiles, ", ") +
-			errorDescriptionChartYaml}
+			errorDescriptionCharts}
 	}
 	return &txqualitychecks.QualityResult{Passed: true}
 }
 
 func (r *HelmStructureExists) IsOptional() bool {
 	return false
+}
+
+func validateChart(chartyamlfile string) (bool, string) {
+	isValid := true
+	returnMessage := "\n\t+ Analysis for " + chartyamlfile + ": "
+	cyf := chartYamlFromFile(chartyamlfile)
+	missingFields := cyf.getMissingMandatoryFields()
+
+	if len(missingFields) > 0 {
+		isValid = false
+		returnMessage += "\n\t\t - Missing mandatory fields: " + strings.Join(missingFields, ", ")
+	}
+	if !cyf.isVersionValid() {
+		isValid = false
+		returnMessage += "\n\t\t - " + cyf.Version + " Version of the Helm Chart is incorrect. It needs to follow Semantic Version."
+	}
+
+	return isValid, returnMessage
 }

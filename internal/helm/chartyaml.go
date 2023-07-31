@@ -33,22 +33,6 @@ type chartyaml struct {
 	Description string `yaml:"description"`
 	AppVersion  string `yaml:"appVersion"`
 	Version     string `yaml:"version"`
-	// Below Fields considered not mandatory
-	// Commented out for future usage.
-	//
-	// Sources      []string `yaml:"sources"`
-	// Home         string   `yaml:"home"`
-	// Dependencies []struct {
-	// 	Name       string `yaml:"name"`
-	// 	Repository string `yaml:"repository"`
-	// 	Version    string `yaml:"version"`
-	// 	Condition  string `yaml:"condition"`
-	// } `yaml:"dependencies"`
-	// Maintainers []struct {
-	// 	Name  string `yaml:"name"`
-	// 	Email string `yaml:"email"`
-	// 	Url   string `yaml:"url"`
-	// } `yaml:"maintainers"`
 }
 
 func newChartYaml() *chartyaml {
@@ -79,30 +63,38 @@ func chartYamlFromFile(ymlfile string) *chartyaml {
 }
 
 func (c *chartyaml) isVersionValid() bool {
+	/*
+		Below regular expresion is used to verify version string according to Semantic Versioning schema (https://semver.org).
+		Following examples match:
+		- "1.2.3"
+		- "1.0.0-alpha"
+		- "1.2.3-alpha.1+ef365"
+		Following don't match:
+		- "1.2.abc"
+		- "0.1-alpha"
+	*/
 	regexPattern := `^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$`
+
 	match, err := regexp.MatchString(regexPattern, c.Version)
 	if err != nil {
 		fmt.Println("Error occured when validating semantic version.")
 		return false
 	}
-	if !match {
-		return false
-	}
-	return true
+	return match
 }
 
-func (c *chartyaml) checkMandatoryFields() []string {
+func (c *chartyaml) getMissingMandatoryFields() []string {
 	chartValues := reflect.ValueOf(*c)
-	numFields := chartValues.NumField()
 	chartType := chartValues.Type()
+	numChartFields := chartValues.NumField()
 
 	missingFields := []string{}
-	for i := 0; i < numFields; i++ {
-		field := chartType.Field(i)
-		fieldValue := chartValues.Field(i)
+	for i := 0; i < numChartFields; i++ {
+		chartField := chartType.Field(i)
+		chartFieldValue := chartValues.Field(i)
 
-		if fieldValue.Len() == 0 {
-			missingFields = append(missingFields, field.Name)
+		if chartFieldValue.Len() == 0 {
+			missingFields = append(missingFields, chartField.Name)
 		}
 	}
 	return missingFields

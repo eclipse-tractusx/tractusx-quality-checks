@@ -73,7 +73,6 @@ func TestShouldPassIfHelmStructureExist(t *testing.T) {
 		"charts/exampleChart/LICENSE",
 		"charts/exampleChart/README.md",
 		"charts/exampleChart/values.yaml",
-		// "charts/exampleChart/templates/NOTES.txt",
 	}
 
 	filesystem.CreateDirs(helmStructureDirsExample)
@@ -90,17 +89,17 @@ func TestShouldPassIfHelmStructureExist(t *testing.T) {
 	}
 }
 
-func TestShouldPassIfChartYamlIsValid(t *testing.T) {
+func TestShouldPassIfConfigurationSettingsAreCorrect(t *testing.T) {
 	c := chartYamlFromFile(ValidChartYmlTestFile)
-	if len(c.checkMandatoryFields()) > 0 || !c.isVersionValid() {
-		t.Errorf("TestChartValid.yaml is valid but test still fails.")
+	if len(c.getMissingMandatoryFields()) > 0 || !c.isVersionValid() {
+		t.Errorf("Configuration settings at TestChartValid.yaml are valid but test still fails.")
 	}
 }
 
-func TestShouldFailIfChartYamlIsInValid(t *testing.T) {
+func TestShouldFailIfConfigurationSettingsAreIncorrect(t *testing.T) {
 	c := chartYamlFromFile(InValidChartYmlTestFile)
-	if len(c.checkMandatoryFields()) == 0 || c.isVersionValid() {
-		t.Errorf("TestChartInvalid.yaml is invalid hence the test should pass.")
+	if len(c.getMissingMandatoryFields()) == 0 || c.isVersionValid() {
+		t.Errorf("Configuration settings TestChartInvalid.yaml are invalid hence the test should pass.")
 	}
 }
 

@@ -37,7 +37,7 @@ func NewTestRunner(tests []QualityGuideline) *GuidelineTestRunner {
 func (runner *GuidelineTestRunner) Run() error {
 	allPassed := true
 	for i, guideline := range runner.guidelines {
-		runner.printer.PrintTitle(fmt.Sprintf("\n%v. Testing Quality Guideline: %s", i+1, guideline.Name()))
+		runner.printer.Print(fmt.Sprintf("\n%v. Testing Quality Guideline: %s", i+1, guideline.Name()))
 
 		result := guideline.Test()
 		if guideline.IsOptional() && !result.Passed {
@@ -51,7 +51,7 @@ func (runner *GuidelineTestRunner) Run() error {
 					guideline.Description(), result.ErrorDescription, guideline.ExternalDescription()),
 			)
 		} else {
-			runner.printer.LogSuccess("Skipped or passed!")
+			runner.printer.Print("Skipped or passed!")
 		}
 
 		allPassed = allPassed && (result.Passed || guideline.IsOptional())
@@ -71,23 +71,10 @@ func (p *StdoutPrinter) Print(message string) {
 	fmt.Println(message)
 }
 
-func (p *StdoutPrinter) PrintTitle(title string) {
-	printTitle := color.New(color.Bold, color.FgHiWhite).PrintlnFunc()
-	printTitle(title)
-}
-
 func (p *StdoutPrinter) LogWarning(warning string) {
 	color.Yellow(warning)
 }
 
 func (p *StdoutPrinter) LogError(err string) {
 	color.Red(err)
-}
-
-func (p *StdoutPrinter) LogInfo(info string) {
-	color.Cyan(info)
-}
-
-func (p *StdoutPrinter) LogSuccess(msg string) {
-	color.Green(msg)
 }
