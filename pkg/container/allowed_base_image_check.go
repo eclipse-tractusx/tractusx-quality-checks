@@ -34,10 +34,11 @@ var baseImageAllowList = []string{
 }
 
 type AllowedBaseImage struct {
+	baseDir string
 }
 
-func NewAllowedBaseImage() txqualitychecks.QualityGuideline {
-	return &AllowedBaseImage{}
+func NewAllowedBaseImage(baseDir string) txqualitychecks.QualityGuideline {
+	return &AllowedBaseImage{baseDir: baseDir}
 }
 
 func (a *AllowedBaseImage) Name() string {
@@ -53,7 +54,7 @@ func (a *AllowedBaseImage) ExternalDescription() string {
 }
 
 func (a *AllowedBaseImage) Test() *txqualitychecks.QualityResult {
-	foundDockerFiles := findDockerfilesAt("./")
+	foundDockerFiles := findDockerfilesAt(a.baseDir)
 
 	checkPassed := true
 	var deniedBaseImages []string
