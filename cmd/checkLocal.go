@@ -24,10 +24,10 @@ import (
 	"os"
 
 	txqualitychecks "github.com/eclipse-tractusx/tractusx-quality-checks/internal"
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/container"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/docs"
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/repo"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/helm"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/repo"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/container"
 	"github.com/spf13/cobra"
 )
 
@@ -37,7 +37,7 @@ var releaseGuidelines = []txqualitychecks.QualityGuideline{
 	docs.NewChangelogExists(),
 	repo.NewLeadingRepositoryDefined(),
 	repo.NewDefaultBranch(),
-	container.NewAllowedBaseImage(),
+	container.NewAllowedBaseImage("./"),
 	repo.NewRepoStructureExists(),
 	helm.NewHelmStructureExists(),
 }
