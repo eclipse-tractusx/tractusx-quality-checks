@@ -21,19 +21,21 @@ package docs
 
 import (
 	"os"
+	"path"
 
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
 type ReadmeExists struct {
+	baseDir string
+}
+
+func NewReadmeExists(baseDir string) tractusx.QualityGuideline {
+	return &ReadmeExists{baseDir}
 }
 
 func (r *ReadmeExists) IsOptional() bool {
 	return false
-}
-
-func NewReadmeExists() tractusx.QualityGuideline {
-	return &ReadmeExists{}
 }
 
 func (r *ReadmeExists) Name() string {
@@ -49,7 +51,7 @@ func (r *ReadmeExists) ExternalDescription() string {
 }
 
 func (r *ReadmeExists) Test() *tractusx.QualityResult {
-	_, err := os.Stat("README.md")
+	_, err := os.Stat(path.Join(r.baseDir, "README.md"))
 
 	if err != nil {
 		return &tractusx.QualityResult{ErrorDescription: "Did not find a README.md file in current directory!"}

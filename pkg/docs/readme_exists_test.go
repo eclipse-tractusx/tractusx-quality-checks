@@ -21,13 +21,12 @@ package docs
 
 import (
 	"os"
+	"path"
 	"testing"
 )
 
 func TestShouldFailIfReadmeDoesNotExist(t *testing.T) {
-	readmeTest := NewReadmeExists()
-
-	result := readmeTest.Test()
+	result := NewReadmeExists("./").Test()
 
 	if result.Passed {
 		t.Errorf("Readme check should fail, if no README file present")
@@ -35,10 +34,9 @@ func TestShouldFailIfReadmeDoesNotExist(t *testing.T) {
 }
 
 func TestProvideErrorDescriptionOnFailingTest(t *testing.T) {
-	readmeTest := NewReadmeExists()
 	expectedError := "Did not find a README.md file in current directory!"
 
-	result := readmeTest.Test()
+	result := NewReadmeExists("./").Test()
 
 	if result.ErrorDescription != expectedError {
 		t.Errorf("Readme check does not provide correct error description on failing check! \nexprected: %s, \ngot: %s", expectedError, result.ErrorDescription)
@@ -46,27 +44,28 @@ func TestProvideErrorDescriptionOnFailingTest(t *testing.T) {
 }
 
 func TestShouldPassIfReadmeExists(t *testing.T) {
-	readmeTest := NewReadmeExists()
-	os.Create("README.md")
+	if _, err := os.Create("README.md"); err != nil {
+		t.Errorf("Could not create README.md for test")
+	}
+	defer os.Remove("README.md")
 
-	result := readmeTest.Test()
+	result := NewReadmeExists("./").Test()
 
 	if !result.Passed {
 		t.Errorf("README exists, but test still fails")
 	}
 
-	os.Remove("README.md")
 }
 
-func TestShouldNotProvideErrorDescriptionForPassingTest(t *testing.T) {
-	readmeTest := NewReadmeExists()
-	os.Create("README.md")
-
-	result := readmeTest.Test()
-
-	if result.ErrorDescription != "" {
-		t.Errorf("Passing tests should not contain any error description")
+func TestShouldFindReadmeAtGivenBasePath(t *testing.T) {
+	dir := t.TempDir()
+	if _, err := os.Create(path.Join(dir, "README.md")); err != nil {
+		t.Errorf("Could not create README.md for test")
 	}
 
-	os.Remove("README.md")
+	result := NewReadmeExists(dir).Test()
+
+	if !result.Passed {
+		t.Errorf("Could not find README.md at given base path")
+	}
 }

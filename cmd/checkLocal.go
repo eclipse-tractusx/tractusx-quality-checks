@@ -24,7 +24,6 @@ import (
 	"os"
 
 	txqualitychecks "github.com/eclipse-tractusx/tractusx-quality-checks/internal"
-	idocs "github.com/eclipse-tractusx/tractusx-quality-checks/internal/docs"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/helm"
 	irepo "github.com/eclipse-tractusx/tractusx-quality-checks/internal/repo"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/container"
@@ -35,7 +34,7 @@ import (
 )
 
 var releaseGuidelines = []tractusx.QualityGuideline{
-	idocs.NewReadmeExists(),
+	docs.NewReadmeExists("./"),
 	docs.NewInstallExists("./"),
 	docs.NewChangelogExists("./"),
 	repo.NewLeadingRepositoryDefined("./"),
