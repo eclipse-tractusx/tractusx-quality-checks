@@ -36,7 +36,7 @@ import (
 
 var releaseGuidelines = []tractusx.QualityGuideline{
 	idocs.NewReadmeExists(),
-	idocs.NewInstallExists(),
+	docs.NewInstallExists("./"),
 	docs.NewChangelogExists("./"),
 	repo.NewLeadingRepositoryDefined("./"),
 	irepo.NewDefaultBranch(),

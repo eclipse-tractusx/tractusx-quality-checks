@@ -21,32 +21,34 @@ package docs
 
 import (
 	"os"
+	"path"
 
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
 type InstallExists struct {
+	baseDir string
 }
 
 // NewInstallExists returns a new check based on QualityGuideline interface.
-func NewInstallExists() tractusx.QualityGuideline {
-	return &InstallExists{}
+func NewInstallExists(baseDir string) tractusx.QualityGuideline {
+	return &InstallExists{baseDir}
 }
 
-func (r *InstallExists) Name() string {
+func (i *InstallExists) Name() string {
 	return "TRG 1.02 - INSTALL.md"
 }
 
-func (r *InstallExists) Description() string {
+func (i *InstallExists) Description() string {
 	return "File INSTALL.md contains comprehensive instructions for installation."
 }
 
-func (r *InstallExists) ExternalDescription() string {
+func (i *InstallExists) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-1/trg-1-2"
 }
 
-func (r *InstallExists) Test() *tractusx.QualityResult {
-	_, err := os.Stat("INSTALL.md")
+func (i *InstallExists) Test() *tractusx.QualityResult {
+	_, err := os.Stat(path.Join(i.baseDir, "INSTALL.md"))
 
 	if err != nil {
 		return &tractusx.QualityResult{
@@ -56,6 +58,6 @@ func (r *InstallExists) Test() *tractusx.QualityResult {
 	return &tractusx.QualityResult{Passed: true}
 }
 
-func (r *InstallExists) IsOptional() bool {
+func (i *InstallExists) IsOptional() bool {
 	return true
 }
