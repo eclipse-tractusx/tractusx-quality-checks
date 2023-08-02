@@ -82,7 +82,7 @@ func GetRepoBaseInfo() *RepoInfo {
 
 // getRepoInfo returns *github.Repository object and error. If GitHub API call
 // failed, an error is returned.
-func GetRepoMetadata(repo *RepoInfo) *github.Repository {
+func getRepoInfo(repo *RepoInfo) *github.Repository {
 	ctx := context.Background()
 	client := *github.NewClient(nil)
 

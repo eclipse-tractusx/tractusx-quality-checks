@@ -21,9 +21,10 @@ package product
 
 import (
 	"fmt"
-	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/repo"
-	"gopkg.in/yaml.v3"
 	"os"
+
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/repo"
+	"gopkg.in/yaml.v3"
 )
 
 const MetadataFilename = ".tractusx"
@@ -75,7 +76,6 @@ func MetadataFromLocalFile() (*Metadata, error) {
 }
 
 func IsLeadingRepo() bool {
-
 	metadata, err := MetadataFromLocalFile()
 	repoInfo := repo.GetRepoBaseInfo()
 	fullRepoName := "https://github.com/eclipse-tractusx/" + (*repoInfo).Reponame

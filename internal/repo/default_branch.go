@@ -20,7 +20,6 @@
 package repo
 
 import (
-	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/repo"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
@@ -44,7 +43,7 @@ func (d defaultBranch) ExternalDescription() string {
 }
 
 func (d defaultBranch) Test() *tractusx.QualityResult {
-	repoInfo := repo.GetRepoMetadata(repo.GetRepoBaseInfo())
+	repoInfo := getRepoInfo(GetRepoBaseInfo())
 
 	if *repoInfo.Fork {
 		// There is no need to enforce default branches on forks
