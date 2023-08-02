@@ -25,7 +25,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/product"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 	"gopkg.in/yaml.v3"
 )
 
@@ -46,7 +46,7 @@ func TestShouldFailIfMetadataFileIsMissing(t *testing.T) {
 }
 
 func TestShouldFailIfLeadingRepositoryMetadataPropertyIsUndefined(t *testing.T) {
-	metadata := product.Metadata{
+	metadata := tractusx.Metadata{
 		ProductName:       "ProductWithoutLeadingRepo",
 		LeadingRepository: "",
 		Repositories:      nil,
@@ -63,7 +63,7 @@ func TestShouldFailIfLeadingRepositoryMetadataPropertyIsUndefined(t *testing.T) 
 }
 
 func TestShouldSucceedIfLeadingRepoIsDefinedInMetadata(t *testing.T) {
-	metadata := product.Metadata{
+	metadata := tractusx.Metadata{
 		ProductName:       "ProductWithoutLeadingRepo",
 		LeadingRepository: "https://github.com/eclipse-tractusx/sig-infra",
 		Repositories:      nil,
@@ -79,7 +79,7 @@ func TestShouldSucceedIfLeadingRepoIsDefinedInMetadata(t *testing.T) {
 
 func TestShouldUseMetadataAtSpecifiedDirectory(t *testing.T) {
 	testDir := t.TempDir()
-	metadata := product.Metadata{
+	metadata := tractusx.Metadata{
 		ProductName:       "ProductWithoutLeadingRepo",
 		LeadingRepository: "https://github.com/eclipse-tractusx/sig-infra",
 		Repositories:      nil,
@@ -93,11 +93,11 @@ func TestShouldUseMetadataAtSpecifiedDirectory(t *testing.T) {
 	}
 }
 
-func givenProductMetadata(t *testing.T, metadata product.Metadata) {
+func givenProductMetadata(t *testing.T, metadata tractusx.Metadata) {
 	givenProductMetadataAtDir(t, metadata, "./")
 }
 
-func givenProductMetadataAtDir(t *testing.T, metadata product.Metadata, dir string) {
+func givenProductMetadataAtDir(t *testing.T, metadata tractusx.Metadata, dir string) {
 	yamlContent, err := yaml.Marshal(&metadata)
 	if err != nil {
 		t.Errorf("Could not serialize metadata test content")

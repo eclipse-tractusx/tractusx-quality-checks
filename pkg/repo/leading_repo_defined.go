@@ -22,7 +22,6 @@ package repo
 import (
 	"strings"
 
-	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/product"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
@@ -51,7 +50,7 @@ func (l *LeadingRepositoryDefined) IsOptional() bool {
 }
 
 func (l *LeadingRepositoryDefined) Test() *tractusx.QualityResult {
-	metadata, err := product.MetadataFromLocalFile(l.baseDir)
+	metadata, err := tractusx.MetadataFromLocalFile(l.baseDir)
 	if err != nil {
 		return &tractusx.QualityResult{ErrorDescription: "Failed! The leadingRepository property must be defined in .tractusx metadata file. Could not load metadata"}
 	}

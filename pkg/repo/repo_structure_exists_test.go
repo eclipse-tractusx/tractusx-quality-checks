@@ -41,7 +41,7 @@ var listOfDirsToBeCreated = []string{
 	"charts",
 }
 
-const metadataTestFile = "../../pkg/product/test/metadata_test_template.yaml"
+const metadataTestFile = "./test/metadata_test_template.yaml"
 
 func TestShouldPassIfRepoStructureExistsWithoutOptional(t *testing.T) {
 	setEnv(t)

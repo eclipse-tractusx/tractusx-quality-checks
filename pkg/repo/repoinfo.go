@@ -24,7 +24,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/product"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 	"github.com/go-ini/ini"
 )
 
@@ -80,7 +80,7 @@ func GetRepoBaseInfo() *RepoInfo {
 }
 
 func isLeadingRepo() bool {
-	metadata, err := product.MetadataFromLocalFile("./")
+	metadata, err := tractusx.MetadataFromLocalFile("./")
 	repoInfo := GetRepoBaseInfo()
 	fullRepoName := "https://github.com/eclipse-tractusx/" + (*repoInfo).Reponame
 
