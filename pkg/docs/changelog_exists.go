@@ -21,19 +21,21 @@ package docs
 
 import (
 	"os"
+	"path"
 
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
 type ChangeLogExists struct {
+	baseDir string
+}
+
+func NewChangelogExists(baseDir string) *ChangeLogExists {
+	return &ChangeLogExists{baseDir}
 }
 
 func (c ChangeLogExists) IsOptional() bool {
 	return false
-}
-
-func NewChangelogExists() *ChangeLogExists {
-	return &ChangeLogExists{}
 }
 
 func (c ChangeLogExists) Name() string {
@@ -49,7 +51,7 @@ func (c ChangeLogExists) ExternalDescription() string {
 }
 
 func (c ChangeLogExists) Test() *tractusx.QualityResult {
-	_, err := os.Stat("CHANGELOG.md")
+	_, err := os.Stat(path.Join(c.baseDir, "CHANGELOG.md"))
 
 	if err != nil {
 		return &tractusx.QualityResult{ErrorDescription: "A CHANGELOG.md file has to be present, describing the changes on between your releases"}

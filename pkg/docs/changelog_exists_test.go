@@ -21,13 +21,12 @@ package docs
 
 import (
 	"os"
+	"path"
 	"testing"
 )
 
 func TestShouldFailIfChangelogFileIsMissing(t *testing.T) {
-	changelogTest := NewChangelogExists()
-
-	result := changelogTest.Test()
+	result := NewChangelogExists("./").Test()
 
 	if result.Passed {
 		t.Errorf("ChangelogExist should fail if no Changelog file present")
@@ -36,22 +35,28 @@ func TestShouldFailIfChangelogFileIsMissing(t *testing.T) {
 
 func TestShouldPassIfChangelogExists(t *testing.T) {
 	_, _ = os.Create("CHANGELOG.md")
-	defer func() {
-		_ = os.Remove("CHANGELOG.md")
-	}()
-	changelogTest := NewChangelogExists()
+	defer os.Remove("CHANGELOG.md")
 
-	result := changelogTest.Test()
+	result := NewChangelogExists("./").Test()
 
 	if !result.Passed {
 		t.Errorf("ChangelogExist should pass, if a CHANGELOG.md exists")
 	}
 }
 
-func TestShouldProvideErrorDescriptionIfFailing(t *testing.T) {
-	changelogTest := NewChangelogExists()
+func TestShouldFindChangelogAtGivenBaseDir(t *testing.T) {
+	dir := t.TempDir()
+	_, _ = os.Create(path.Join(dir, "CHANGELOG.md"))
 
-	result := changelogTest.Test()
+	result := NewChangelogExists(dir).Test()
+
+	if !result.Passed {
+		t.Errorf("ChangelogExist should find file at given base dir")
+	}
+}
+
+func TestShouldProvideErrorDescriptionIfFailing(t *testing.T) {
+	result := NewChangelogExists("./").Test()
 
 	if result.ErrorDescription == "" {
 		t.Errorf("Failing tests should provide an error description")
