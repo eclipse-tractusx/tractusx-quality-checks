@@ -70,6 +70,7 @@ func (c RepoStructureExists) Test() *txqualitychecks.QualityResult {
 	}
 
 	mandatoryForLeadingRepo := []string{"docs", "charts"}
+	printer := &txqualitychecks.StdoutPrinter{}
 
 	if product.IsLeadingRepo() {
 		listOfMandatoryFilesToBeChecked = append(listOfMandatoryFilesToBeChecked, mandatoryForLeadingRepo...)
@@ -79,13 +80,14 @@ func (c RepoStructureExists) Test() *txqualitychecks.QualityResult {
 	missingOptionalFiles := filesystem.CheckMissingFiles(listOfOptionalFilesToBeChecked)
 
 	if len(missingOptionalFiles) > 0 {
-		fmt.Printf("Warning! Guideline description: %s\n\t%s\n\tMore infos: %s\n",
-			c.Description(), "The check detected following optional files missing: "+strings.Join(missingOptionalFiles, " "),
-			c.ExternalDescription())
+		printer.LogWarning(
+			fmt.Sprintf("Warning! Guideline description: %s\n\t%s\n\tMore infos: %s\n",
+				c.Description(), "The check detected following optional files missing: "+strings.Join(missingOptionalFiles, ", "),
+				c.ExternalDescription()))
 	}
 
 	if len(missingMandatoryFiles) > 0 {
-		return &txqualitychecks.QualityResult{ErrorDescription: "The check detected following mandatory files missing: " + strings.Join(missingMandatoryFiles, " ")}
+		return &txqualitychecks.QualityResult{ErrorDescription: "The check detected following mandatory files missing: " + strings.Join(missingMandatoryFiles, ", ")}
 	}
 
 	return &txqualitychecks.QualityResult{Passed: true}

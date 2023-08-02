@@ -84,3 +84,23 @@ func (p *PrinterMock) Print(message string) {
 	fmt.Println(message)
 	p.messages = append(p.messages, message)
 }
+
+func (p *PrinterMock) PrintTitle(title string) {
+	p.Print(title)
+}
+
+func (p *PrinterMock) LogWarning(warning string) {
+	p.Print(warning)
+}
+
+func (p *PrinterMock) LogError(err string) {
+	p.Print(err)
+}
+
+func (p *PrinterMock) LogInfo(info string) {
+	p.Print(info)
+}
+
+func (p *PrinterMock) LogSuccess(msg string) {
+	p.Print(msg)
+}

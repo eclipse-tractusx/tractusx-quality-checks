@@ -25,6 +25,9 @@ import (
 	"testing"
 )
 
+var ValidChartYmlTestFile string = "test/TestChartValid.yaml"
+var InValidChartYmlTestFile string = "test/TestChartInValid.yaml"
+
 func TestShouldPassIfHelmDirIsMissing(t *testing.T) {
 	helmStructureTest := NewHelmStructureExists()
 
@@ -70,18 +73,43 @@ func TestShouldPassIfHelmStructureExist(t *testing.T) {
 		"charts/exampleChart/LICENSE",
 		"charts/exampleChart/README.md",
 		"charts/exampleChart/values.yaml",
-		"charts/exampleChart/templates/NOTES.txt",
 	}
 
 	filesystem.CreateDirs(helmStructureDirsExample)
 	filesystem.CreateFiles(helmStructureFilesExample)
 	defer os.RemoveAll("charts")
 
+	copyTemplateFileTo("charts/exampleChart/Chart.yaml", t)
 	helmStructureTest := NewHelmStructureExists()
 
 	result := helmStructureTest.Test()
 
 	if !result.Passed {
 		t.Errorf("Helm structure exists hence test should pass.")
+	}
+}
+
+func TestShouldPassIfConfigurationSettingsAreCorrect(t *testing.T) {
+	c := chartYamlFromFile(ValidChartYmlTestFile)
+	if len(c.getMissingMandatoryFields()) > 0 || !c.isVersionValid() {
+		t.Errorf("Configuration settings at TestChartValid.yaml are valid but test still fails.")
+	}
+}
+
+func TestShouldFailIfConfigurationSettingsAreIncorrect(t *testing.T) {
+	c := chartYamlFromFile(InValidChartYmlTestFile)
+	if len(c.getMissingMandatoryFields()) == 0 || c.isVersionValid() {
+		t.Errorf("Configuration settings TestChartInvalid.yaml are invalid hence the test should pass.")
+	}
+}
+
+func copyTemplateFileTo(path string, t *testing.T) {
+	templateFile, err := os.ReadFile(ValidChartYmlTestFile)
+	if err != nil {
+		t.Errorf("Could not read template file necessary for this test")
+	}
+	err = os.WriteFile(path, templateFile, 0644)
+	if err != nil {
+		t.Errorf("Could not copy template file to designated path")
 	}
 }

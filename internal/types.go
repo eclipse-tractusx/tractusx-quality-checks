@@ -46,4 +46,6 @@ type QualityResult struct {
 
 type Printer interface {
 	Print(message string)
+	LogWarning(warning string)
+	LogError(err string)
 }

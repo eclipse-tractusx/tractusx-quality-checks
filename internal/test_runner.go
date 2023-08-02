@@ -22,6 +22,7 @@ package txqualitychecks
 import (
 	"errors"
 	"fmt"
+	"github.com/fatih/color"
 )
 
 type GuidelineTestRunner struct {
@@ -30,25 +31,27 @@ type GuidelineTestRunner struct {
 }
 
 func NewTestRunner(tests []QualityGuideline) *GuidelineTestRunner {
-	return &GuidelineTestRunner{guidelines: tests, printer: &stdoutPrinter{}}
+	return &GuidelineTestRunner{guidelines: tests, printer: &StdoutPrinter{}}
 }
 
 func (runner *GuidelineTestRunner) Run() error {
 	allPassed := true
-	for _, guideline := range runner.guidelines {
-		runner.printer.Print(fmt.Sprintf("Testing Quality Guideline: %s", guideline.Name()))
+	for i, guideline := range runner.guidelines {
+		runner.printer.Print(fmt.Sprintf("\n%v. Testing Quality Guideline: %s", i+1, guideline.Name()))
 
 		result := guideline.Test()
 		if guideline.IsOptional() && !result.Passed {
-			runner.printer.Print(
+			runner.printer.LogWarning(
 				fmt.Sprintf("Warning! Test failed, but test '%s' is marked as optional.\nMore infos:\n\t%s\n\t%s",
 					guideline.Name(), result.ErrorDescription, guideline.ExternalDescription()),
 			)
 		} else if !result.Passed {
-			runner.printer.Print(
+			runner.printer.LogError(
 				fmt.Sprintf("Failed! Guideline description: %s\n\t%s\n\tMore infos: %s",
 					guideline.Description(), result.ErrorDescription, guideline.ExternalDescription()),
 			)
+		} else {
+			runner.printer.Print("Skipped or passed!")
 		}
 
 		allPassed = allPassed && (result.Passed || guideline.IsOptional())
@@ -57,12 +60,21 @@ func (runner *GuidelineTestRunner) Run() error {
 	if !allPassed {
 		return errors.New("not all tests have passed")
 	}
+
 	return nil
 }
 
-type stdoutPrinter struct {
+type StdoutPrinter struct {
 }
 
-func (p *stdoutPrinter) Print(message string) {
+func (p *StdoutPrinter) Print(message string) {
 	fmt.Println(message)
+}
+
+func (p *StdoutPrinter) LogWarning(warning string) {
+	color.Yellow(warning)
+}
+
+func (p *StdoutPrinter) LogError(err string) {
+	color.Red(err)
 }

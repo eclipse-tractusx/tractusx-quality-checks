@@ -23,13 +23,13 @@ import (
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/filesystem"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
 type HelmStructureExists struct {
 }
 
-// NewHelmStructureExists returns a new check based on QualityGuideline interface.
 func NewHelmStructureExists() txqualitychecks.QualityGuideline {
 	return &HelmStructureExists{}
 }
@@ -53,8 +53,6 @@ func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
 		"LICENSE",
 		"README.md",
 		"values.yaml",
-		"templates",
-		"templates/NOTES.txt",
 	}
 
 	mainDir := "charts"
@@ -68,23 +66,57 @@ func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
 	}
 
 	missingFiles := []string{}
+	chartYamlFiles := []string{}
 	for _, hc := range helmCharts {
 		if hc.IsDir() {
-			tmpFilesStructure := []string{}
 			for _, fname := range helmStructureFiles {
-				tmpFilesStructure = append(tmpFilesStructure, mainDir+"/"+hc.Name()+"/"+fname)
+				fpath := filepath.Join(mainDir, hc.Name(), fname)
+				isMissing := filesystem.CheckMissingFiles([]string{fpath})
+				if fname == "Chart.yaml" && isMissing == nil {
+					chartYamlFiles = append(chartYamlFiles, fpath)
+				} else if isMissing != nil {
+					missingFiles = append(missingFiles, isMissing...)
+				}
 			}
-			missingFiles = append(missingFiles, filesystem.CheckMissingFiles(tmpFilesStructure)...)
 		}
 	}
 
-	if len(missingFiles) > 0 {
-		return &txqualitychecks.QualityResult{ErrorDescription: "Following files are missing: " + strings.Join(missingFiles, " ")}
+	errorDescriptionCharts := ""
+	chartsValid := true
+	if len(chartYamlFiles) > 0 {
+
+		for _, fpath := range chartYamlFiles {
+			isValid, msg := validateChart(fpath)
+			chartsValid = chartsValid && isValid
+			errorDescriptionCharts += msg
+		}
 	}
 
+	if len(missingFiles) > 0 || !chartsValid {
+		return &txqualitychecks.QualityResult{ErrorDescription: "+ Following Helm Chart structure files are missing: " + strings.Join(missingFiles, ", ") +
+			errorDescriptionCharts}
+	}
 	return &txqualitychecks.QualityResult{Passed: true}
 }
 
 func (r *HelmStructureExists) IsOptional() bool {
 	return false
+}
+
+func validateChart(chartyamlfile string) (bool, string) {
+	isValid := true
+	returnMessage := "\n\t+ Analysis for " + chartyamlfile + ": "
+	cyf := chartYamlFromFile(chartyamlfile)
+	missingFields := cyf.getMissingMandatoryFields()
+
+	if len(missingFields) > 0 {
+		isValid = false
+		returnMessage += "\n\t\t - Missing mandatory fields: " + strings.Join(missingFields, ", ")
+	}
+	if !cyf.isVersionValid() {
+		isValid = false
+		returnMessage += "\n\t\t - " + cyf.Version + " Version of the Helm Chart is incorrect. It needs to follow Semantic Version."
+	}
+
+	return isValid, returnMessage
 }
