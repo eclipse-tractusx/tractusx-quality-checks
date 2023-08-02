@@ -20,9 +20,10 @@
 package helm
 
 import (
-	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/filesystem"
 	"os"
 	"testing"
+
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/filesystem"
 )
 
 var ValidChartYmlTestFile string = "test/TestChartValid.yaml"

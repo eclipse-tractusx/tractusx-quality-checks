@@ -24,7 +24,7 @@ import (
 	"strings"
 
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
-	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/filesystem"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/filesystem"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/product"
 )
 

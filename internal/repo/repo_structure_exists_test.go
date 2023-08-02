@@ -20,9 +20,10 @@
 package repo
 
 import (
-	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/filesystem"
 	"os"
 	"testing"
+
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/filesystem"
 )
 
 var listOfFilesToBeCreated []string = []string{

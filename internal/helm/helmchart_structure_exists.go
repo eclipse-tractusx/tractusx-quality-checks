@@ -20,11 +20,12 @@
 package helm
 
 import (
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
-	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/filesystem"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/filesystem"
 )
 
 type HelmStructureExists struct {
