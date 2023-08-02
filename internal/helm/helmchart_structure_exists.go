@@ -24,14 +24,14 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/filesystem"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
 type HelmStructureExists struct {
 }
 
-func NewHelmStructureExists() txqualitychecks.QualityGuideline {
+func NewHelmStructureExists() tractusx.QualityGuideline {
 	return &HelmStructureExists{}
 }
 
@@ -47,7 +47,7 @@ func (r *HelmStructureExists) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-5/trg-5-02"
 }
 
-func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
+func (r *HelmStructureExists) Test() *tractusx.QualityResult {
 	helmStructureFiles := []string{
 		".helmignore",
 		"Chart.yaml",
@@ -58,12 +58,12 @@ func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
 
 	mainDir := "charts"
 	if fi, err := os.Stat(mainDir); err != nil || !fi.IsDir() {
-		return &txqualitychecks.QualityResult{Passed: true}
+		return &tractusx.QualityResult{Passed: true}
 	}
 
 	helmCharts, err := os.ReadDir(mainDir)
 	if err != nil || len(helmCharts) == 0 {
-		return &txqualitychecks.QualityResult{ErrorDescription: "Can't read Helm Charts at charts/."}
+		return &tractusx.QualityResult{ErrorDescription: "Can't read Helm Charts at charts/."}
 	}
 
 	missingFiles := []string{}
@@ -94,10 +94,10 @@ func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
 	}
 
 	if len(missingFiles) > 0 || !chartsValid {
-		return &txqualitychecks.QualityResult{ErrorDescription: "+ Following Helm Chart structure files are missing: " + strings.Join(missingFiles, ", ") +
+		return &tractusx.QualityResult{ErrorDescription: "+ Following Helm Chart structure files are missing: " + strings.Join(missingFiles, ", ") +
 			errorDescriptionCharts}
 	}
-	return &txqualitychecks.QualityResult{Passed: true}
+	return &tractusx.QualityResult{Passed: true}
 }
 
 func (r *HelmStructureExists) IsOptional() bool {

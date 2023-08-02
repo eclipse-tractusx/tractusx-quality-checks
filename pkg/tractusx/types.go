@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package txqualitychecks
+package tractusx
 
 // QualityGuideline represents the QualityGuideline to check as an interface.
 //

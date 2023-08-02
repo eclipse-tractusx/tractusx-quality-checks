@@ -28,10 +28,11 @@ import (
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/helm"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/repo"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/container"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 	"github.com/spf13/cobra"
 )
 
-var releaseGuidelines = []txqualitychecks.QualityGuideline{
+var releaseGuidelines = []tractusx.QualityGuideline{
 	docs.NewReadmeExists(),
 	docs.NewInstallExists(),
 	docs.NewChangelogExists(),

@@ -22,7 +22,7 @@ package docs
 import (
 	"os"
 
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
 type ChangeLogExists struct {
@@ -48,11 +48,11 @@ func (c ChangeLogExists) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-1/trg-1-3"
 }
 
-func (c ChangeLogExists) Test() *txqualitychecks.QualityResult {
+func (c ChangeLogExists) Test() *tractusx.QualityResult {
 	_, err := os.Stat("CHANGELOG.md")
 
 	if err != nil {
-		return &txqualitychecks.QualityResult{ErrorDescription: "A CHANGELOG.md file has to be present, describing the changes on between your releases"}
+		return &tractusx.QualityResult{ErrorDescription: "A CHANGELOG.md file has to be present, describing the changes on between your releases"}
 	}
-	return &txqualitychecks.QualityResult{Passed: true}
+	return &tractusx.QualityResult{Passed: true}
 }

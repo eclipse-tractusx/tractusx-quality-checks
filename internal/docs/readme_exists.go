@@ -22,7 +22,7 @@ package docs
 import (
 	"os"
 
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
 type ReadmeExists struct {
@@ -32,7 +32,7 @@ func (r *ReadmeExists) IsOptional() bool {
 	return false
 }
 
-func NewReadmeExists() txqualitychecks.QualityGuideline {
+func NewReadmeExists() tractusx.QualityGuideline {
 	return &ReadmeExists{}
 }
 
@@ -48,11 +48,11 @@ func (r *ReadmeExists) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-1/trg-1-1"
 }
 
-func (r *ReadmeExists) Test() *txqualitychecks.QualityResult {
+func (r *ReadmeExists) Test() *tractusx.QualityResult {
 	_, err := os.Stat("README.md")
 
 	if err != nil {
-		return &txqualitychecks.QualityResult{ErrorDescription: "Did not find a README.md file in current directory!"}
+		return &tractusx.QualityResult{ErrorDescription: "Did not find a README.md file in current directory!"}
 	}
-	return &txqualitychecks.QualityResult{Passed: true}
+	return &tractusx.QualityResult{Passed: true}
 }

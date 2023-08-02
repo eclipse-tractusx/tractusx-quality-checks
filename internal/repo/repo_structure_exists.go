@@ -26,6 +26,7 @@ import (
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/filesystem"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/product"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
 type RepoStructureExists struct {
@@ -51,7 +52,7 @@ func (c RepoStructureExists) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-2/trg-2-3"
 }
 
-func (c RepoStructureExists) Test() *txqualitychecks.QualityResult {
+func (c RepoStructureExists) Test() *tractusx.QualityResult {
 	// Slices containing required files and folders in the repo structure.
 	// Before modification make sure you align to TRG 2.03 guideline.
 	listOfOptionalFilesToBeChecked := []string{
@@ -87,8 +88,8 @@ func (c RepoStructureExists) Test() *txqualitychecks.QualityResult {
 	}
 
 	if len(missingMandatoryFiles) > 0 {
-		return &txqualitychecks.QualityResult{ErrorDescription: "The check detected following mandatory files missing: " + strings.Join(missingMandatoryFiles, ", ")}
+		return &tractusx.QualityResult{ErrorDescription: "The check detected following mandatory files missing: " + strings.Join(missingMandatoryFiles, ", ")}
 	}
 
-	return &txqualitychecks.QualityResult{Passed: true}
+	return &tractusx.QualityResult{Passed: true}
 }

@@ -23,10 +23,12 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
 func TestShouldPassIfNotTestsAreRun(t *testing.T) {
-	err := NewTestRunner([]QualityGuideline{}).Run()
+	err := NewTestRunner([]tractusx.QualityGuideline{}).Run()
 
 	if err != nil {
 		t.Errorf("Running no tests should succeed")
@@ -34,7 +36,7 @@ func TestShouldPassIfNotTestsAreRun(t *testing.T) {
 }
 
 func TestShouldFailWhenRunningFailingQualityTage(t *testing.T) {
-	err := NewTestRunner([]QualityGuideline{&FailingQualityGuideline{}}).Run()
+	err := NewTestRunner([]tractusx.QualityGuideline{&FailingQualityGuideline{}}).Run()
 
 	if err == nil {
 		t.Errorf("Expected error if only a failing quality guideline is run")
@@ -42,7 +44,7 @@ func TestShouldFailWhenRunningFailingQualityTage(t *testing.T) {
 }
 
 func TestShouldPassIfOnlyPassingQualityGuidelinesAreRun(t *testing.T) {
-	err := NewTestRunner([]QualityGuideline{&PassingQualityGuideline{}}).Run()
+	err := NewTestRunner([]tractusx.QualityGuideline{&PassingQualityGuideline{}}).Run()
 
 	if err != nil {
 		t.Errorf("Should not raise an error if only succeeding quality guidelines are run")
@@ -50,7 +52,7 @@ func TestShouldPassIfOnlyPassingQualityGuidelinesAreRun(t *testing.T) {
 }
 
 func TestShouldFailIfAtLeastOneFailingTestIsRun(t *testing.T) {
-	runner := NewTestRunner([]QualityGuideline{
+	runner := NewTestRunner([]tractusx.QualityGuideline{
 		&PassingQualityGuideline{},
 		&PassingQualityGuideline{},
 		&FailingQualityGuideline{},
@@ -65,7 +67,7 @@ func TestShouldFailIfAtLeastOneFailingTestIsRun(t *testing.T) {
 
 func TestShouldLogTheGuidelineNameWhenRunningTheTest(t *testing.T) {
 	runner := NewTestRunner(
-		[]QualityGuideline{&PassingQualityGuideline{Guideline{name: "TRG 1 - README test"}}},
+		[]tractusx.QualityGuideline{&PassingQualityGuideline{Guideline{name: "TRG 1 - README test"}}},
 	)
 	printerMock := &PrinterMock{}
 	runner.printer = printerMock
@@ -89,7 +91,7 @@ func TestShouldLogDescriptionOfGuidelineIfTheTestIsFailing(t *testing.T) {
 			externalDescription: "https://en.wikipedia.org/wiki/Chuck_Norris",
 		},
 	}
-	runner := NewTestRunner([]QualityGuideline{failingGuideline})
+	runner := NewTestRunner([]tractusx.QualityGuideline{failingGuideline})
 	printerMock := &PrinterMock{}
 	runner.printer = printerMock
 
@@ -125,7 +127,7 @@ func TestShouldOnlyLogAdditionalDescriptionForFailingTests(t *testing.T) {
 			externalDescription: "https://de.wikipedia.org/wiki//dev/null",
 		},
 	}
-	runner := NewTestRunner([]QualityGuideline{failingGuideline, passingGuideline})
+	runner := NewTestRunner([]tractusx.QualityGuideline{failingGuideline, passingGuideline})
 	printerMock := &PrinterMock{}
 	runner.printer = printerMock
 
@@ -155,7 +157,7 @@ func TestShouldNotFailIfOptionalTestFail(t *testing.T) {
 		},
 	}
 
-	runner := NewTestRunner([]QualityGuideline{failingGuideline})
+	runner := NewTestRunner([]tractusx.QualityGuideline{failingGuideline})
 	err := runner.Run()
 
 	if err != nil {

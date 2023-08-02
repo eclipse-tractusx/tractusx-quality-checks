@@ -20,14 +20,14 @@
 package repo
 
 import (
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/repo"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
 type defaultBranch struct {
 }
 
-func NewDefaultBranch() txqualitychecks.QualityGuideline {
+func NewDefaultBranch() tractusx.QualityGuideline {
 	return &defaultBranch{}
 }
 
@@ -43,23 +43,23 @@ func (d defaultBranch) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-2/trg-2-1"
 }
 
-func (d defaultBranch) Test() *txqualitychecks.QualityResult {
+func (d defaultBranch) Test() *tractusx.QualityResult {
 	repoInfo := repo.GetRepoMetadata(repo.GetRepoBaseInfo())
 
 	if *repoInfo.Fork {
 		// There is no need to enforce default branches on forks
 		// Since all the other checks should be executable on forks, we cannot let this single check break a workflow
-		return &txqualitychecks.QualityResult{Passed: true}
+		return &tractusx.QualityResult{Passed: true}
 	}
 
 	if *repoInfo.DefaultBranch != "main" {
-		return &txqualitychecks.QualityResult{
+		return &tractusx.QualityResult{
 			Passed:           false,
 			ErrorDescription: "Default branch not set to 'main'.",
 		}
 	}
 
-	return &txqualitychecks.QualityResult{Passed: true}
+	return &tractusx.QualityResult{Passed: true}
 }
 
 func (d defaultBranch) IsOptional() bool {

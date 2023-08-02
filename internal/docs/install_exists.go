@@ -22,14 +22,14 @@ package docs
 import (
 	"os"
 
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
 type InstallExists struct {
 }
 
 // NewInstallExists returns a new check based on QualityGuideline interface.
-func NewInstallExists() txqualitychecks.QualityGuideline {
+func NewInstallExists() tractusx.QualityGuideline {
 	return &InstallExists{}
 }
 
@@ -45,15 +45,15 @@ func (r *InstallExists) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-1/trg-1-2"
 }
 
-func (r *InstallExists) Test() *txqualitychecks.QualityResult {
+func (r *InstallExists) Test() *tractusx.QualityResult {
 	_, err := os.Stat("INSTALL.md")
 
 	if err != nil {
-		return &txqualitychecks.QualityResult{
+		return &tractusx.QualityResult{
 			ErrorDescription: "Optional file INSTALL.md not found in current directory.",
 		}
 	}
-	return &txqualitychecks.QualityResult{Passed: true}
+	return &tractusx.QualityResult{Passed: true}
 }
 
 func (r *InstallExists) IsOptional() bool {
