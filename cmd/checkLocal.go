@@ -26,8 +26,9 @@ import (
 	txqualitychecks "github.com/eclipse-tractusx/tractusx-quality-checks/internal"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/docs"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/helm"
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/repo"
+	irepo "github.com/eclipse-tractusx/tractusx-quality-checks/internal/repo"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/container"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/repo"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 	"github.com/spf13/cobra"
 )
@@ -36,10 +37,10 @@ var releaseGuidelines = []tractusx.QualityGuideline{
 	docs.NewReadmeExists(),
 	docs.NewInstallExists(),
 	docs.NewChangelogExists(),
-	repo.NewLeadingRepositoryDefined(),
-	repo.NewDefaultBranch(),
+	repo.NewLeadingRepositoryDefined("./"),
+	irepo.NewDefaultBranch(),
 	container.NewAllowedBaseImage("./"),
-	repo.NewRepoStructureExists(),
+	repo.NewRepoStructureExists("./"),
 	helm.NewHelmStructureExists(),
 }
 

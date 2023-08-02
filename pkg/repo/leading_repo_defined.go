@@ -27,10 +27,11 @@ import (
 )
 
 type LeadingRepositoryDefined struct {
+	baseDir string
 }
 
-func NewLeadingRepositoryDefined() tractusx.QualityGuideline {
-	return &LeadingRepositoryDefined{}
+func NewLeadingRepositoryDefined(baseDir string) tractusx.QualityGuideline {
+	return &LeadingRepositoryDefined{baseDir}
 }
 
 func (l *LeadingRepositoryDefined) Name() string {
@@ -50,7 +51,7 @@ func (l *LeadingRepositoryDefined) IsOptional() bool {
 }
 
 func (l *LeadingRepositoryDefined) Test() *tractusx.QualityResult {
-	metadata, err := product.MetadataFromLocalFile()
+	metadata, err := product.MetadataFromLocalFile(l.baseDir)
 	if err != nil {
 		return &tractusx.QualityResult{ErrorDescription: "Failed! The leadingRepository property must be defined in .tractusx metadata file. Could not load metadata"}
 	}

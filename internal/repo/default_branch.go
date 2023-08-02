@@ -20,7 +20,12 @@
 package repo
 
 import (
+	"context"
+	"fmt"
+
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/repo"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
+	"github.com/google/go-github/v50/github"
 )
 
 type defaultBranch struct {
@@ -43,7 +48,7 @@ func (d defaultBranch) ExternalDescription() string {
 }
 
 func (d defaultBranch) Test() *tractusx.QualityResult {
-	repoInfo := getRepoInfo(GetRepoBaseInfo())
+	repoInfo := getRepoInfo(repo.GetRepoBaseInfo())
 
 	if *repoInfo.Fork {
 		// There is no need to enforce default branches on forks
@@ -63,4 +68,16 @@ func (d defaultBranch) Test() *tractusx.QualityResult {
 
 func (d defaultBranch) IsOptional() bool {
 	return false
+}
+
+func getRepoInfo(repo *repo.RepoInfo) *github.Repository {
+	ctx := context.Background()
+	client := *github.NewClient(nil)
+
+	repoInfo, _, err := client.Repositories.Get(ctx, repo.Owner, repo.Reponame)
+	if err != nil {
+		fmt.Printf("Error querying GitHub API:\n%v\n", err)
+	}
+
+	return repoInfo
 }

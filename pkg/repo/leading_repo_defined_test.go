@@ -21,6 +21,7 @@ package repo
 
 import (
 	"os"
+	"path"
 	"strings"
 	"testing"
 
@@ -37,7 +38,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestShouldFailIfMetadataFileIsMissing(t *testing.T) {
-	result := NewLeadingRepositoryDefined().Test()
+	result := NewLeadingRepositoryDefined("./").Test()
 
 	if result.Passed {
 		t.Errorf("LeadingRepoDefined should faild, if there is no repository metadata")
@@ -52,7 +53,7 @@ func TestShouldFailIfLeadingRepositoryMetadataPropertyIsUndefined(t *testing.T) 
 	}
 	givenProductMetadata(t, metadata)
 
-	result := NewLeadingRepositoryDefined().Test()
+	result := NewLeadingRepositoryDefined("./").Test()
 	if result.Passed {
 		t.Errorf("Check should fail if metadata file exists, but does not have leading repo defined")
 	}
@@ -69,20 +70,40 @@ func TestShouldSucceedIfLeadingRepoIsDefinedInMetadata(t *testing.T) {
 	}
 	givenProductMetadata(t, metadata)
 
-	result := NewLeadingRepositoryDefined().Test()
+	result := NewLeadingRepositoryDefined("./").Test()
 
 	if !result.Passed {
 		t.Errorf("Leading Repo check should pass, if configured in metadata")
 	}
 }
 
+func TestShouldUseMetadataAtSpecifiedDirectory(t *testing.T) {
+	testDir := t.TempDir()
+	metadata := product.Metadata{
+		ProductName:       "ProductWithoutLeadingRepo",
+		LeadingRepository: "https://github.com/eclipse-tractusx/sig-infra",
+		Repositories:      nil,
+	}
+	givenProductMetadataAtDir(t, metadata, testDir)
+
+	result := NewLeadingRepositoryDefined(testDir).Test()
+
+	if !result.Passed {
+		t.Errorf("Leading Repo check should use metadata from a given path")
+	}
+}
+
 func givenProductMetadata(t *testing.T, metadata product.Metadata) {
+	givenProductMetadataAtDir(t, metadata, "./")
+}
+
+func givenProductMetadataAtDir(t *testing.T, metadata product.Metadata, dir string) {
 	yamlContent, err := yaml.Marshal(&metadata)
 	if err != nil {
 		t.Errorf("Could not serialize metadata test content")
 	}
 
-	err = os.WriteFile(".tractusx", yamlContent, 0600)
+	err = os.WriteFile(path.Join(dir, ".tractusx"), yamlContent, 0600)
 	if err != nil {
 		t.Errorf("Could not write test metadata file")
 	}

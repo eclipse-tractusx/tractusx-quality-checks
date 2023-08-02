@@ -21,6 +21,7 @@ package product
 
 import (
 	"os"
+	"path"
 	"reflect"
 	"testing"
 )
@@ -45,7 +46,7 @@ var metadataFromTestTemplate = Metadata{
 const metadataTestFile = "./test/metadata_test_template.yaml"
 
 func TestShouldReturnErrorWhenReadingNonExistentDefaultMetadataFile(t *testing.T) {
-	_, err := MetadataFromLocalFile()
+	_, err := MetadataFromLocalFile("./")
 
 	if err == nil {
 		t.Errorf("Reading the product metadata file from default location should fail if not existing")
@@ -58,7 +59,7 @@ func TestShouldReadProductMetadataFromDefaultFile(t *testing.T) {
 	copyTemplateFileTo(".tractusx", t)
 	defer os.Remove(".tractusx")
 
-	metadata, err := MetadataFromLocalFile()
+	metadata, err := MetadataFromLocalFile("./")
 
 	if err != nil {
 		t.Errorf("Should be able to read metadata file after copying to default location")
@@ -69,26 +70,14 @@ func TestShouldReadProductMetadataFromDefaultFile(t *testing.T) {
 	}
 }
 
-func TestShouldPassIsLeadingRepoValidEnvVariable(t *testing.T) {
-	copyTemplateFileTo(".tractusx", t)
-	defer os.Remove(".tractusx")
-	os.Setenv("GITHUB_REPOSITORY", "eclipse-tractusx/sig-infra")
-	os.Setenv("GITHUB_REPOSITORY_OWNER", "tester")
+func TestShouldReadMetadataFromGivenBaseDir(t *testing.T) {
+	tempDir := t.TempDir()
+	copyTemplateFileTo(path.Join(tempDir, ".tractusx"), t)
 
-	if !IsLeadingRepo() {
-		t.Errorf("Test should pass, but $GITHUB_REPOSITORY is not equal leadingRepo from .tractusx")
-	}
+	metadata, _ := MetadataFromLocalFile(tempDir)
 
-}
-
-func TestShouldFailIsLeadingRepoFakeEnvVariable(t *testing.T) {
-	copyTemplateFileTo(".tractusx", t)
-	defer os.Remove(".tractusx")
-	os.Setenv("GITHUB_REPOSITORY", "repo/fake_reponame")
-	os.Setenv("GITHUB_REPOSITORY_OWNER", "tester")
-
-	if IsLeadingRepo() {
-		t.Errorf("Repo shouldn't be identified as leading one, there is fake env variable $GITHUB_REPOSITORY.")
+	if !reflect.DeepEqual(metadata, &metadataFromTestTemplate) {
+		t.Errorf("Metadata read from given base directory does not match test template values")
 	}
 }
 
