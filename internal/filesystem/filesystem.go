@@ -19,11 +19,16 @@
 
 package filesystem
 
-import "os"
+import (
+	"log"
+	"os"
+)
 
 func CreateFiles(files []string) {
 	for _, file := range files {
-		os.Create(file)
+		if _, err := os.Create(file); err != nil {
+			log.Fatalf("could not create file %s. Error %s", file, err)
+		}
 	}
 }
 

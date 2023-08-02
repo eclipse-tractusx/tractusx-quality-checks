@@ -21,13 +21,14 @@ package helm
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"reflect"
 	"regexp"
+
+	"gopkg.in/yaml.v3"
 )
 
-type chartyaml struct {
+type Chartyaml struct {
 	ApiVersion  string `yaml:"apiVersion"`
 	Name        string `yaml:"name"`
 	Description string `yaml:"description"`
@@ -35,8 +36,8 @@ type chartyaml struct {
 	Version     string `yaml:"version"`
 }
 
-func newChartYaml() *chartyaml {
-	return &chartyaml{
+func newChartYaml() *Chartyaml {
+	return &Chartyaml{
 		ApiVersion:  "",
 		Name:        "",
 		Description: "",
@@ -45,14 +46,14 @@ func newChartYaml() *chartyaml {
 	}
 }
 
-func chartYamlFromFile(ymlfile string) *chartyaml {
+func ChartYamlFromFile(ymlfile string) *Chartyaml {
 	data, err := ioutil.ReadFile(ymlfile)
 	if err != nil {
 		fmt.Printf("Unable to read %v.\n", ymlfile)
 		return nil
 	}
 
-	var c chartyaml
+	var c Chartyaml
 	err = yaml.Unmarshal(data, &c)
 	if err != nil {
 		fmt.Printf("Unable to parse YAML file: %v.\n", ymlfile)
@@ -62,7 +63,7 @@ func chartYamlFromFile(ymlfile string) *chartyaml {
 	return &c
 }
 
-func (c *chartyaml) isVersionValid() bool {
+func (c *Chartyaml) IsVersionValid() bool {
 	/*
 		Below regular expresion is used to verify version string according to Semantic Versioning schema (https://semver.org).
 		Following examples match:
@@ -83,12 +84,12 @@ func (c *chartyaml) isVersionValid() bool {
 	return match
 }
 
-func (c *chartyaml) getMissingMandatoryFields() []string {
+func (c *Chartyaml) GetMissingMandatoryFields() []string {
 	chartValues := reflect.ValueOf(*c)
 	chartType := chartValues.Type()
 	numChartFields := chartValues.NumField()
 
-	missingFields := []string{}
+	var missingFields []string
 	for i := 0; i < numChartFields; i++ {
 		chartField := chartType.Field(i)
 		chartFieldValue := chartValues.Field(i)

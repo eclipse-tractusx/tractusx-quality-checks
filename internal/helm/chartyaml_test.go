@@ -22,7 +22,7 @@ package helm
 import "testing"
 
 func TestShouldPassIfCanReadChartYaml(t *testing.T) {
-	c := chartYamlFromFile("test/TestChartValid.yaml")
+	c := ChartYamlFromFile("test/TestChartValid.yaml")
 	if c.Name != "test-application" {
 		t.Errorf("Test should pass but name of the helm chart is not 'test-application'.")
 	}
@@ -31,7 +31,7 @@ func TestShouldPassIfCanReadChartYaml(t *testing.T) {
 func TestShouldBeValidForSemanticVersion(t *testing.T) {
 	c := newChartYaml()
 	c.Version = "1.2.3"
-	if !c.isVersionValid() {
+	if !c.IsVersionValid() {
 		t.Errorf("Test should pass since version is valid according Semantic Version schema.")
 	}
 }
@@ -39,14 +39,14 @@ func TestShouldBeValidForSemanticVersion(t *testing.T) {
 func TestShouldBeInValidForSemanticVersion(t *testing.T) {
 	c := newChartYaml()
 	c.Version = "1.2.ABC"
-	if c.isVersionValid() {
+	if c.IsVersionValid() {
 		t.Errorf("Test should fail since version is invalid according to Semantic Version schema.")
 	}
 }
 
 func TestShouldPassIfConfigurationSettingsArePresent(t *testing.T) {
-	c := chartYamlFromFile("test/TestChartValid.yaml")
-	missingFields := c.getMissingMandatoryFields()
+	c := ChartYamlFromFile("test/TestChartValid.yaml")
+	missingFields := c.GetMissingMandatoryFields()
 
 	if len(missingFields) > 0 {
 		t.Errorf("Test should pass since all configuration settings are set.")
@@ -54,8 +54,8 @@ func TestShouldPassIfConfigurationSettingsArePresent(t *testing.T) {
 }
 
 func TestShouldFailIfConfigurationSettingsAreMissing(t *testing.T) {
-	c := chartYamlFromFile("test/TestChartInValid.yaml")
-	missingFields := c.getMissingMandatoryFields()
+	c := ChartYamlFromFile("test/TestChartInValid.yaml")
+	missingFields := c.GetMissingMandatoryFields()
 
 	if len(missingFields) == 0 {
 		t.Errorf("Test should fail since one configuration setting is missing.")

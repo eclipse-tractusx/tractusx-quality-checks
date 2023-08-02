@@ -24,10 +24,10 @@ import (
 	"os"
 
 	txqualitychecks "github.com/eclipse-tractusx/tractusx-quality-checks/internal"
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/helm"
 	irepo "github.com/eclipse-tractusx/tractusx-quality-checks/internal/repo"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/container"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/docs"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/helm"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/repo"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 	"github.com/spf13/cobra"
@@ -41,7 +41,7 @@ var releaseGuidelines = []tractusx.QualityGuideline{
 	irepo.NewDefaultBranch(),
 	container.NewAllowedBaseImage("./"),
 	repo.NewRepoStructureExists("./"),
-	helm.NewHelmStructureExists(),
+	helm.NewHelmStructureExists("./"),
 }
 
 // checkLocalCmd represents the checkLocal command
