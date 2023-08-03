@@ -22,15 +22,15 @@ package repo
 import (
 	"strings"
 
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
-	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/product"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
 type LeadingRepositoryDefined struct {
+	baseDir string
 }
 
-func NewLeadingRepositoryDefined() txqualitychecks.QualityGuideline {
-	return &LeadingRepositoryDefined{}
+func NewLeadingRepositoryDefined(baseDir string) tractusx.QualityGuideline {
+	return &LeadingRepositoryDefined{baseDir}
 }
 
 func (l *LeadingRepositoryDefined) Name() string {
@@ -49,15 +49,15 @@ func (l *LeadingRepositoryDefined) IsOptional() bool {
 	return false
 }
 
-func (l *LeadingRepositoryDefined) Test() *txqualitychecks.QualityResult {
-	metadata, err := product.MetadataFromLocalFile()
+func (l *LeadingRepositoryDefined) Test() *tractusx.QualityResult {
+	metadata, err := tractusx.MetadataFromLocalFile(l.baseDir)
 	if err != nil {
-		return &txqualitychecks.QualityResult{ErrorDescription: "Failed! The leadingRepository property must be defined in .tractusx metadata file. Could not load metadata"}
+		return &tractusx.QualityResult{ErrorDescription: "Failed! The leadingRepository property must be defined in .tractusx metadata file. Could not load metadata"}
 	}
 
 	if strings.TrimSpace(metadata.LeadingRepository) == "" {
-		return &txqualitychecks.QualityResult{ErrorDescription: "Failed! The leadingRepository property must be defined in .tractusx metadata file"}
+		return &tractusx.QualityResult{ErrorDescription: "Failed! The leadingRepository property must be defined in .tractusx metadata file"}
 	}
 
-	return &txqualitychecks.QualityResult{Passed: true}
+	return &tractusx.QualityResult{Passed: true}
 }

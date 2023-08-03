@@ -20,12 +20,13 @@
 package repo
 
 import (
-	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/filesystem"
 	"os"
 	"testing"
+
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/filesystem"
 )
 
-var listOfFilesToBeCreated []string = []string{
+var listOfFilesToBeCreated = []string{
 	"CODE_OF_CONDUCT.md",
 	"CONTRIBUTING.md",
 	"DEPENDENCIES",
@@ -35,12 +36,12 @@ var listOfFilesToBeCreated []string = []string{
 	"SECURITY.md",
 }
 
-var listOfDirsToBeCreated []string = []string{
+var listOfDirsToBeCreated = []string{
 	"docs",
 	"charts",
 }
 
-const metadataTestFile = "../../pkg/product/test/metadata_test_template.yaml"
+const metadataTestFile = "./test/metadata_test_template.yaml"
 
 func TestShouldPassIfRepoStructureExistsWithoutOptional(t *testing.T) {
 	setEnv(t)
@@ -49,7 +50,7 @@ func TestShouldPassIfRepoStructureExistsWithoutOptional(t *testing.T) {
 	filesystem.CreateFiles(listOfFilesToBeCreated)
 	filesystem.CreateDirs(listOfDirsToBeCreated)
 
-	repostructureTest := NewRepoStructureExists()
+	repostructureTest := NewRepoStructureExists("./")
 	result := repostructureTest.Test()
 	filesystem.CleanFiles(append(listOfFilesToBeCreated, listOfDirsToBeCreated...))
 
@@ -67,7 +68,7 @@ func TestShouldPassIfRepoStructureExistsWithOptional(t *testing.T) {
 	filesystem.CreateFiles(listOfFilesToBeCreated)
 	filesystem.CreateDirs(listOfDirsToBeCreated)
 
-	repostructureTest := NewRepoStructureExists()
+	repostructureTest := NewRepoStructureExists("./")
 	result := repostructureTest.Test()
 	filesystem.CleanFiles(append(listOfFilesToBeCreated, listOfDirsToBeCreated...))
 
@@ -81,7 +82,7 @@ func TestShouldFailIfRepoStructureIsMissing(t *testing.T) {
 	setEnv(t)
 	defer os.Remove(".tractusx")
 
-	repostructureTest := NewRepoStructureExists()
+	repostructureTest := NewRepoStructureExists("./")
 
 	result := repostructureTest.Test()
 

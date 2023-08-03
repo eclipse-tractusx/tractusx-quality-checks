@@ -17,43 +17,41 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package docs
+package filesystem
 
 import (
+	"log"
 	"os"
-	"testing"
 )
 
-func TestShouldFailIfChangelogFileIsMissing(t *testing.T) {
-	changelogTest := NewChangelogExists()
-
-	result := changelogTest.Test()
-
-	if result.Passed {
-		t.Errorf("ChangelogExist should fail if no Changelog file present")
+func CreateFiles(files []string) {
+	for _, file := range files {
+		if _, err := os.Create(file); err != nil {
+			log.Fatalf("could not create file %s. Error %s", file, err)
+		}
 	}
 }
 
-func TestShouldPassIfChangelogExists(t *testing.T) {
-	_, _ = os.Create("CHANGELOG.md")
-	defer func() {
-		_ = os.Remove("CHANGELOG.md")
-	}()
-	changelogTest := NewChangelogExists()
-
-	result := changelogTest.Test()
-
-	if !result.Passed {
-		t.Errorf("ChangelogExist should pass, if a CHANGELOG.md exists")
+func CreateDirs(dirs []string) {
+	for _, dir := range dirs {
+		os.MkdirAll(dir, 0750)
 	}
 }
 
-func TestShouldProvideErrorDescriptionIfFailing(t *testing.T) {
-	changelogTest := NewChangelogExists()
-
-	result := changelogTest.Test()
-
-	if result.ErrorDescription == "" {
-		t.Errorf("Failing tests should provide an error description")
+func CleanFiles(files []string) {
+	for _, file := range files {
+		os.Remove(file)
 	}
+}
+
+func CheckMissingFiles(listOfFiles []string) []string {
+	var missingFiles []string
+
+	for _, file := range listOfFiles {
+
+		if _, err := os.Stat(file); os.IsNotExist(err) {
+			missingFiles = append(missingFiles, file)
+		}
+	}
+	return missingFiles
 }

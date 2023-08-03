@@ -17,13 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package product
+package tractusx
 
 import (
 	"fmt"
-	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/repo"
-	"gopkg.in/yaml.v3"
 	"os"
+	"path"
+
+	"gopkg.in/yaml.v3"
 )
 
 const MetadataFilename = ".tractusx"
@@ -54,11 +55,11 @@ func MetadataFromFile(fileContent []byte) (*Metadata, error) {
 	return &metadata, nil
 }
 
-// MetadataFromLocalFile will read a local file '.tractusx', that is supposed to contain information about
+// MetadataFromLocalFile will read a local file '.tractusx in the specified dir', that is supposed to contain information about
 // a product. If the file exists, MetadataFromLocalFile will return the information as an instance of Metadata.
 // If the file cannot be parsed or does not exist, an error is returned and Metadata will be nil
-func MetadataFromLocalFile() (*Metadata, error) {
-	metadataFileAsBytes, err := os.ReadFile(MetadataFilename)
+func MetadataFromLocalFile(dir string) (*Metadata, error) {
+	metadataFileAsBytes, err := os.ReadFile(path.Join(dir, MetadataFilename))
 
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Could not read Tractus-X metadatafile from default location: %s", MetadataFilename))
@@ -72,17 +73,4 @@ func MetadataFromLocalFile() (*Metadata, error) {
 	}
 
 	return file, nil
-}
-
-func IsLeadingRepo() bool {
-
-	metadata, err := MetadataFromLocalFile()
-	repoInfo := repo.GetRepoBaseInfo()
-	fullRepoName := "https://github.com/eclipse-tractusx/" + (*repoInfo).Reponame
-
-	if err != nil || metadata.LeadingRepository != fullRepoName {
-		return false
-	}
-
-	return true
 }

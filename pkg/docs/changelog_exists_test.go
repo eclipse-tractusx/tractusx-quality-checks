@@ -21,41 +21,44 @@ package docs
 
 import (
 	"os"
-
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
+	"path"
+	"testing"
 )
 
-type InstallExists struct {
-}
+func TestShouldFailIfChangelogFileIsMissing(t *testing.T) {
+	result := NewChangelogExists("./").Test()
 
-// NewInstallExists returns a new check based on QualityGuideline interface.
-func NewInstallExists() txqualitychecks.QualityGuideline {
-	return &InstallExists{}
-}
-
-func (r *InstallExists) Name() string {
-	return "TRG 1.02 - INSTALL.md"
-}
-
-func (r *InstallExists) Description() string {
-	return "File INSTALL.md contains comprehensive instructions for installation."
-}
-
-func (r *InstallExists) ExternalDescription() string {
-	return "https://eclipse-tractusx.github.io/docs/release/trg-1/trg-1-2"
-}
-
-func (r *InstallExists) Test() *txqualitychecks.QualityResult {
-	_, err := os.Stat("INSTALL.md")
-
-	if err != nil {
-		return &txqualitychecks.QualityResult{
-			ErrorDescription: "Optional file INSTALL.md not found in current directory.",
-		}
+	if result.Passed {
+		t.Errorf("ChangelogExist should fail if no Changelog file present")
 	}
-	return &txqualitychecks.QualityResult{Passed: true}
 }
 
-func (r *InstallExists) IsOptional() bool {
-	return true
+func TestShouldPassIfChangelogExists(t *testing.T) {
+	_, _ = os.Create("CHANGELOG.md")
+	defer os.Remove("CHANGELOG.md")
+
+	result := NewChangelogExists("./").Test()
+
+	if !result.Passed {
+		t.Errorf("ChangelogExist should pass, if a CHANGELOG.md exists")
+	}
+}
+
+func TestShouldFindChangelogAtGivenBaseDir(t *testing.T) {
+	dir := t.TempDir()
+	_, _ = os.Create(path.Join(dir, "CHANGELOG.md"))
+
+	result := NewChangelogExists(dir).Test()
+
+	if !result.Passed {
+		t.Errorf("ChangelogExist should find file at given base dir")
+	}
+}
+
+func TestShouldProvideErrorDescriptionIfFailing(t *testing.T) {
+	result := NewChangelogExists("./").Test()
+
+	if result.ErrorDescription == "" {
+		t.Errorf("Failing tests should provide an error description")
+	}
 }

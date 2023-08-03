@@ -21,22 +21,24 @@ package repo
 
 import (
 	"fmt"
+	"path"
 	"strings"
 
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
-	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/filesystem"
-	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/product"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/filesystem"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
 type RepoStructureExists struct {
+	baseDir string
+}
+
+func NewRepoStructureExists(baseDir string) tractusx.QualityGuideline {
+	return &RepoStructureExists{baseDir}
 }
 
 func (c RepoStructureExists) IsOptional() bool {
 	return false
-}
-
-func NewRepoStructureExists() *RepoStructureExists {
-	return &RepoStructureExists{}
 }
 
 func (c RepoStructureExists) Name() string {
@@ -51,28 +53,28 @@ func (c RepoStructureExists) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-2/trg-2-3"
 }
 
-func (c RepoStructureExists) Test() *txqualitychecks.QualityResult {
+func (c RepoStructureExists) Test() *tractusx.QualityResult {
 	// Slices containing required files and folders in the repo structure.
 	// Before modification make sure you align to TRG 2.03 guideline.
 	listOfOptionalFilesToBeChecked := []string{
-		"AUTHORS.md",
-		"INSTALL.md",
+		path.Join(c.baseDir, "AUTHORS.md"),
+		path.Join(c.baseDir, "INSTALL.md"),
 	}
 
 	listOfMandatoryFilesToBeChecked := []string{
-		"CODE_OF_CONDUCT.md",
-		"CONTRIBUTING.md",
-		"DEPENDENCIES",
-		"LICENSE",
-		"NOTICE.md",
-		"README.md",
-		"SECURITY.md",
+		path.Join(c.baseDir, "CODE_OF_CONDUCT.md"),
+		path.Join(c.baseDir, "CONTRIBUTING.md"),
+		path.Join(c.baseDir, "DEPENDENCIES"),
+		path.Join(c.baseDir, "LICENSE"),
+		path.Join(c.baseDir, "NOTICE.md"),
+		path.Join(c.baseDir, "README.md"),
+		path.Join(c.baseDir, "SECURITY.md"),
 	}
 
 	mandatoryForLeadingRepo := []string{"docs", "charts"}
 	printer := &txqualitychecks.StdoutPrinter{}
 
-	if product.IsLeadingRepo() {
+	if isLeadingRepo() {
 		listOfMandatoryFilesToBeChecked = append(listOfMandatoryFilesToBeChecked, mandatoryForLeadingRepo...)
 	}
 
@@ -87,8 +89,8 @@ func (c RepoStructureExists) Test() *txqualitychecks.QualityResult {
 	}
 
 	if len(missingMandatoryFiles) > 0 {
-		return &txqualitychecks.QualityResult{ErrorDescription: "The check detected following mandatory files missing: " + strings.Join(missingMandatoryFiles, ", ")}
+		return &tractusx.QualityResult{ErrorDescription: "The check detected following mandatory files missing: " + strings.Join(missingMandatoryFiles, ", ")}
 	}
 
-	return &txqualitychecks.QualityResult{Passed: true}
+	return &tractusx.QualityResult{Passed: true}
 }

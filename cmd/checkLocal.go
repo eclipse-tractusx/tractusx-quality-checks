@@ -24,22 +24,24 @@ import (
 	"os"
 
 	txqualitychecks "github.com/eclipse-tractusx/tractusx-quality-checks/internal"
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/docs"
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/helm"
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/repo"
+	irepo "github.com/eclipse-tractusx/tractusx-quality-checks/internal/repo"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/container"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/docs"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/helm"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/repo"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 	"github.com/spf13/cobra"
 )
 
-var releaseGuidelines = []txqualitychecks.QualityGuideline{
-	docs.NewReadmeExists(),
-	docs.NewInstallExists(),
-	docs.NewChangelogExists(),
-	repo.NewLeadingRepositoryDefined(),
-	repo.NewDefaultBranch(),
+var releaseGuidelines = []tractusx.QualityGuideline{
+	docs.NewReadmeExists("./"),
+	docs.NewInstallExists("./"),
+	docs.NewChangelogExists("./"),
+	repo.NewLeadingRepositoryDefined("./"),
+	irepo.NewDefaultBranch(),
 	container.NewAllowedBaseImage("./"),
-	repo.NewRepoStructureExists(),
-	helm.NewHelmStructureExists(),
+	repo.NewRepoStructureExists("./"),
+	helm.NewHelmStructureExists("./"),
 }
 
 // checkLocalCmd represents the checkLocal command

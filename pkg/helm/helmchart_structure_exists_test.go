@@ -20,30 +20,29 @@
 package helm
 
 import (
-	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/filesystem"
 	"os"
+	"path"
 	"testing"
+
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/filesystem"
 )
 
-var ValidChartYmlTestFile string = "test/TestChartValid.yaml"
-var InValidChartYmlTestFile string = "test/TestChartInValid.yaml"
+var validChartYmlTestFile = "test/TestChartValid.yaml"
 
 func TestShouldPassIfHelmDirIsMissing(t *testing.T) {
-	helmStructureTest := NewHelmStructureExists()
-
-	result := helmStructureTest.Test()
+	result := NewHelmStructureExists("./").Test()
 
 	if !result.Passed {
 		t.Errorf("Helm directory doesn't exist hence test should pass.")
 	}
 }
 
-func TestShouldFailIfNoHelmChartsFound(t *testing.T) {
+func TestShouldFailForEmptyChartsDir(t *testing.T) {
 	os.Mkdir("charts", 0750)
 	defer os.Remove("charts")
 
-	helmStructureTest := NewHelmStructureExists()
-	result := helmStructureTest.Test()
+	result := NewHelmStructureExists("./").Test()
+
 	if result.Passed {
 		t.Errorf("Helm directory doesn't contain any charts hence test should fail.")
 	}
@@ -53,7 +52,7 @@ func TestShouldFailIfHelmStructureIsMissing(t *testing.T) {
 	os.MkdirAll("charts/exampleChart", 0750)
 	defer os.RemoveAll("charts")
 
-	helmStructureTest := NewHelmStructureExists()
+	helmStructureTest := NewHelmStructureExists("./")
 
 	result := helmStructureTest.Test()
 
@@ -63,52 +62,48 @@ func TestShouldFailIfHelmStructureIsMissing(t *testing.T) {
 }
 
 func TestShouldPassIfHelmStructureExist(t *testing.T) {
-	helmStructureDirsExample := []string{
-		"charts/exampleChart/templates",
-	}
-
-	helmStructureFilesExample := []string{
+	_ = os.MkdirAll("charts/exampleChart/templates", 0750)
+	filesystem.CreateFiles([]string{
 		"charts/exampleChart/.helmignore",
 		"charts/exampleChart/Chart.yaml",
 		"charts/exampleChart/LICENSE",
 		"charts/exampleChart/README.md",
 		"charts/exampleChart/values.yaml",
-	}
-
-	filesystem.CreateDirs(helmStructureDirsExample)
-	filesystem.CreateFiles(helmStructureFilesExample)
+	})
 	defer os.RemoveAll("charts")
-
 	copyTemplateFileTo("charts/exampleChart/Chart.yaml", t)
-	helmStructureTest := NewHelmStructureExists()
 
-	result := helmStructureTest.Test()
+	result := NewHelmStructureExists("./").Test()
 
 	if !result.Passed {
 		t.Errorf("Helm structure exists hence test should pass.")
 	}
 }
 
-func TestShouldPassIfConfigurationSettingsAreCorrect(t *testing.T) {
-	c := chartYamlFromFile(ValidChartYmlTestFile)
-	if len(c.getMissingMandatoryFields()) > 0 || !c.isVersionValid() {
-		t.Errorf("Configuration settings at TestChartValid.yaml are valid but test still fails.")
-	}
-}
+func TestShouldPassIfChartStructureExistsAtGivenBaseDir(t *testing.T) {
+	dir := t.TempDir()
+	os.MkdirAll(path.Join(dir, "charts", "exampleChart"), 0770)
+	filesystem.CreateFiles([]string{
+		path.Join(dir, "charts/exampleChart/.helmignore"),
+		path.Join(dir, "charts/exampleChart/LICENSE"),
+		path.Join(dir, "charts/exampleChart/README.md"),
+		path.Join(dir, "charts/exampleChart/values.yaml"),
+	})
+	copyTemplateFileTo(path.Join(dir, "charts", "exampleChart", "Chart.yaml"), t)
 
-func TestShouldFailIfConfigurationSettingsAreIncorrect(t *testing.T) {
-	c := chartYamlFromFile(InValidChartYmlTestFile)
-	if len(c.getMissingMandatoryFields()) == 0 || c.isVersionValid() {
-		t.Errorf("Configuration settings TestChartInvalid.yaml are invalid hence the test should pass.")
+	result := NewHelmStructureExists(dir).Test()
+
+	if !result.Passed {
+		t.Errorf("Should pass, if helm chart file and dir structure exists at given base dir")
 	}
 }
 
 func copyTemplateFileTo(path string, t *testing.T) {
-	templateFile, err := os.ReadFile(ValidChartYmlTestFile)
+	templateFile, err := os.ReadFile(validChartYmlTestFile)
 	if err != nil {
 		t.Errorf("Could not read template file necessary for this test")
 	}
-	err = os.WriteFile(path, templateFile, 0644)
+	err = os.WriteFile(path, templateFile, 0770)
 	if err != nil {
 		t.Errorf("Could not copy template file to designated path")
 	}

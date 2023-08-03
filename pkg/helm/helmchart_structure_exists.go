@@ -20,18 +20,23 @@
 package helm
 
 import (
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
-	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/filesystem"
+	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/filesystem"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/helm"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
 type HelmStructureExists struct {
+	baseDir string
 }
 
-func NewHelmStructureExists() txqualitychecks.QualityGuideline {
-	return &HelmStructureExists{}
+func NewHelmStructureExists(baseDir string) tractusx.QualityGuideline {
+	return &HelmStructureExists{baseDir}
 }
 
 func (r *HelmStructureExists) Name() string {
@@ -46,7 +51,7 @@ func (r *HelmStructureExists) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-5/trg-5-02"
 }
 
-func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
+func (r *HelmStructureExists) Test() *tractusx.QualityResult {
 	helmStructureFiles := []string{
 		".helmignore",
 		"Chart.yaml",
@@ -55,18 +60,18 @@ func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
 		"values.yaml",
 	}
 
-	mainDir := "charts"
+	mainDir := path.Join(r.baseDir, "charts")
 	if fi, err := os.Stat(mainDir); err != nil || !fi.IsDir() {
-		return &txqualitychecks.QualityResult{Passed: true}
+		return &tractusx.QualityResult{Passed: true}
 	}
 
 	helmCharts, err := os.ReadDir(mainDir)
 	if err != nil || len(helmCharts) == 0 {
-		return &txqualitychecks.QualityResult{ErrorDescription: "Can't read Helm Charts at charts/."}
+		return &tractusx.QualityResult{ErrorDescription: fmt.Sprintf("Can't read Helm Charts at %s.", mainDir)}
 	}
 
-	missingFiles := []string{}
-	chartYamlFiles := []string{}
+	var missingFiles []string
+	var chartYamlFiles []string
 	for _, hc := range helmCharts {
 		if hc.IsDir() {
 			for _, fname := range helmStructureFiles {
@@ -93,10 +98,10 @@ func (r *HelmStructureExists) Test() *txqualitychecks.QualityResult {
 	}
 
 	if len(missingFiles) > 0 || !chartsValid {
-		return &txqualitychecks.QualityResult{ErrorDescription: "+ Following Helm Chart structure files are missing: " + strings.Join(missingFiles, ", ") +
+		return &tractusx.QualityResult{ErrorDescription: "+ Following Helm Chart structure files are missing: " + strings.Join(missingFiles, ", ") +
 			errorDescriptionCharts}
 	}
-	return &txqualitychecks.QualityResult{Passed: true}
+	return &tractusx.QualityResult{Passed: true}
 }
 
 func (r *HelmStructureExists) IsOptional() bool {
@@ -106,14 +111,14 @@ func (r *HelmStructureExists) IsOptional() bool {
 func validateChart(chartyamlfile string) (bool, string) {
 	isValid := true
 	returnMessage := "\n\t+ Analysis for " + chartyamlfile + ": "
-	cyf := chartYamlFromFile(chartyamlfile)
-	missingFields := cyf.getMissingMandatoryFields()
+	cyf := helm.ChartYamlFromFile(chartyamlfile)
+	missingFields := cyf.GetMissingMandatoryFields()
 
 	if len(missingFields) > 0 {
 		isValid = false
 		returnMessage += "\n\t\t - Missing mandatory fields: " + strings.Join(missingFields, ", ")
 	}
-	if !cyf.isVersionValid() {
+	if !cyf.IsVersionValid() {
 		isValid = false
 		returnMessage += "\n\t\t - " + cyf.Version + " Version of the Helm Chart is incorrect. It needs to follow Semantic Version."
 	}

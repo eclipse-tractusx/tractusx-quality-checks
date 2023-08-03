@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"strings"
 
-	txqualitychecks "github.com/eclipse-tractusx/tractusx-quality-checks/internal"
+	txqualitychecks "github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
 var baseImageAllowList = []string{

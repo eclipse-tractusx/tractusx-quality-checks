@@ -21,38 +21,43 @@ package docs
 
 import (
 	"os"
+	"path"
 
-	"github.com/eclipse-tractusx/tractusx-quality-checks/internal"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
-type ReadmeExists struct {
+type InstallExists struct {
+	baseDir string
 }
 
-func (r *ReadmeExists) IsOptional() bool {
-	return false
+// NewInstallExists returns a new check based on QualityGuideline interface.
+func NewInstallExists(baseDir string) tractusx.QualityGuideline {
+	return &InstallExists{baseDir}
 }
 
-func NewReadmeExists() txqualitychecks.QualityGuideline {
-	return &ReadmeExists{}
+func (i *InstallExists) Name() string {
+	return "TRG 1.02 - INSTALL.md"
 }
 
-func (r *ReadmeExists) Name() string {
-	return "TRG 1.01 - README.md"
+func (i *InstallExists) Description() string {
+	return "File INSTALL.md contains comprehensive instructions for installation."
 }
 
-func (r *ReadmeExists) Description() string {
-	return "A good README.md file is the starting point for everyone opening a repository. It should help them find all critical information in an easy way."
+func (i *InstallExists) ExternalDescription() string {
+	return "https://eclipse-tractusx.github.io/docs/release/trg-1/trg-1-2"
 }
 
-func (r *ReadmeExists) ExternalDescription() string {
-	return "https://eclipse-tractusx.github.io/docs/release/trg-1/trg-1-1"
-}
-
-func (r *ReadmeExists) Test() *txqualitychecks.QualityResult {
-	_, err := os.Stat("README.md")
+func (i *InstallExists) Test() *tractusx.QualityResult {
+	_, err := os.Stat(path.Join(i.baseDir, "INSTALL.md"))
 
 	if err != nil {
-		return &txqualitychecks.QualityResult{ErrorDescription: "Did not find a README.md file in current directory!"}
+		return &tractusx.QualityResult{
+			ErrorDescription: "Optional file INSTALL.md not found in current directory.",
+		}
 	}
-	return &txqualitychecks.QualityResult{Passed: true}
+	return &tractusx.QualityResult{Passed: true}
+}
+
+func (i *InstallExists) IsOptional() bool {
+	return true
 }

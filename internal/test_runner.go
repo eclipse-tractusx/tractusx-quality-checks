@@ -22,15 +22,17 @@ package txqualitychecks
 import (
 	"errors"
 	"fmt"
+
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 	"github.com/fatih/color"
 )
 
 type GuidelineTestRunner struct {
-	guidelines []QualityGuideline
-	printer    Printer
+	guidelines []tractusx.QualityGuideline
+	printer    tractusx.Printer
 }
 
-func NewTestRunner(tests []QualityGuideline) *GuidelineTestRunner {
+func NewTestRunner(tests []tractusx.QualityGuideline) *GuidelineTestRunner {
 	return &GuidelineTestRunner{guidelines: tests, printer: &StdoutPrinter{}}
 }
 

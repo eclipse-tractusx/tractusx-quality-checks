@@ -19,7 +19,11 @@
 
 package txqualitychecks
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
+)
 
 type Guideline struct {
 	name                string
@@ -48,8 +52,8 @@ func (f FailingQualityGuideline) ExternalDescription() string {
 	return f.externalDescription
 }
 
-func (f FailingQualityGuideline) Test() *QualityResult {
-	return &QualityResult{Passed: false}
+func (f FailingQualityGuideline) Test() *tractusx.QualityResult {
+	return &tractusx.QualityResult{Passed: false}
 }
 
 type PassingQualityGuideline struct {
@@ -72,8 +76,8 @@ func (p PassingQualityGuideline) ExternalDescription() string {
 	return p.externalDescription
 }
 
-func (p PassingQualityGuideline) Test() *QualityResult {
-	return &QualityResult{Passed: true}
+func (p PassingQualityGuideline) Test() *tractusx.QualityResult {
+	return &tractusx.QualityResult{Passed: true}
 }
 
 type PrinterMock struct {

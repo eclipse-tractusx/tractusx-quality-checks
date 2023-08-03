@@ -20,13 +20,12 @@
 package repo
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"strings"
 
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 	"github.com/go-ini/ini"
-	"github.com/google/go-github/v50/github"
 )
 
 // RepoInfo provides basic infor
@@ -80,16 +79,14 @@ func GetRepoBaseInfo() *RepoInfo {
 	return &result
 }
 
-// getRepoInfo returns *github.Repository object and error. If GitHub API call
-// failed, an error is returned.
-func GetRepoMetadata(repo *RepoInfo) *github.Repository {
-	ctx := context.Background()
-	client := *github.NewClient(nil)
+func isLeadingRepo() bool {
+	metadata, err := tractusx.MetadataFromLocalFile("./")
+	repoInfo := GetRepoBaseInfo()
+	fullRepoName := "https://github.com/eclipse-tractusx/" + (*repoInfo).Reponame
 
-	repoInfo, _, err := client.Repositories.Get(ctx, repo.Owner, repo.Reponame)
-	if err != nil {
-		fmt.Printf("Error querying GitHub API:\n%v\n", err)
+	if err != nil || metadata.LeadingRepository != fullRepoName {
+		return false
 	}
 
-	return repoInfo
+	return true
 }
