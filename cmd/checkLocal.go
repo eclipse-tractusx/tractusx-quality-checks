@@ -42,6 +42,7 @@ var releaseGuidelines = []tractusx.QualityGuideline{
 	container.NewAllowedBaseImage("./"),
 	repo.NewRepoStructureExists("./"),
 	helm.NewHelmStructureExists("./"),
+	helm.NewResourceMgmt("./"),
 }
 
 // checkLocalCmd represents the checkLocal command
