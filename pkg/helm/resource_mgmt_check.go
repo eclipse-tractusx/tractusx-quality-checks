@@ -17,19 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
- package helm
+package helm
 
- import (
+import (
 	"fmt"
-	"os"
-	// "regexp"
-	"path"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/engine"
-	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/api/apps/v1"
 	core "k8s.io/api/core/v1"
+	"k8s.io/client-go/kubernetes/scheme"
+	"os"
+	"path"
 )
 
 type ResourceMgmt struct {
@@ -67,11 +66,12 @@ func (r *ResourceMgmt) Test() *tractusx.QualityResult {
 		return &tractusx.QualityResult{ErrorDescription: fmt.Sprintf("Can't read Helm Charts at %s.", chartDir)}
 	}
 
-	errorDescription := ""
+	var errorDescription string
 	for _, hc := range helmCharts {
 		if !hc.IsDir() {
 			continue
 		}
+
 		loadedChart, err := loader.Load(path.Join(chartDir, hc.Name()))
 		if err != nil {
 			errorDescription += fmt.Sprintf("\n\tCan't read %s helm chart.", hc.Name())
@@ -79,13 +79,13 @@ func (r *ResourceMgmt) Test() *tractusx.QualityResult {
 		}
 
 		finalValues := map[string]interface{}{
-			"Values": loadedChart.Values,
+			"Values":  loadedChart.Values,
 			"Release": map[string]string{"Namespace": "tractusx-check"},
 		}
 
 		renderedChart, err := engine.Render(loadedChart, finalValues)
 		if err != nil {
-			errorDescription += fmt.Sprintf("\n\tUnable to render helm chart %s.", hc.Name())
+			errorDescription += fmt.Sprintf("\n\tUnable to render helm chart %s. %s", hc.Name(), err)
 			continue
 		}
 
@@ -97,7 +97,7 @@ func (r *ResourceMgmt) Test() *tractusx.QualityResult {
 			}
 		}
 	}
-	
+
 	if errorDescription != "" {
 		return &tractusx.QualityResult{ErrorDescription: errorDescription}
 	}
@@ -106,34 +106,33 @@ func (r *ResourceMgmt) Test() *tractusx.QualityResult {
 
 func validateChartResMgmt(k8sManifest string) (bool, string) {
 	var containers []core.Container
-	isOK := ""
 
 	decode := scheme.Codecs.UniversalDeserializer().Decode
 	obj, groupVersionKind, err := decode([]byte(k8sManifest), nil, nil)
 
 	if err != nil {
-		return true, isOK
+		return true, ""
 	}
-	 
+
 	switch groupVersionKind.Kind {
-		case "Deployment": 
-			containers = obj.(*v1.Deployment).Spec.Template.Spec.Containers
-		case "StatefulSet": 
-			containers = obj.(*v1.StatefulSet).Spec.Template.Spec.Containers
- 	}
+	case "Deployment":
+		containers = obj.(*v1.Deployment).Spec.Template.Spec.Containers
+	case "StatefulSet":
+		containers = obj.(*v1.StatefulSet).Spec.Template.Spec.Containers
+	}
 
 	for _, c := range containers {
 		if c.Resources.Requests == nil {
 			return false, "No resources requests found in the manifest."
 		}
 		if c.Resources.Requests.Cpu().IsZero() || c.Resources.Requests.Memory().IsZero() {
-			return false, "CPU or Memory not defined in Resources."
+			return false, "CPU or Memory not defined in resources Requests."
 		}
 		if c.Resources.Limits == nil {
 			return false, "No resources limits found in the manifest."
 		}
 		if c.Resources.Limits.Cpu().IsZero() || c.Resources.Limits.Memory().IsZero() {
-			return false, "CPU or Memory not defined in Limits."
+			return false, "CPU or Memory not defined in resources Limits."
 		}
 		if c.Resources.Requests.Cpu().MilliValue() == c.Resources.Limits.Cpu().MilliValue() {
 			return false, "Requested CPU can't be the same as Limit CPU. Limit should be 2-3 times higher."
@@ -142,6 +141,5 @@ func validateChartResMgmt(k8sManifest string) (bool, string) {
 			return false, "Requested Memory size must be equal to Limit Memory size."
 		}
 	}
-	return true, isOK
-
+	return true, ""
 }
