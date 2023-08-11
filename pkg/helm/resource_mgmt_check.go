@@ -21,14 +21,15 @@ package helm
 
 import (
 	"fmt"
+	"os"
+	"path"
+
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/engine"
 	"k8s.io/api/apps/v1"
 	core "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/scheme"
-	"os"
-	"path"
 )
 
 type ResourceMgmt struct {
@@ -67,32 +68,21 @@ func (r *ResourceMgmt) Test() *tractusx.QualityResult {
 	}
 
 	var errorDescription string
-	for _, hc := range helmCharts {
-		if !hc.IsDir() {
+	for _, helmchart := range helmCharts {
+		if !helmchart.IsDir() {
 			continue
 		}
 
-		loadedChart, err := loader.Load(path.Join(chartDir, hc.Name()))
-		if err != nil {
-			errorDescription += fmt.Sprintf("\n\tCan't read %s helm chart.", hc.Name())
+		renderedChartManifests, errDesc := renderChart(path.Join(chartDir, helmchart.Name()))
+		if renderedChartManifests == nil {
+			errorDescription += errDesc
 			continue
 		}
 
-		finalValues := map[string]interface{}{
-			"Values":  loadedChart.Values,
-			"Release": map[string]string{"Namespace": "tractusx-check"},
-		}
-
-		renderedChart, err := engine.Render(loadedChart, finalValues)
-		if err != nil {
-			errorDescription += fmt.Sprintf("\n\tUnable to render helm chart %s. %s", hc.Name(), err)
-			continue
-		}
-
-		for n, rc := range renderedChart {
-			isValid, msg := validateChartResMgmt(rc)
+		for manifestName, manifestContent := range renderedChartManifests {
+			isValid, errMsg := validateResourceSetting(manifestContent)
 			if !isValid {
-				errorDescription += fmt.Sprintf("\n\t[%s]: %s", n, msg)
+				errorDescription += fmt.Sprintf("\n\t[%s]: %s", manifestName, errMsg)
 				continue
 			}
 		}
@@ -104,7 +94,7 @@ func (r *ResourceMgmt) Test() *tractusx.QualityResult {
 	return &tractusx.QualityResult{Passed: true}
 }
 
-func validateChartResMgmt(k8sManifest string) (bool, string) {
+func validateResourceSetting(k8sManifest string) (bool, string) {
 	var containers []core.Container
 
 	decode := scheme.Codecs.UniversalDeserializer().Decode
@@ -142,4 +132,22 @@ func validateChartResMgmt(k8sManifest string) (bool, string) {
 		}
 	}
 	return true, ""
+}
+
+func renderChart(chartPath string) (map[string]string, string) {
+	loadedChart, err := loader.Load(chartPath)
+	if err != nil {
+		return nil, fmt.Sprintf("\n\tCan't read %s helm chart.", chartPath)
+	}
+
+	finalValues := map[string]interface{}{
+		"Values":  loadedChart.Values,
+		"Release": map[string]string{"Namespace": "tractusx-check"},
+	}
+
+	renderedChart, err := engine.Render(loadedChart, finalValues)
+	if err != nil {
+		return nil, fmt.Sprintf("\n\tUnable to render helm chart %s.", chartPath)
+	}
+	return renderedChart, ""
 }
