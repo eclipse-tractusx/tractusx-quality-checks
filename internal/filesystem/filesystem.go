@@ -62,7 +62,7 @@ func CheckMissingFiles(listOfFiles []string) []string {
 func FindPrefixedFiles(dir string, prefix string) []string {
 	var foundFiles []string
 	filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
-		if !info.IsDir() && strings.Contains(info.Name(), prefix) {
+		if !info.IsDir() && strings.HasPrefix(info.Name(), prefix) {
 			foundFiles = append(foundFiles, path)
 		}
 		return nil
