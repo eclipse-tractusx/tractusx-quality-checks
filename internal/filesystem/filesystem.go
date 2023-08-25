@@ -20,8 +20,11 @@
 package filesystem
 
 import (
+	"io/fs"
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 func CreateFiles(files []string) {
@@ -54,4 +57,15 @@ func CheckMissingFiles(listOfFiles []string) []string {
 		}
 	}
 	return missingFiles
+}
+
+func findPrefixedFiles(dir string, prefix string) []string {
+	var foundFiles []string
+	filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
+		if !info.IsDir() && strings.Contains(info.Name(), prefix) {
+			foundFiles = append(foundFiles, path)
+		}
+		return nil
+	})
+	return foundFiles
 }
