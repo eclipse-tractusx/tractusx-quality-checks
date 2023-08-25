@@ -54,7 +54,6 @@ func (c RepoStructureExists) ExternalDescription() string {
 }
 
 func (c RepoStructureExists) Test() *tractusx.QualityResult {
-	dir := "."
 	// Slices containing required files and folders in the repo structure.
 	// Before modification make sure you align to TRG 2.03 guideline.
 	listOfOptionalFilesToBeChecked := []string{
@@ -80,7 +79,7 @@ func (c RepoStructureExists) Test() *tractusx.QualityResult {
 
 	missingMandatoryFiles := filesystem.CheckMissingFiles(listOfMandatoryFilesToBeChecked)
 	missingOptionalFiles := filesystem.CheckMissingFiles(listOfOptionalFilesToBeChecked)
-	if dependencyFiles := filesystem.FindPrefixedFiles(dir, "DEPENDENCIES"); dependencyFiles == nil {
+	if dependencyFiles := filesystem.FindPrefixedFiles(c.baseDir, "DEPENDENCIES"); dependencyFiles == nil {
 		missingMandatoryFiles = append(missingMandatoryFiles, "DEPENDENCIES")
 	}
 

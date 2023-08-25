@@ -29,11 +29,11 @@ import (
 var listOfFilesToBeCreated = []string{
 	"CODE_OF_CONDUCT.md",
 	"CONTRIBUTING.md",
-	"DEPENDENCIES",
 	"LICENSE",
 	"NOTICE.md",
 	"README.md",
 	"SECURITY.md",
+	"DEPENDENCIES",
 }
 
 var listOfDirsToBeCreated = []string{
@@ -88,6 +88,23 @@ func TestShouldFailIfRepoStructureIsMissing(t *testing.T) {
 
 	if result.Passed {
 		t.Errorf("RepoStructureExist should fail if repo structure exists.")
+	}
+}
+
+func TestShouldPassWithMultipleDependenciesFiles(t *testing.T) {
+	setEnv(t)
+	defer os.Remove(".tractusx")
+
+	newListOfFilesToBeCreated := append(listOfFilesToBeCreated[:len(listOfFilesToBeCreated)-1], []string{"DEPENDENCIES_FRONTEND", "DEPENDENCIES_BACKEND"}...)
+	filesystem.CreateFiles(newListOfFilesToBeCreated)
+	filesystem.CreateDirs(listOfDirsToBeCreated)
+
+	repostructureTest := NewRepoStructureExists("./")
+	result := repostructureTest.Test()
+	filesystem.CleanFiles(append(newListOfFilesToBeCreated, listOfDirsToBeCreated...))
+
+	if !result.Passed {
+		t.Errorf("There is multiple DEPENDENCIES files, test should pass.")
 	}
 }
 
