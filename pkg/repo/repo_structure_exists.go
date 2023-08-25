@@ -54,6 +54,7 @@ func (c RepoStructureExists) ExternalDescription() string {
 }
 
 func (c RepoStructureExists) Test() *tractusx.QualityResult {
+	dir := "."
 	// Slices containing required files and folders in the repo structure.
 	// Before modification make sure you align to TRG 2.03 guideline.
 	listOfOptionalFilesToBeChecked := []string{
@@ -64,7 +65,6 @@ func (c RepoStructureExists) Test() *tractusx.QualityResult {
 	listOfMandatoryFilesToBeChecked := []string{
 		path.Join(c.baseDir, "CODE_OF_CONDUCT.md"),
 		path.Join(c.baseDir, "CONTRIBUTING.md"),
-		path.Join(c.baseDir, "DEPENDENCIES"),
 		path.Join(c.baseDir, "LICENSE"),
 		path.Join(c.baseDir, "NOTICE.md"),
 		path.Join(c.baseDir, "README.md"),
@@ -80,6 +80,9 @@ func (c RepoStructureExists) Test() *tractusx.QualityResult {
 
 	missingMandatoryFiles := filesystem.CheckMissingFiles(listOfMandatoryFilesToBeChecked)
 	missingOptionalFiles := filesystem.CheckMissingFiles(listOfOptionalFilesToBeChecked)
+	if dependencyFiles := filesystem.FindPrefixedFiles(dir, "DEPENDENCIES"); dependencyFiles == nil {
+		missingMandatoryFiles = append(missingMandatoryFiles, "DEPENDENCIES")
+	}
 
 	if len(missingOptionalFiles) > 0 {
 		printer.LogWarning(
