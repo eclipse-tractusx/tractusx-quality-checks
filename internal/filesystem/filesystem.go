@@ -20,10 +20,8 @@
 package filesystem
 
 import (
-	"io/fs"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -61,11 +59,14 @@ func CheckMissingFiles(listOfFiles []string) []string {
 
 func FindPrefixedFiles(dir string, prefix string) []string {
 	var foundFiles []string
-	filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
-		if !info.IsDir() && strings.HasPrefix(info.Name(), prefix) {
-			foundFiles = append(foundFiles, path)
-		}
+	fs, err := os.ReadDir(dir)
+	if err != nil {
 		return nil
-	})
+	}
+	for _, f := range fs {
+		if !f.IsDir() && strings.HasPrefix(f.Name(), prefix) {
+			foundFiles = append(foundFiles, f.Name())
+		}
+	}
 	return foundFiles
 }
