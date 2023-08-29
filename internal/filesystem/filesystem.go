@@ -22,6 +22,7 @@ package filesystem
 import (
 	"log"
 	"os"
+	"strings"
 )
 
 func CreateFiles(files []string) {
@@ -54,4 +55,18 @@ func CheckMissingFiles(listOfFiles []string) []string {
 		}
 	}
 	return missingFiles
+}
+
+func FindPrefixedFiles(dir string, prefix string) []string {
+	var foundFiles []string
+	fs, err := os.ReadDir(dir)
+	if err != nil {
+		return nil
+	}
+	for _, f := range fs {
+		if !f.IsDir() && strings.HasPrefix(f.Name(), prefix) {
+			foundFiles = append(foundFiles, f.Name())
+		}
+	}
+	return foundFiles
 }
