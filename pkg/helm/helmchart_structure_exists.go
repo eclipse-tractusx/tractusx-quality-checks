@@ -54,7 +54,6 @@ func (r *HelmStructureExists) ExternalDescription() string {
 func (r *HelmStructureExists) Test() *tractusx.QualityResult {
 	helmStructureFiles := []string{
 		".helmignore",
-		"Chart.yaml",
 		"LICENSE",
 		"README.md",
 		"values.yaml",
@@ -73,15 +72,16 @@ func (r *HelmStructureExists) Test() *tractusx.QualityResult {
 	var missingFiles []string
 	var chartYamlFiles []string
 	for _, hc := range helmCharts {
-		if hc.IsDir() {
-			for _, fname := range helmStructureFiles {
-				fpath := filepath.Join(chartDir, hc.Name(), fname)
-				isMissing := filesystem.CheckMissingFiles([]string{fpath})
-				if fname == "Chart.yaml" && isMissing == nil {
-					chartYamlFiles = append(chartYamlFiles, fpath)
-				} else if isMissing != nil {
-					missingFiles = append(missingFiles, isMissing...)
-				}
+		if _, err := os.Stat(path.Join(chartDir, hc.Name(), "Chart.yaml")); !hc.IsDir() || err != nil {
+            continue
+        }
+		for _, fname := range helmStructureFiles {
+			fpath := filepath.Join(chartDir, hc.Name(), fname)
+			isMissing := filesystem.CheckMissingFiles([]string{fpath})
+			if fname == "Chart.yaml" && isMissing == nil {
+				chartYamlFiles = append(chartYamlFiles, fpath)
+			} else if isMissing != nil {
+				missingFiles = append(missingFiles, isMissing...)
 			}
 		}
 	}

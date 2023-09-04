@@ -50,6 +50,7 @@ func TestShouldFailForEmptyChartsDir(t *testing.T) {
 
 func TestShouldFailIfHelmStructureIsMissing(t *testing.T) {
 	os.MkdirAll("charts/exampleChart", 0750)
+	filesystem.CreateFiles([]string{"charts/exampleChart/Chart.yaml"})
 	defer os.RemoveAll("charts")
 
 	helmStructureTest := NewHelmStructureExists("./")
