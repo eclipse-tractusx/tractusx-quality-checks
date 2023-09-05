@@ -37,14 +37,14 @@ func TestShouldPassIfHelmDirIsMissing(t *testing.T) {
 	}
 }
 
-func TestShouldFailForEmptyChartsDir(t *testing.T) {
+func TestShouldPassForEmptyChartsDir(t *testing.T) {
 	os.Mkdir("charts", 0750)
 	defer os.Remove("charts")
 
 	result := NewHelmStructureExists("./").Test()
 
-	if result.Passed {
-		t.Errorf("Helm directory doesn't contain any charts hence test should fail.")
+	if !result.Passed {
+		t.Errorf("Helm directory doesn't contain any charts hence test should pass.")
 	}
 }
 

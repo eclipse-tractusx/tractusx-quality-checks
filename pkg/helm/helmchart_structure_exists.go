@@ -20,16 +20,21 @@
 package helm
 
 import (
-	"fmt"
 	"os"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/filesystem"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/helm"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
+
+var helmStructureFiles []string = []string{
+	".helmignore",
+	"LICENSE",
+	"README.md",
+	"values.yaml",
+}
 
 type HelmStructureExists struct {
 	baseDir string
@@ -51,45 +56,32 @@ func (r *HelmStructureExists) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-5/trg-5-02"
 }
 
+func (r *HelmStructureExists) IsOptional() bool {
+	return false
+}
+
 func (r *HelmStructureExists) Test() *tractusx.QualityResult {
-	helmStructureFiles := []string{
-		".helmignore",
-		"LICENSE",
-		"README.md",
-		"values.yaml",
-	}
+	var missingFiles []string
+	var chartYamlFiles []string
+	errorDescriptionCharts := ""
+	chartsValid := true
 
 	chartDir := path.Join(r.baseDir, "charts")
-	if fi, err := os.Stat(chartDir); err != nil || !fi.IsDir() {
+	helmCharts, err := os.ReadDir(chartDir)
+	if err != nil || len(helmCharts) == 0 {
 		return &tractusx.QualityResult{Passed: true}
 	}
 
-	helmCharts, err := os.ReadDir(chartDir)
-	if err != nil || len(helmCharts) == 0 {
-		return &tractusx.QualityResult{ErrorDescription: fmt.Sprintf("Can't read Helm Charts at %s.", chartDir)}
-	}
-
-	var missingFiles []string
-	var chartYamlFiles []string
 	for _, hc := range helmCharts {
-		if _, err := os.Stat(path.Join(chartDir, hc.Name(), "Chart.yaml")); !hc.IsDir() || err != nil {
-            continue
-        }
-		for _, fname := range helmStructureFiles {
-			fpath := filepath.Join(chartDir, hc.Name(), fname)
-			isMissing := filesystem.CheckMissingFiles([]string{fpath})
-			if fname == "Chart.yaml" && isMissing == nil {
-				chartYamlFiles = append(chartYamlFiles, fpath)
-			} else if isMissing != nil {
-				missingFiles = append(missingFiles, isMissing...)
-			}
+		chartYamlPath := path.Join(chartDir, hc.Name(), "Chart.yaml")
+		if _, err := os.Stat(chartYamlPath); err != nil || !hc.IsDir() {
+			continue
 		}
+		chartYamlFiles = append(chartYamlFiles, chartYamlPath)
+		missingFiles = append(missingFiles, getMissingChartFiles(path.Join(chartDir, hc.Name()))...)
 	}
 
-	errorDescriptionCharts := ""
-	chartsValid := true
 	if len(chartYamlFiles) > 0 {
-
 		for _, fpath := range chartYamlFiles {
 			isValid, msg := validateChart(fpath)
 			chartsValid = chartsValid && isValid
@@ -104,8 +96,15 @@ func (r *HelmStructureExists) Test() *tractusx.QualityResult {
 	return &tractusx.QualityResult{Passed: true}
 }
 
-func (r *HelmStructureExists) IsOptional() bool {
-	return false
+func getMissingChartFiles(chartPath string) []string {
+	var missingFiles []string
+	for _, fileToCheck := range helmStructureFiles {
+		missingFile := filesystem.CheckMissingFiles([]string{path.Join(chartPath, fileToCheck)})
+		if missingFile != nil {
+			missingFiles = append(missingFiles, missingFile...)
+		}
+	}
+	return missingFiles
 }
 
 func validateChart(chartyamlfile string) (bool, string) {
