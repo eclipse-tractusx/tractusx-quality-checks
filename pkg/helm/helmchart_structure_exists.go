@@ -73,11 +73,10 @@ func (r *HelmStructureExists) Test() *tractusx.QualityResult {
 	}
 
 	for _, hc := range helmCharts {
-		chartYamlPath := path.Join(chartDir, hc.Name(), "Chart.yaml")
-		if _, err := os.Stat(chartYamlPath); err != nil || !hc.IsDir() {
+		if !isChartDirectory(path.Join(chartDir, hc.Name())) {
 			continue
 		}
-		chartYamlFiles = append(chartYamlFiles, chartYamlPath)
+		chartYamlFiles = append(chartYamlFiles, path.Join(chartDir, hc.Name(), "Chart.yaml"))
 		getMissingChartFiles(path.Join(chartDir, hc.Name()), &missingFiles)
 	}
 
@@ -88,11 +87,18 @@ func (r *HelmStructureExists) Test() *tractusx.QualityResult {
 			errorDescriptionCharts += msg
 		}
 	}
+
 	if len(missingFiles) > 0 || !chartsValid {
 		return &tractusx.QualityResult{ErrorDescription: "+ Following Helm Chart structure files are missing: " + strings.Join(missingFiles, ", ") +
 			errorDescriptionCharts}
 	}
 	return &tractusx.QualityResult{Passed: true}
+}
+
+func isChartDirectory(dir string) bool {
+	chartYamlPath := path.Join(dir, "Chart.yaml")
+	_, err := os.Stat(chartYamlPath)
+	return err == nil
 }
 
 func getMissingChartFiles(chartPath string, missingFiles *[]string) {
