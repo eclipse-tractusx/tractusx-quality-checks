@@ -20,6 +20,7 @@
 name: Create GitHub Release
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - "v*.*.*"
@@ -30,6 +31,13 @@ env:
 jobs:
   release:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, darwin, windows]
+        goarch: ['386', amd64]
+        include:
+          - os: darwin
+            version: [arm, arm64]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -51,7 +59,7 @@ jobs:
           echo "major=${major}" >> $GITHUB_OUTPUT
 
       - name: Build binary
-        run: go build -o ${{ github.workspace }}/bin/${{ env.APP_NAME }}-${{ steps.version.outputs.version }}
+        run: env GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o ${{ github.workspace }}/bin/${{ env.APP_NAME }}-${{ steps.version.outputs.version }}-${{ matrix.goos }}-${{ matrix.goarch }}
         working-directory: ${{ github.workspace }}
 
       - name: Create GitHub release
@@ -70,8 +78,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/bin/${{ env.APP_NAME }}-${{ steps.version.outputs.version }}
-          asset_name: ${{ env.APP_NAME }}-${{ steps.version.outputs.version }}
+          asset_path: ${{ github.workspace }}/bin/${{ env.APP_NAME }}-${{ steps.version.outputs.version }}-${{ matrix.goos }}-${{ matrix.goarch }}
+          asset_name: ${{ env.APP_NAME }}-${{ steps.version.outputs.version }}-${{ matrix.goos }}-${{ matrix.goarch }}
           asset_content_type: application/octet-stream
 
       - name: Force update major tag
