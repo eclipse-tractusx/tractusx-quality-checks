@@ -18,7 +18,7 @@ this repository.
 
 ## Git pre-commit hook
 
-It is possible to add quality checks as git pre-commit hook in the repository which will run checks triggered by git commit command. To achive that flease follow below steps:
+It is possible to add quality checks as git pre-commit hook in the repository which will run checks triggered by git commit command. To achieve that please follow below steps:
 
 1. Download latest version of the tractusx-quality-checks tool for your platform under Asset section at https://github.com/eclipse-tractusx/tractusx-quality-checks/releases
 2. Add executable permission if necessary and copy the binary (changing file name to tractusx-quality-checks) into one of the $PATH location depending on your OS.
@@ -30,7 +30,7 @@ $ chmod +x tractusx-quality-checks-0.8.0-darwin-arm64
 $ sudo cp tractusx-quality-checks-0.8.0-darwin-arm64 /usr/local/bin/tractusx-quality-checks
 ```
 
-3. Inside your repo copy below to .git/hooks/pre-commit inside your repo:
+3. Inside your repo copy below to .git/hooks/pre-commit:
 
 ```
     #!/usr/bin/env bash
