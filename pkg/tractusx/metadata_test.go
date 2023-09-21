@@ -29,6 +29,7 @@ import (
 var metadataFromTestTemplate = Metadata{
 	ProductName:       "sig-infra",
 	LeadingRepository: "https://github.com/eclipse-tractusx/sig-infra",
+	RepoCategory:      "special",
 	Repositories: []Repository{
 		{
 			Name:             "sig-infra",

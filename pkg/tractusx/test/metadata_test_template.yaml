@@ -20,6 +20,7 @@
 
 product: "sig-infra"
 leadingRepository: "https://github.com/eclipse-tractusx/sig-infra"
+repoCategory:      "special"
 repositories:
   - name: "sig-infra"
     usage: "Contains issue templates and workflows"
