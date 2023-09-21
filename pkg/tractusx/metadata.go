@@ -30,10 +30,10 @@ import (
 const MetadataFilename = ".tractusx"
 
 type Metadata struct {
-	ProductName          string       `yaml:"product"`
-	LeadingRepository    string       `yaml:"leadingRepository"`
-	SupportingRepository bool         `yaml:"supportingRepository"`
-	Repositories         []Repository `yaml:"repositories"`
+	ProductName       string       `yaml:"product"`
+	LeadingRepository string       `yaml:"leadingRepository"`
+	RepoCategory      string       `yaml:"repoCategory"`
+	Repositories      []Repository `yaml:"repositories"`
 }
 
 type Repository struct {
