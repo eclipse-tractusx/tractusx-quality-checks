@@ -20,7 +20,7 @@
 
 product: "tractusx-quality-checks"
 leadingRepository: "https://github.com/eclipse-tractusx/sig-infra"
-supportingRepository: true
+repoCategory: "support"
 repositories:
     - name: "Tractus-X quality checks"
       usage: "automated release guidelines checks"
