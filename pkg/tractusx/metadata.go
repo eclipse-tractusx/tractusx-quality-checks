@@ -32,6 +32,7 @@ const MetadataFilename = ".tractusx"
 type Metadata struct {
 	ProductName       string       `yaml:"product"`
 	LeadingRepository string       `yaml:"leadingRepository"`
+	RepoCategory      string       `yaml:"repoCategory"`
 	Repositories      []Repository `yaml:"repositories"`
 }
 
@@ -62,7 +63,7 @@ func MetadataFromLocalFile(dir string) (*Metadata, error) {
 	metadataFileAsBytes, err := os.ReadFile(path.Join(dir, MetadataFilename))
 
 	if err != nil {
-		fmt.Println(fmt.Sprintf("Could not read Tractus-X metadatafile from default location: %s", MetadataFilename))
+		fmt.Printf("Could not read Tractus-X metadatafile from default location: %s\n", MetadataFilename)
 		return nil, err
 	}
 
