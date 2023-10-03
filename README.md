@@ -20,7 +20,7 @@ this repository.
 
 It is possible to add quality checks as git pre-commit hook in the repository which will run checks triggered by git commit command. To achieve that please follow below steps:
 
-1. Download latest version of the tractusx-quality-checks tool for your platform under Asset section at https://github.com/eclipse-tractusx/tractusx-quality-checks/releases
+1. Download latest version of the tractusx-quality-checks tool for your platform under Asset section at https://github.com/eclipse-tractusx/tractusx-quality-checks/releases/latest
 2. Add executable permission if necessary and copy the binary (changing file name to tractusx-quality-checks) into one of the $PATH location depending on your OS.
 
 #### macOS example:
