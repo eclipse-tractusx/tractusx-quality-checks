@@ -31,6 +31,7 @@ var baseImageAllowList = []string{
 	"nginxinc/nginx-unprivileged",
 	"mcr.microsoft.com/dotnet/runtime",
 	"mcr.microsoft.com/dotnet/aspnet",
+	"alpine",
 }
 
 type AllowedBaseImage struct {
