@@ -38,11 +38,11 @@ var releaseGuidelines = []tractusx.QualityGuideline{
 	container.NewNonRootContainer(),
 	docs.NewChangelogExists("./"),
 	docs.NewInstallExists("./"),
-	repo.NewLeadingRepositoryDefined("./"),
 	docs.NewReadmeExists("./"),
 	helm.NewHelmStructureExists("./"),
 	helm.NewResourceMgmt("./"),
 	irepo.NewDefaultBranch(),
+	repo.NewLeadingRepositoryDefined("./"),
 	repo.NewRepoStructureExists("./"),
 }
 
