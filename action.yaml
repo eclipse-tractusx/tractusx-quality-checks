@@ -23,20 +23,24 @@ inputs:
   version:
     description: The version of the quality checks release to use
     required: true
-    default: "0.7.0"
+    default: "0.7.3"
+  platform:
+    description: The platform architecture where the quality checks runs on
+    required: true
+    default: "linux-amd64"
 
 runs:
   using: composite
   steps:
     - name: Download quality checks binary
-      run: curl -OL https://github.com/eclipse-tractusx/tractusx-quality-checks/releases/download/v${{ inputs.version }}/tractusx-quality-checks-${{ inputs.version }}
+      run: curl -OL https://github.com/eclipse-tractusx/tractusx-quality-checks/releases/download/v${{ inputs.version }}/tractusx-quality-checks-${{ inputs.version }}-${{ inputs.platform }}
       shell: bash
 
     - name: Make binary executable
-      run: chmod +x ./tractusx-quality-checks-${{ inputs.version }}
+      run: chmod +x ./tractusx-quality-checks-${{ inputs.version }}-${{ inputs.platform }}
       shell: bash
 
     - name: Run quality checks
-      run: ./tractusx-quality-checks-${{ inputs.version }} checkLocal
+      run: ./tractusx-quality-checks-${{ inputs.version }}-${{ inputs.platform }} checkLocal
       shell: bash
 
