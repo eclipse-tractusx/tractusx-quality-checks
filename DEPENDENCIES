@@ -33,7 +33,7 @@ go/golang/github.com%2Fgoogle/gnostic-models/v0.6.9-0.20230804172637-c7be7c783f4
 go/golang/github.com%2Fgoogle/go-cmp/v0.5.2, BSD-3-Clause, approved, #5689
 go/golang/github.com%2Fgoogle/go-cmp/v0.5.5, BSD-3-Clause, approved, #5689
 go/golang/github.com%2Fgoogle/go-cmp/v0.5.9, BSD-3-Clause, approved, #5689
-go/golang/github.com%2Fgoogle/go-cmp/v0.6.0, , restricted, clearlydefined
+go/golang/github.com%2Fgoogle/go-cmp/v0.6.0, BSD-3-Clause, approved, #11058
 go/golang/github.com%2Fgoogle/go-querystring/v1.1.0, BSD-3-Clause, approved, clearlydefined
 go/golang/github.com%2Fgoogle/gofuzz/v1.0.0, Apache-2.0, approved, clearlydefined
 go/golang/github.com%2Fgoogle/gofuzz/v1.2.0, Apache-2.0, approved, clearlydefined
@@ -99,7 +99,7 @@ go/golang/golang.org%2Fx/crypto/v0.0.0-20190308221718-c2843e01d9a2, BSD-3-Clause
 go/golang/golang.org%2Fx/crypto/v0.0.0-20191011191535-87dc89f01550, BSD-3-Clause AND (BSD-3-Clause AND OpenSSL) AND (BSD-3-Clause AND MIT), approved, #5633
 go/golang/golang.org%2Fx/crypto/v0.0.0-20200622213623-75b288015ac9, BSD-3-Clause AND (BSD-3-Clause AND OpenSSL) AND (BSD-3-Clause AND MIT), approved, #5633
 go/golang/golang.org%2Fx/crypto/v0.0.0-20210921155107-089bfa567519, BSD-3-Clause AND (BSD-3-Clause AND OpenSSL) AND (BSD-3-Clause AND MIT), approved, #5633
-go/golang/golang.org%2Fx/crypto/v0.14.0, , restricted, clearlydefined
+go/golang/golang.org%2Fx/crypto/v0.14.0, BSD-3-Clause AND (BSD-3-Clause AND OpenSSL) AND (BSD-3-Clause AND MIT), approved, #11059
 go/golang/golang.org%2Fx/crypto/v0.3.0, BSD-3-Clause AND (BSD-3-Clause AND OpenSSL) AND (BSD-3-Clause AND MIT), approved, #9279
 go/golang/golang.org%2Fx/crypto/v0.3.1-0.20221117191849-2c476679df9a, BSD-3-Clause AND (BSD-3-Clause AND OpenSSL) AND (BSD-3-Clause AND MIT), approved, #9279
 go/golang/golang.org%2Fx/crypto/v0.7.0, BSD-3-Clause AND (BSD-3-Clause AND OpenSSL) AND (BSD-3-Clause AND MIT), approved, #8205
