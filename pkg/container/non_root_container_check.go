@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"regexp"
 
-	txqualitychecks "github.com/eclipse-tractusx/tractusx-quality-checks/internal"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
 // validateUserRegex is used to match valid username/uid, group-name/gid
@@ -31,8 +31,8 @@ const validateUserRegex = `(^(\d|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2
 
 type NonRootContainer struct{}
 
-// NewNonRootContainer returns a new check based on txqualitychecks.QualityGuideline interface.
-func NewNonRootContainer() txqualitychecks.QualityGuideline {
+// NewNonRootContainer returns a new check based on tractusx.QualityGuideline interface.
+func NewNonRootContainer() tractusx.QualityGuideline {
 	return &NonRootContainer{}
 }
 
@@ -48,7 +48,7 @@ func (n NonRootContainer) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-4/trg-4-03"
 }
 
-func (n NonRootContainer) Test() *txqualitychecks.QualityResult {
+func (n NonRootContainer) Test() *tractusx.QualityResult {
 	checkPassed := true
 	var errorDescription string
 	dockerfiles := findDockerfilesAt("./")
@@ -65,7 +65,7 @@ func (n NonRootContainer) Test() *txqualitychecks.QualityResult {
 		}
 	}
 
-	return &txqualitychecks.QualityResult{Passed: checkPassed, ErrorDescription: errorDescription}
+	return &tractusx.QualityResult{Passed: checkPassed, ErrorDescription: errorDescription}
 }
 
 func (n NonRootContainer) IsOptional() bool {

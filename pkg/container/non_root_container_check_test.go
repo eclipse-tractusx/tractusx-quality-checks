@@ -113,3 +113,20 @@ func TestQualityCheckPass(t *testing.T) {
 		}
 	}
 }
+
+func correttoDockerfile() *dockerfile {
+	return newDockerfile().
+		appendCommand("FROM amazoncorreto:8").
+		appendEmptyLine().
+		appendCommand("USER corretto").
+		appendCommand("COPY . .")
+}
+
+func temurinDockerfile() *dockerfile {
+	return newDockerfile().
+		appendCommand("FROM distroless").
+		appendEmptyLine().
+		appendCommand("COPY . .").
+		appendCommand("FROM eclipse/temurin").
+		appendCommand("USER temurin")
+}
