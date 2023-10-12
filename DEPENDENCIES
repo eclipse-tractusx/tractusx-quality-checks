@@ -1,4 +1,4 @@
-go/golang/github.com%2FProtonMail/go-crypto/v0.0.0-20230710112148-e01326fd72eb, BSD-3-Clause AND BSD-2-Clause, approved, #8202
+go/golang/github.com%2FProtonMail/go-crypto/v0.0.0-20230717121422-5aa5874ade95, BSD-3-Clause AND BSD-2-Clause, approved, #8202
 go/golang/github.com%2Fbwesterb/go-ristretto/v1.2.3, MIT, approved, clearlydefined
 go/golang/github.com%2Fcloudflare/circl/v1.3.3, BSD-3-Clause, approved, clearlydefined
 go/golang/github.com%2Fcpuguy83%2Fgo-md2man/v2/v2.0.2, MIT, approved, clearlydefined
