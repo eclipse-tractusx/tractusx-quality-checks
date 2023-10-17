@@ -40,8 +40,9 @@ type QualityGuideline interface {
 // QualityResult implements test result via Passed bool and in case of error a
 // ErrorDescription.
 type QualityResult struct {
-	Passed           bool
-	ErrorDescription string
+	Passed              bool
+	ErrorDescription    string
+	ErrorDescriptionWeb string
 }
 
 type Printer interface {
