@@ -71,16 +71,21 @@ func (a *AllowedBaseImage) Test() *txqualitychecks.QualityResult {
 		}
 	}
 
-	return &txqualitychecks.QualityResult{Passed: checkPassed, ErrorDescription: buildErrorDescription(deniedBaseImages)}
+	return &txqualitychecks.QualityResult{Passed: checkPassed, ErrorDescription: buildErrorDescription(deniedBaseImages, "cli"), ErrorDescriptionWeb: buildErrorDescription(deniedBaseImages, "web") }
 }
 
 func (a *AllowedBaseImage) IsOptional() bool {
 	return false
 }
 
-func buildErrorDescription(deniedImages []string) string {
+// Function to return error message of failed test.
+// There are two types of formatting: cli (default) and web
+func buildErrorDescription(deniedImages []string, errorFormat string) string {
 	if len(deniedImages) == 0 {
 		return ""
+	}
+	if strings.EqualFold(errorFormat, "web") {
+		return "Dockerfile(s) use not approved images:<br>"+strings.Join(deniedImages,"<br>")
 	}
 	return "We want to align on docker base images. We detected a Dockerfile specifying " +
 		strings.Join(deniedImages, ", ") + "\n\tAllowed images are: \n\t - " +
