@@ -89,8 +89,8 @@ func (r *HelmStructureExists) Test() *tractusx.QualityResult {
 	}
 
 	if len(missingFiles) > 0 || !chartsValid {
-		return &tractusx.QualityResult{ErrorDescription: "+ Following Helm Chart structure files are missing: " + strings.Join(missingFiles, ", ") +
-			errorDescriptionCharts}
+		errMsg := "+ Following Helm Chart structure files are missing: " + strings.Join(missingFiles, ", ") + errorDescriptionCharts
+		return &tractusx.QualityResult{ErrorDescription: errMsg, ErrorDescriptionWeb: strings.ReplaceAll(errMsg, "\n", "<br>")}
 	}
 	return &tractusx.QualityResult{Passed: true}
 }
