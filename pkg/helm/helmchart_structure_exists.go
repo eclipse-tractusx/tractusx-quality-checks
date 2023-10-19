@@ -105,14 +105,14 @@ func getMissingChartFiles(chartPath string, missingFiles *[]string) {
 	for _, fileToCheck := range helmStructureFiles {
 		missingFile := filesystem.CheckMissingFiles([]string{path.Join(chartPath, fileToCheck)})
 		if missingFile != nil {
-			*missingFiles = append(*missingFiles, missingFile...)
+			*missingFiles = append(*missingFiles, []string{strings.Split(missingFile[0], "charts")[1][1:]}...)
 		}
 	}
 }
 
 func validateChart(chartyamlfile string) (bool, string) {
 	isValid := true
-	returnMessage := "\n\t+ Analysis for " + chartyamlfile + ": "
+	returnMessage := "\n\t+ Analysis for " + strings.Split(chartyamlfile, "charts")[1][1:] + ": "
 	cyf := helm.ChartYamlFromFile(chartyamlfile)
 	missingFields := cyf.GetMissingMandatoryFields()
 
