@@ -139,21 +139,6 @@ func dockerFileWithBaseImage(baseImage string) *dockerfile {
 	return newDockerfile().appendCommand("FROM " + baseImage)
 }
 
-func correttoDockerfile() *dockerfile {
-	return newDockerfile().
-		appendCommand("FROM amazoncorreto:8").
-		appendEmptyLine().
-		appendCommand("COPY . .")
-}
-
-func temurinDockerfile() *dockerfile {
-	return newDockerfile().
-		appendCommand("FROM distroless").
-		appendEmptyLine().
-		appendCommand("COPY . .").
-		appendCommand("FROM eclipse/temurin")
-}
-
 func randomSubDir(t *testing.T) string {
 	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	b := make([]rune, 10)

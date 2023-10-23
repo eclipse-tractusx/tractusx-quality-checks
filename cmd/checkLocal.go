@@ -34,15 +34,16 @@ import (
 )
 
 var releaseGuidelines = []tractusx.QualityGuideline{
-	docs.NewReadmeExists("./"),
-	docs.NewInstallExists("./"),
-	docs.NewChangelogExists("./"),
-	repo.NewLeadingRepositoryDefined("./"),
-	irepo.NewDefaultBranch(),
 	container.NewAllowedBaseImage("./"),
-	repo.NewRepoStructureExists("./"),
+	container.NewNonRootContainer(),
+	docs.NewChangelogExists("./"),
+	docs.NewInstallExists("./"),
+	docs.NewReadmeExists("./"),
 	helm.NewHelmStructureExists("./"),
 	helm.NewResourceMgmt("./"),
+	irepo.NewDefaultBranch(),
+	repo.NewLeadingRepositoryDefined("./"),
+	repo.NewRepoStructureExists("./"),
 }
 
 // checkLocalCmd represents the checkLocal command
