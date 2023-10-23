@@ -61,7 +61,11 @@ func (n NonRootContainer) Test() *tractusx.QualityResult {
 
 		if !validateUser(file.user()) {
 			checkPassed = false
-			errorDescription = "Invalid user specified in Dockerfile: " + dockerfilePath
+			if len(errorDescription) > 0 {
+				errorDescription = errorDescription + "\nInvalid user specified in Dockerfile: " + dockerfilePath
+			} else {
+				errorDescription = "Invalid user specified in Dockerfile: " + dockerfilePath
+			}
 		}
 	}
 
