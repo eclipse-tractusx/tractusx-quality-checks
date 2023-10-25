@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"strings"
 
-	txqualitychecks "github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
 )
 
 var baseImageAllowList = []string{
@@ -38,7 +38,7 @@ type AllowedBaseImage struct {
 	baseDir string
 }
 
-func NewAllowedBaseImage(baseDir string) txqualitychecks.QualityGuideline {
+func NewAllowedBaseImage(baseDir string) tractusx.QualityGuideline {
 	return &AllowedBaseImage{baseDir: baseDir}
 }
 
@@ -54,7 +54,7 @@ func (a *AllowedBaseImage) ExternalDescription() string {
 	return "https://eclipse-tractusx.github.io/docs/release/trg-4/trg-4-02"
 }
 
-func (a *AllowedBaseImage) Test() *txqualitychecks.QualityResult {
+func (a *AllowedBaseImage) Test() *tractusx.QualityResult {
 	foundDockerFiles := findDockerfilesAt(a.baseDir)
 
 	checkPassed := true
@@ -70,8 +70,10 @@ func (a *AllowedBaseImage) Test() *txqualitychecks.QualityResult {
 			deniedBaseImages = append(deniedBaseImages, file.baseImage())
 		}
 	}
-
-	return &txqualitychecks.QualityResult{Passed: checkPassed, ErrorDescription: buildErrorDescription(deniedBaseImages, "cli"), ErrorDescriptionWeb: buildErrorDescription(deniedBaseImages, "web") }
+	if tractusx.ErrorOutputFormat == tractusx.WebErrOutputFormat {
+		return &tractusx.QualityResult{Passed: checkPassed, ErrorDescription: buildErrorDescription(deniedBaseImages, tractusx.WebErrOutputFormat)}
+	}
+	return &tractusx.QualityResult{Passed: checkPassed, ErrorDescription: buildErrorDescription(deniedBaseImages, tractusx.CliErrOutputFormat)}
 }
 
 func (a *AllowedBaseImage) IsOptional() bool {
@@ -80,12 +82,12 @@ func (a *AllowedBaseImage) IsOptional() bool {
 
 // Function to return error message of failed test.
 // There are two types of formatting: cli (default) and web
-func buildErrorDescription(deniedImages []string, errorFormat string) string {
+func buildErrorDescription(deniedImages []string, errorFormat int) string {
 	if len(deniedImages) == 0 {
 		return ""
 	}
-	if strings.EqualFold(errorFormat, "web") {
-		return "Dockerfile(s) use not approved images:<br>"+strings.Join(deniedImages,"<br>")
+	if errorFormat == tractusx.WebErrOutputFormat {
+		return "Dockerfile(s) use not approved images:<br>" + strings.Join(deniedImages, "<br>")
 	}
 	return "We want to align on docker base images. We detected a Dockerfile specifying " +
 		strings.Join(deniedImages, ", ") + "\n\tAllowed images are: \n\t - " +
