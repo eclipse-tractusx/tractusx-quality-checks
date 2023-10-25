@@ -40,9 +40,8 @@ type QualityGuideline interface {
 // QualityResult implements test result via Passed bool and in case of error a
 // ErrorDescription.
 type QualityResult struct {
-	Passed              bool
-	ErrorDescription    string
-	ErrorDescriptionWeb string
+	Passed           bool
+	ErrorDescription string
 }
 
 type Printer interface {
@@ -50,3 +49,10 @@ type Printer interface {
 	LogWarning(warning string)
 	LogError(err string)
 }
+
+var ErrorOutputFormat = CliErrOutputFormat
+
+const (
+	CliErrOutputFormat = iota
+	WebErrOutputFormat = iota
+)
