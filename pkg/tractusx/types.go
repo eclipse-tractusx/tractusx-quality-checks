@@ -49,3 +49,10 @@ type Printer interface {
 	LogWarning(warning string)
 	LogError(err string)
 }
+
+var ErrorOutputFormat = CliErrOutputFormat
+
+const (
+	CliErrOutputFormat = iota
+	WebErrOutputFormat = iota
+)
