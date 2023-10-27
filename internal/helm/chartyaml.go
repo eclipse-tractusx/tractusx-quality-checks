@@ -22,6 +22,7 @@ package helm
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"reflect"
 	"regexp"
 
@@ -47,7 +48,7 @@ func newChartYaml() *Chartyaml {
 }
 
 func ChartYamlFromFile(ymlfile string) *Chartyaml {
-	data, err := ioutil.ReadFile(ymlfile)
+	data, err := os.ReadFile(ymlfile)
 	if err != nil {
 		fmt.Printf("Unable to read %v.\n", ymlfile)
 		return nil
