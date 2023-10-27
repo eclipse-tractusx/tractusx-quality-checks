@@ -21,7 +21,6 @@ package helm
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"regexp"
