@@ -29,11 +29,13 @@ import (
 // validateUserRegex is used to match valid username/uid, group-name/gid
 const validateUserRegex = `(^(\d|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-6])$)|(^[a-z_][a-z0-9_-]*[$]?$)`
 
-type NonRootContainer struct{}
+type NonRootContainer struct{
+	baseDir string
+}
 
 // NewNonRootContainer returns a new check based on tractusx.QualityGuideline interface.
-func NewNonRootContainer() tractusx.QualityGuideline {
-	return &NonRootContainer{}
+func NewNonRootContainer(baseDir string) tractusx.QualityGuideline {
+	return &NonRootContainer{baseDir}
 }
 
 func (n NonRootContainer) Name() string {
@@ -51,7 +53,7 @@ func (n NonRootContainer) ExternalDescription() string {
 func (n NonRootContainer) Test() *tractusx.QualityResult {
 	checkPassed := true
 	var errorDescription string
-	dockerfiles := findDockerfilesAt("./")
+	dockerfiles := findDockerfilesAt(n.baseDir)
 
 	for _, dockerfilePath := range dockerfiles {
 		file, err := dockerfileFromPath(dockerfilePath)

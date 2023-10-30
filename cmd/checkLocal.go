@@ -35,7 +35,7 @@ import (
 
 var releaseGuidelines = []tractusx.QualityGuideline{
 	container.NewAllowedBaseImage("./"),
-	container.NewNonRootContainer(),
+	container.NewNonRootContainer("./"),
 	docs.NewChangelogExists("./"),
 	docs.NewInstallExists("./"),
 	docs.NewReadmeExists("./"),
