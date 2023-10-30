@@ -99,6 +99,7 @@ func (r *HelmStructureExists) Test() *tractusx.QualityResult {
 	return &tractusx.QualityResult{Passed: true}
 }
 
+// Function to validate if provided is helm chart directory.
 func IsChartDirectory(dir string) bool {
 	chartYamlPath := path.Join(dir, "Chart.yaml")
 	_, err := os.Stat(chartYamlPath)
