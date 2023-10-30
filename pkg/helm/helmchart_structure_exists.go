@@ -20,13 +20,14 @@
 package helm
 
 import (
-	"os"
-	"path"
-	"strings"
-
+	"fmt"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/filesystem"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/internal/helm"
 	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
+	"gopkg.in/yaml.v3"
+	"os"
+	"path"
+	"strings"
 )
 
 var helmStructureFiles []string = []string{
@@ -116,7 +117,7 @@ func getMissingChartFiles(chartPath string, missingFiles *[]string) {
 func validateChart(chartYamlFile string) (bool, string) {
 	isValid := true
 	returnMessage := "\n\t+ Analysis for " + strings.Split(chartYamlFile, "charts")[1][1:] + ": "
-	cyf := helm.ChartYamlFromFile(chartYamlFile)
+	cyf := ChartYamlFromFile(chartYamlFile)
 	missingFields := cyf.GetMissingMandatoryFields()
 
 	if len(missingFields) > 0 {
@@ -131,7 +132,19 @@ func validateChart(chartYamlFile string) (bool, string) {
 	return isValid, returnMessage
 }
 
-func GetChartValues(chartYamlFile string) helm.Chartyaml {
-	chartValues := helm.ChartYamlFromFile(chartYamlFile)
-	return *chartValues
+func ChartYamlFromFile(ymlfile string) *helm.Chartyaml {
+	data, err := os.ReadFile(ymlfile)
+	if err != nil {
+		fmt.Printf("Unable to read %v.\n", ymlfile)
+		return nil
+	}
+
+	var c helm.Chartyaml
+	err = yaml.Unmarshal(data, &c)
+	if err != nil {
+		fmt.Printf("Unable to parse YAML file: %v.\n", ymlfile)
+		return nil
+	}
+
+	return &c
 }

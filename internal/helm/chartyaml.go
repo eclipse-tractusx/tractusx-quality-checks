@@ -21,11 +21,8 @@ package helm
 
 import (
 	"fmt"
-	"os"
 	"reflect"
 	"regexp"
-
-	"gopkg.in/yaml.v3"
 )
 
 type Chartyaml struct {
@@ -44,23 +41,6 @@ func newChartYaml() *Chartyaml {
 		AppVersion:  "",
 		Version:     "",
 	}
-}
-
-func ChartYamlFromFile(ymlfile string) *Chartyaml {
-	data, err := os.ReadFile(ymlfile)
-	if err != nil {
-		fmt.Printf("Unable to read %v.\n", ymlfile)
-		return nil
-	}
-
-	var c Chartyaml
-	err = yaml.Unmarshal(data, &c)
-	if err != nil {
-		fmt.Printf("Unable to parse YAML file: %v.\n", ymlfile)
-		return nil
-	}
-
-	return &c
 }
 
 func (c *Chartyaml) IsVersionValid() bool {
