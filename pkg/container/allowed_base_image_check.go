@@ -56,13 +56,20 @@ func (a *AllowedBaseImage) ExternalDescription() string {
 
 func (a *AllowedBaseImage) Test() *tractusx.QualityResult {
 	foundDockerFiles := findDockerfilesAt(a.baseDir)
+	dockerfilesToSkip := getDockerfilePathsToIgnore(a.baseDir)
 
 	checkPassed := true
 	var deniedBaseImages []string
 	for _, dockerfilePath := range foundDockerFiles {
+		if containsString(dockerfilesToSkip, dockerfilePath) {
+			fmt.Printf("Dockerfile at path %s configured to skip", dockerfilePath)
+			continue
+		}
+
 		file, err := dockerfileFromPath(dockerfilePath)
 		if err != nil {
 			fmt.Printf("Could not read dockerfile from Path %s\n", dockerfilePath)
+			continue
 		}
 
 		if !isAllowedBaseImage(file.baseImage()) {
@@ -95,6 +102,24 @@ func buildErrorDescription(deniedImages []string) string {
 func isAllowedBaseImage(image string) bool {
 	for _, imageFromAllowList := range baseImageAllowList {
 		if strings.Contains(image, imageFromAllowList) {
+			return true
+		}
+	}
+	return false
+}
+
+func getDockerfilePathsToIgnore(dir string) []string {
+	file, err := tractusx.MetadataFromLocalFile(dir)
+	if err != nil {
+		return []string{}
+	}
+
+	return file.AlignedBaseImages
+}
+
+func containsString(slice []string, element string) bool {
+	for _, v := range slice {
+		if v == element {
 			return true
 		}
 	}
