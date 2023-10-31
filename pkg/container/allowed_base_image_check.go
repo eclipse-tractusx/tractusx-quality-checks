@@ -91,6 +91,7 @@ func buildErrorDescription(deniedImages []string) string {
 		strings.Join(deniedImages, ", ") + "\n\tAllowed images are: \n\t - " +
 		strings.Join(baseImageAllowList, "\n\t - ")
 }
+
 func isAllowedBaseImage(image string) bool {
 	for _, imageFromAllowList := range baseImageAllowList {
 		if strings.Contains(image, imageFromAllowList) {

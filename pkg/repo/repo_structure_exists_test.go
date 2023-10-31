@@ -110,8 +110,8 @@ func TestShouldPassWithMultipleDependenciesFiles(t *testing.T) {
 
 func setEnv(t *testing.T) {
 	copyTemplateFileTo(".tractusx", t)
-	os.Setenv("GITHUB_REPOSITORY", "eclipse-tractusx/sig-infra")
-	os.Setenv("GITHUB_REPOSITORY_OWNER", "tester")
+	_ = os.Setenv("GITHUB_REPOSITORY", "eclipse-tractusx/sig-infra")
+	_ = os.Setenv("GITHUB_REPOSITORY_OWNER", "tester")
 }
 
 func copyTemplateFileTo(path string, t *testing.T) {

@@ -38,7 +38,7 @@ func TestShouldPassIfHelmDirIsMissing(t *testing.T) {
 }
 
 func TestShouldPassForEmptyChartsDir(t *testing.T) {
-	os.Mkdir("charts", 0750)
+	_ = os.Mkdir("charts", 0750)
 	defer os.Remove("charts")
 
 	result := NewHelmStructureExists("./").Test()
@@ -49,7 +49,7 @@ func TestShouldPassForEmptyChartsDir(t *testing.T) {
 }
 
 func TestShouldFailIfHelmStructureIsMissing(t *testing.T) {
-	os.MkdirAll("charts/exampleChart", 0750)
+	_ = os.MkdirAll("charts/exampleChart", 0750)
 	filesystem.CreateFiles([]string{"charts/exampleChart/Chart.yaml"})
 	defer os.RemoveAll("charts")
 
@@ -83,7 +83,7 @@ func TestShouldPassIfHelmStructureExist(t *testing.T) {
 
 func TestShouldPassIfChartStructureExistsAtGivenBaseDir(t *testing.T) {
 	dir := t.TempDir()
-	os.MkdirAll(path.Join(dir, "charts", "exampleChart"), 0770)
+	_ = os.MkdirAll(path.Join(dir, "charts", "exampleChart"), 0770)
 	filesystem.CreateFiles([]string{
 		path.Join(dir, "charts/exampleChart/.helmignore"),
 		path.Join(dir, "charts/exampleChart/LICENSE"),
