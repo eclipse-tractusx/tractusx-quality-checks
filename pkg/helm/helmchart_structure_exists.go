@@ -73,7 +73,7 @@ func (r *HelmStructureExists) Test() *tractusx.QualityResult {
 	}
 
 	for _, hc := range helmCharts {
-		if !isChartDirectory(path.Join(chartDir, hc.Name())) {
+		if !IsChartDirectory(path.Join(chartDir, hc.Name())) {
 			continue
 		}
 		chartYamlFiles = append(chartYamlFiles, path.Join(chartDir, hc.Name(), "Chart.yaml"))
@@ -98,7 +98,8 @@ func (r *HelmStructureExists) Test() *tractusx.QualityResult {
 	return &tractusx.QualityResult{Passed: true}
 }
 
-func isChartDirectory(dir string) bool {
+// Function to validate if provided is helm chart directory.
+func IsChartDirectory(dir string) bool {
 	chartYamlPath := path.Join(dir, "Chart.yaml")
 	_, err := os.Stat(chartYamlPath)
 	return err == nil
@@ -113,10 +114,10 @@ func getMissingChartFiles(chartPath string, missingFiles *[]string) {
 	}
 }
 
-func validateChart(chartyamlfile string) (bool, string) {
+func validateChart(chartYamlFile string) (bool, string) {
 	isValid := true
-	returnMessage := "\n\t+ Analysis for " + strings.Split(chartyamlfile, "charts")[1][1:] + ": "
-	cyf := helm.ChartYamlFromFile(chartyamlfile)
+	returnMessage := "\n\t+ Analysis for " + strings.Split(chartYamlFile, "charts")[1][1:] + ": "
+	cyf := helm.ChartYamlFromFile(chartYamlFile)
 	missingFields := cyf.GetMissingMandatoryFields()
 
 	if len(missingFields) > 0 {
@@ -129,4 +130,9 @@ func validateChart(chartyamlfile string) (bool, string) {
 	}
 
 	return isValid, returnMessage
+}
+
+func GetChartValues(chartYamlFile string) helm.Chartyaml {
+	chartValues := helm.ChartYamlFromFile(chartYamlFile)
+	return *chartValues
 }

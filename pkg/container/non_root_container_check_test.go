@@ -26,7 +26,7 @@ import (
 )
 
 func TestShouldPassIfNoDockerfileFound(t *testing.T) {
-	result := NewNonRootContainer().Test()
+	result := NewNonRootContainer("./").Test()
 
 	if result == nil || result.Passed == false {
 		t.Errorf("Non-Root Container Check should pass, if there is no Dockerfile found")
@@ -102,7 +102,7 @@ func TestQualityCheckPass(t *testing.T) {
 		if err := tc.file.writeTo("."); err != nil {
 			fmt.Printf("could not write %s", tc.file.filename)
 		}
-		result := NewNonRootContainer().Test()
+		result := NewNonRootContainer("./").Test()
 
 		if result.Passed != tc.want {
 			t.Errorf("got '%t', expected '%t' as result", result.Passed, tc.want)
