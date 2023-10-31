@@ -70,10 +70,8 @@ func (a *AllowedBaseImage) Test() *tractusx.QualityResult {
 			deniedBaseImages = append(deniedBaseImages, file.baseImage())
 		}
 	}
-	if tractusx.ErrorOutputFormat == tractusx.WebErrOutputFormat {
-		return &tractusx.QualityResult{Passed: checkPassed, ErrorDescription: buildErrorDescription(deniedBaseImages, tractusx.WebErrOutputFormat)}
-	}
-	return &tractusx.QualityResult{Passed: checkPassed, ErrorDescription: buildErrorDescription(deniedBaseImages, tractusx.CliErrOutputFormat)}
+
+	return &tractusx.QualityResult{Passed: checkPassed, ErrorDescription: buildErrorDescription(deniedBaseImages)}
 }
 
 func (a *AllowedBaseImage) IsOptional() bool {
@@ -82,11 +80,11 @@ func (a *AllowedBaseImage) IsOptional() bool {
 
 // Function to return error message of failed test.
 // There are two types of formatting: cli (default) and web
-func buildErrorDescription(deniedImages []string, errorFormat int) string {
+func buildErrorDescription(deniedImages []string) string {
 	if len(deniedImages) == 0 {
 		return ""
 	}
-	if errorFormat == tractusx.WebErrOutputFormat {
+	if tractusx.ErrorOutputFormat == tractusx.WebErrOutputFormat {
 		return "Dockerfile(s) use not approved images:<br>" + strings.Join(deniedImages, "<br>")
 	}
 	return "We want to align on docker base images. We detected a Dockerfile specifying " +
