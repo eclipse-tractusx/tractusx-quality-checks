@@ -28,7 +28,7 @@ import (
 	"github.com/go-ini/ini"
 )
 
-// RepoInfo provides basic infor
+// RepoInfo is a struct to keep basic information about a repository
 type RepoInfo struct {
 	Owner    string
 	Reponame string

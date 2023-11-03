@@ -19,6 +19,15 @@
 
 package tractusx
 
+// ErrorOutputFormat is used to control the output format of error message.
+// Before running QualityGuideline.Test(), set the value to your preferred output format
+var ErrorOutputFormat = CliErrOutputFormat
+
+const (
+	CliErrOutputFormat = iota
+	WebErrOutputFormat
+)
+
 // QualityGuideline represents the QualityGuideline to check as an interface.
 //
 // The interface provide information about Name, Description, ExternalDescription,
@@ -49,10 +58,3 @@ type Printer interface {
 	LogWarning(warning string)
 	LogError(err string)
 }
-
-var ErrorOutputFormat = CliErrOutputFormat
-
-const (
-	CliErrOutputFormat = iota
-	WebErrOutputFormat = iota
-)

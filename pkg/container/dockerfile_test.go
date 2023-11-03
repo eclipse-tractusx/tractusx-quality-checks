@@ -66,8 +66,8 @@ func TestShouldFindMultipleDockerfiles(t *testing.T) {
 	tempDir := t.TempDir()
 	secondTempDir := t.TempDir()
 
-	newDockerfile().writeTo(tempDir)
-	newDockerfile().writeTo(secondTempDir)
+	_ = newDockerfile().writeTo(tempDir)
+	_ = newDockerfile().writeTo(secondTempDir)
 
 	foundFiles := findDockerfilesAt(path.Join(tempDir, "../"))
 
@@ -80,11 +80,11 @@ func TestShouldFindDockerfilesWithUnusualNames(t *testing.T) {
 	tempDir := t.TempDir()
 	dockerfile := newDockerfile()
 	dockerfile.filename = "Dockerfile.full"
-	dockerfile.writeTo(tempDir)
+	_ = dockerfile.writeTo(tempDir)
 	dockerfile.filename = "db.Dockerfile"
-	dockerfile.writeTo(tempDir)
+	_ = dockerfile.writeTo(tempDir)
 	dockerfile.filename = "Dockerfile-dev"
-	dockerfile.writeTo(tempDir)
+	_ = dockerfile.writeTo(tempDir)
 
 	foundFiles := findDockerfilesAt(tempDir)
 

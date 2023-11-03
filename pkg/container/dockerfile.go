@@ -30,8 +30,6 @@ import (
 	"strings"
 )
 
-const NoUserFound = "No User found"
-
 // dockerfile is a simple utility to create or read dockerfiles.
 // the commands are supposed to contain every single instruction of the Dockerfile it represents
 type dockerfile struct {
@@ -84,7 +82,7 @@ func (d *dockerfile) writeTo(path string) error {
 	defer file.Close()
 
 	for _, command := range d.commands {
-		file.WriteString(command + "\n")
+		_, _ = file.WriteString(command + "\n")
 	}
 
 	return nil
@@ -136,7 +134,7 @@ func findDockerfilesAt(dir string) []string {
 	fmt.Println("Start finding Dockerfiles at " + dir)
 	var foundFiles []string
 
-	filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
+	_ = filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
 		if !info.IsDir() && strings.Contains(info.Name(), "Dockerfile") {
 			foundFiles = append(foundFiles, path)
 		}

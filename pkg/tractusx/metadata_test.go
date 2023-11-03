@@ -42,6 +42,11 @@ var metadataFromTestTemplate = Metadata{
 			Url:              "https://github.com/eclipse-tractusx/charts",
 		},
 	},
+	SkipReleaseChecks: SkipReleaseChecks{
+		AlignedBaseImages: []string{
+			"/path/to/non-published/Dockerfile",
+		},
+	},
 }
 
 const metadataTestFile = "./test/metadata_test_template.yaml"

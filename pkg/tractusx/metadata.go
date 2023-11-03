@@ -34,12 +34,17 @@ type Metadata struct {
 	LeadingRepository string       `yaml:"leadingRepository"`
 	RepoCategory      string       `yaml:"repoCategory"`
 	Repositories      []Repository `yaml:"repositories"`
+	SkipReleaseChecks `yaml:"skipReleaseChecks"`
 }
 
 type Repository struct {
 	Name             string `yaml:"name"`
 	UsageDescription string `yaml:"usage"`
 	Url              string `yaml:"url"`
+}
+
+type SkipReleaseChecks struct {
+	AlignedBaseImages []string `yaml:"alignedBaseImage"`
 }
 
 // MetadataFromFile does take fileContent as byte slice and tries to deserialize it into Metadata.

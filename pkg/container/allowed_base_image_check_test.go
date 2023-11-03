@@ -22,8 +22,12 @@ package container
 import (
 	"math/rand"
 	"os"
+	"path"
 	"strings"
 	"testing"
+
+	"github.com/eclipse-tractusx/tractusx-quality-checks/pkg/tractusx"
+	"gopkg.in/yaml.v3"
 )
 
 func TestShouldPassIfNoDockerfilePresent(t *testing.T) {
@@ -135,6 +139,19 @@ func TestShouldIncludeAllUnallowedBaseImagesInErrorDescription(t *testing.T) {
 
 }
 
+func TestShouldSkipDockerfilesThatAreExcludedByMetadataConfig(t *testing.T) {
+	tempDir := t.TempDir()
+	baseImageAllowList = []string{"only-this"}
+	_ = dockerFileWithBaseImage("an-unaligned-one").writeTo(tempDir)
+	saveMetadataConfigToSkip(path.Join(tempDir, "Dockerfile"), tempDir)
+
+	result := NewAllowedBaseImage(tempDir).Test()
+
+	if !result.Passed {
+		t.Errorf("Aligned base image check should succeed, if non-aligned image is configured to be ignored")
+	}
+}
+
 func dockerFileWithBaseImage(baseImage string) *dockerfile {
 	return newDockerfile().appendCommand("FROM " + baseImage)
 }
@@ -153,4 +170,17 @@ func randomSubDir(t *testing.T) string {
 	}
 
 	return subDirPath
+}
+
+func saveMetadataConfigToSkip(dockerfilePath string, dir string) {
+	metadata := tractusx.Metadata{
+		SkipReleaseChecks: tractusx.SkipReleaseChecks{
+			AlignedBaseImages: []string{
+				dockerfilePath,
+			},
+		},
+	}
+
+	bytes, _ := yaml.Marshal(&metadata)
+	_ = os.WriteFile(path.Join(dir, ".tractusx"), bytes, 0644)
 }

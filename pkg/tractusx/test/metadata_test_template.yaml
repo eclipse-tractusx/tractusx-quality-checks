@@ -28,3 +28,6 @@ repositories:
   - name: "charts"
     usage: "Central Helm repository containing all released charts of Tractus-X"
     url: "https://github.com/eclipse-tractusx/charts"
+skipReleaseChecks:
+  alignedBaseImage:
+    - "/path/to/non-published/Dockerfile"

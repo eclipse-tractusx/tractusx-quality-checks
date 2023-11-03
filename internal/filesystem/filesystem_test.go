@@ -24,8 +24,8 @@ import (
 	"testing"
 )
 
-var testFile string = "_testfile"
-var testDir string = "_testdir"
+var testFile = "_testfile"
+var testDir = "_testdir"
 
 func TestShouldPassIfFileGetsCreated(t *testing.T) {
 	CreateFiles([]string{testFile})

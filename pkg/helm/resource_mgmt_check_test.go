@@ -78,7 +78,7 @@ func copyFile(dest string, source string, t *testing.T) {
 
 func setupChartBasics(dir string, values string, t *testing.T) {
 	testchartPath := path.Join("test", "charts", "testchart")
-	os.MkdirAll(path.Join(dir, "charts", "testchart", "templates"), 0770)
+	_ = os.MkdirAll(path.Join(dir, "charts", "testchart", "templates"), 0770)
 	copyFile(path.Join(dir, "charts", "testchart", "values.yaml"), path.Join(testchartPath, values), t)
 	copyFile(path.Join(dir, "charts", "testchart", "Chart.yaml"), path.Join(testchartPath, "Chart.yaml"), t)
 }
