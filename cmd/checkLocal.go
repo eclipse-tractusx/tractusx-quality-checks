@@ -33,19 +33,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var releaseGuidelines = []tractusx.QualityGuideline{
-	container.NewAllowedBaseImage("./"),
-	container.NewNonRootContainer("./"),
-	docs.NewChangelogExists("./"),
-	docs.NewInstallExists("./"),
-	docs.NewReadmeExists("./"),
-	helm.NewHelmStructureExists("./"),
-	helm.NewResourceMgmt("./"),
-	irepo.NewDefaultBranch(),
-	repo.NewLeadingRepositoryDefined("./"),
-	repo.NewRepoStructureExists("./"),
-}
-
 // checkLocalCmd represents the checkLocal command
 var checkLocalCmd = &cobra.Command{
 	Use:   "checkLocal",
@@ -54,6 +41,25 @@ var checkLocalCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Running local checks of eclipse-tractusx release guidelines")
+
+		basedir := "./"
+		if os.Getenv("CHECKLOCAL_BASEDIR") != "" {
+			basedir = os.Getenv("CHECKLOCAL_BASEDIR")
+		}
+
+		var releaseGuidelines = []tractusx.QualityGuideline{
+			container.NewAllowedBaseImage(basedir),
+			container.NewNonRootContainer(basedir),
+			docs.NewChangelogExists(basedir),
+			docs.NewInstallExists(basedir),
+			docs.NewReadmeExists(basedir),
+			helm.NewHelmStructureExists(basedir),
+			helm.NewResourceMgmt(basedir),
+			irepo.NewDefaultBranch(),
+			repo.NewLeadingRepositoryDefined(basedir),
+			repo.NewRepoStructureExists(basedir),
+		}
+
 		runner := txqualitychecks.NewTestRunner(releaseGuidelines)
 		err := runner.Run()
 
