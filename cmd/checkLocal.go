@@ -42,9 +42,9 @@ var checkLocalCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Running local checks of eclipse-tractusx release guidelines")
 
-		basedir := "./"
-		if os.Getenv("CHECKLOCAL_BASEDIR") != "" {
-			basedir = os.Getenv("CHECKLOCAL_BASEDIR")
+		basedir := os.Getenv("CHECKLOCAL_BASEDIR")
+		if basedir == "" {
+			basedir = "./"
 		}
 
 		var releaseGuidelines = []tractusx.QualityGuideline{
