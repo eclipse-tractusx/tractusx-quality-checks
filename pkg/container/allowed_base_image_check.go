@@ -92,8 +92,10 @@ func buildErrorDescription(deniedImages []string) string {
 		return ""
 	}
 	if tractusx.ErrorOutputFormat == tractusx.WebErrOutputFormat {
+		fmt.Printf("\n\n\n\nI AM HERE %v \n\n\n", tractusx.ErrorOutputFormat)
 		return "Dockerfile(s) use not approved images:<br>" + strings.Join(deniedImages, "<br>")
 	}
+	fmt.Printf("\n\n\n\nI SHOULD NOT BE HERE %v \n\n\n", tractusx.ErrorOutputFormat)
 	return "We want to align on docker base images. We detected a Dockerfile specifying " +
 		strings.Join(deniedImages, ", ") + "\n\tAllowed images are: \n\t - " +
 		strings.Join(baseImageAllowList, "\n\t - ")
