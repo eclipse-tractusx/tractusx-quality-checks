@@ -25,7 +25,7 @@ var ErrorOutputFormat = CliErrOutputFormat
 
 const (
 	CliErrOutputFormat = iota
-	WebErrOutputFormat
+	WebErrOutputFormat = iota
 )
 
 // QualityGuideline represents the QualityGuideline to check as an interface.
