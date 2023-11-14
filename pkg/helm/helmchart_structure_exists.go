@@ -20,6 +20,7 @@
 package helm
 
 import (
+	"errors"
 	"os"
 	"path"
 	"strings"
@@ -61,30 +62,32 @@ func (r *HelmStructureExists) IsOptional() bool {
 }
 
 func (r *HelmStructureExists) Test() *tractusx.QualityResult {
-	var missingFiles []string
-	var chartYamlFiles []string
-	errorDescriptionCharts := ""
-	chartsValid := true
-
 	chartDir := path.Join(r.baseDir, "charts")
 	helmCharts, err := os.ReadDir(chartDir)
 	if err != nil || len(helmCharts) == 0 {
 		return &tractusx.QualityResult{Passed: true}
 	}
 
+	var missingFiles []string
+	var chartYamlFiles []string
 	for _, hc := range helmCharts {
 		if !IsChartDirectory(path.Join(chartDir, hc.Name())) {
 			continue
 		}
 		chartYamlFiles = append(chartYamlFiles, path.Join(chartDir, hc.Name(), "Chart.yaml"))
-		getMissingChartFiles(path.Join(chartDir, hc.Name()), &missingFiles)
+		missingFiles = getMissingChartFiles(path.Join(chartDir, hc.Name()))
 	}
 
+	errorDescriptionCharts := ""
+	chartsValid := true
 	if len(chartYamlFiles) > 0 {
 		for _, fpath := range chartYamlFiles {
-			isValid, msg := validateChart(fpath)
-			chartsValid = chartsValid && isValid
-			errorDescriptionCharts += msg
+			errorDescriptionCharts = "\n\t+ Analysis for " + strings.Split(fpath, "charts")[1][1:] + ": "
+			err = validateChart(fpath)
+			if err != nil {
+				errorDescriptionCharts += err.Error()
+				chartsValid = false
+			}
 		}
 	}
 
@@ -105,31 +108,34 @@ func IsChartDirectory(dir string) bool {
 	return err == nil
 }
 
-func getMissingChartFiles(chartPath string, missingFiles *[]string) {
+func getMissingChartFiles(chartPath string) []string {
+	var result []string
 	for _, fileToCheck := range helmStructureFiles {
 		missingFile := filesystem.CheckMissingFiles([]string{path.Join(chartPath, fileToCheck)})
 		if missingFile != nil {
-			*missingFiles = append(*missingFiles, []string{strings.Split(missingFile[0], "charts")[1][1:]}...)
+			result = append(result, []string{strings.Split(missingFile[0], "charts")[1][1:]}...)
 		}
 	}
+	return result
 }
 
-func validateChart(chartYamlFile string) (bool, string) {
-	isValid := true
-	returnMessage := "\n\t+ Analysis for " + strings.Split(chartYamlFile, "charts")[1][1:] + ": "
+func validateChart(chartYamlFile string) error {
+	errorMessage := ""
+
 	cyf := helm.ChartYamlFromFile(chartYamlFile)
 	missingFields := cyf.GetMissingMandatoryFields()
 
 	if len(missingFields) > 0 {
-		isValid = false
-		returnMessage += "\n\t\t - Missing mandatory fields: " + strings.Join(missingFields, ", ")
+		errorMessage += "\n\t\t - Missing mandatory fields: " + strings.Join(missingFields, ", ")
 	}
 	if !cyf.IsVersionValid() {
-		isValid = false
-		returnMessage += "\n\t\t - " + cyf.Version + " Version of the Helm Chart is incorrect. It needs to follow Semantic Version."
+		errorMessage += "\n\t\t - " + cyf.Version + " Version of the Helm Chart is incorrect. It needs to follow Semantic Version."
 	}
 
-	return isValid, returnMessage
+	if errorMessage != "" {
+		return errors.New(errorMessage)
+	}
+	return nil
 }
 
 func GetChartValues(chartYamlFile string) helm.Chartyaml {
