@@ -26,6 +26,11 @@ import (
 	"testing"
 )
 
+const (
+	fullExampleTemplate    = "./test/metadata_test_template.yaml"
+	noRepoCategoryTemplate = "./test/no_repo_category.yaml"
+)
+
 var metadataFromTestTemplate = Metadata{
 	ProductName:       "sig-infra",
 	LeadingRepository: "https://github.com/eclipse-tractusx/sig-infra",
@@ -49,8 +54,6 @@ var metadataFromTestTemplate = Metadata{
 	},
 }
 
-const metadataTestFile = "./test/metadata_test_template.yaml"
-
 func TestShouldReturnErrorWhenReadingNonExistentDefaultMetadataFile(t *testing.T) {
 	_, err := MetadataFromLocalFile("./")
 
@@ -62,7 +65,7 @@ func TestShouldReturnErrorWhenReadingNonExistentDefaultMetadataFile(t *testing.T
 // This test works with a predefined metadata file located at ./test/metadata_test_template.yaml (see metadataTestFile const).
 // This is a well known file, so we can confidently assert property names
 func TestShouldReadProductMetadataFromDefaultFile(t *testing.T) {
-	copyTemplateFileTo(".tractusx", t)
+	copyTemplateFileTo(fullExampleTemplate, ".tractusx", t)
 	defer os.Remove(".tractusx")
 
 	metadata, err := MetadataFromLocalFile("./")
@@ -78,7 +81,7 @@ func TestShouldReadProductMetadataFromDefaultFile(t *testing.T) {
 
 func TestShouldReadMetadataFromGivenBaseDir(t *testing.T) {
 	tempDir := t.TempDir()
-	copyTemplateFileTo(path.Join(tempDir, ".tractusx"), t)
+	copyTemplateFileTo(fullExampleTemplate, path.Join(tempDir, ".tractusx"), t)
 
 	metadata, _ := MetadataFromLocalFile(tempDir)
 
@@ -87,8 +90,21 @@ func TestShouldReadMetadataFromGivenBaseDir(t *testing.T) {
 	}
 }
 
-func copyTemplateFileTo(path string, t *testing.T) {
-	templateFile, err := os.ReadFile(metadataTestFile)
+func TestShouldParseWithoutRepoCategory(t *testing.T) {
+	tempDir := os.TempDir()
+	copyTemplateFileTo(noRepoCategoryTemplate, path.Join(tempDir, ".tractusx"), t)
+
+	file, err := MetadataFromLocalFile(tempDir)
+	if err != nil {
+		t.Errorf("Repo category should be optional. Parsing should not fail if there is no repo category")
+	}
+	if file.RepoCategory != "" {
+		t.Errorf("Repo category should default to empty string if not present in parsed file")
+	}
+}
+
+func copyTemplateFileTo(templatePath string, path string, t *testing.T) {
+	templateFile, err := os.ReadFile(templatePath)
 	if err != nil {
 		t.Errorf("Could not read template file necessary for this test")
 	}
