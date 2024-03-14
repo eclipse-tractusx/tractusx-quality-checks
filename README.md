@@ -1,5 +1,12 @@
 # Eclipse Tractus-X quality checks
 
+[![status: archive](https://github.com/GIScience/badges/raw/master/status/archive.svg)](https://github.com/GIScience/badges#archive)
+
+This is content that is moved to another repository. The new location is [sig-release/release-automation](https://github.com/eclipse-tractusx/sig-release/tree/main/release-automation)
+
+>❗**Note**❗
+> This repository is currently not under active maintenance and therefore archived. If you plan on picking up this product again, feel free to reach out ot the Eclipse Tractus-X projects leads via [mailing list](https://accounts.eclipse.org/mailing-list/tractusx-dev).
+
 The [Eclipse Tractus-X](https://projects.eclipse.org/projects/automotive.tractusx) quality checks is an automation effort
 to ensure basic quality alignment across [Tractus-X OSS products](https://github.com/eclipse-tractusx/).
 
